@@ -31,7 +31,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.3</version>
                 <configuration>
-                    <mainClass>fr.cyu.App</mainClass>
+                    <mainClass>fr.cyu.chromatynk.App</mainClass>
                 </configuration>
             </plugin>
         </plugins>
