@@ -1,5 +1,8 @@
 package fr.cyu.chromatynk;
 
+import fr.cyu.chromatynk.ast.expr.Add;
+import fr.cyu.chromatynk.ast.expr.LiteralInt;
+import fr.cyu.chromatynk.ast.expr.Percent;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
