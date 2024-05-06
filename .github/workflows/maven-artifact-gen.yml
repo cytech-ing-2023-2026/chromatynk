@@ -1,0 +1,40 @@
+# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
+# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
+
+name: Maven Artifact
+
+on: [ push, pull_request ]
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: 'maven'
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
+
+    - name: Build and package with Maven
+      run: mvn package
+
+    - name: Extract current branch name
+      id: branch-name
+      uses: tj-actions/branch-names@v7
+
+    - name: Format branch name # Avoids GitHub Actions from panicking about / characters in artifact names.
+      id: format-branch-name
+      run: echo "formatted_branch=$(echo ${{ steps.branch-name.outputs.current_branch }} | tr -s '/' '-')" >> $GITHUB_OUTPUT
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: chromatync-artifacts-${{ steps.format-branch-name.outputs.formatted_branch }}
+        path: 'target/chromatynk-*.jar'
