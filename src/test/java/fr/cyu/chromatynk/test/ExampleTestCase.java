@@ -7,13 +7,13 @@ import org.junit.jupiter.api.Test;
 /**
  * A test suite example.
  */
-class ExampleTestCase {
+public class ExampleTestCase {
 
     /**
      * A test example.
      */
     @Test
-    void addition() {
+    public void addition() {
         assertEquals(2, 1+1);
     }
 
