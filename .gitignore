@@ -5,3 +5,6 @@ target
 
 # Visual Studio Code
 .vscode
+
+# Crash reports
+hs_err_pid*.log
