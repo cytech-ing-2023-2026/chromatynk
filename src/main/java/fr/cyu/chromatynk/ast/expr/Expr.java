@@ -1,177 +1,152 @@
 package fr.cyu.chromatynk.ast.expr;
 
+import fr.cyu.chromatynk.ast.Type;
+import fr.cyu.chromatynk.eval.Value;
+
+import java.util.Optional;
+
 /**
  * A Sealed interface Expr {}*
  * An interface named Expr with classes inside in order to use it
  */
 public sealed interface Expr {
-    /**
-     * An int {@code value}*
-     *
-     * @param value the int value wanted
-     */
-    record LiteralInt(int value) implements Expr {
-    }
 
     /**
-     * A String {@code value}*
+     * A literal boolean.
      *
-     * @param value the string value wanted
+     * @param value the literal value
      */
-    record LiteralString(String value) implements Expr {
-    }
+    record LiteralBool(boolean value) implements Expr {}
 
     /**
-     * A Bool {@code value}*
+     * A literal String.
      *
-     * @param value the boolean value wanted
+     * @param value the literal value
      */
-    record LiteralBool(boolean value) implements Expr {
-    }
+    record LiteralString(String value) implements Expr {}
 
     /**
-     * An addition {@code left+right}*
+     * A literal integer.
      *
-     * @param left  the left member of the addition
-     * @param right the right member of the addition
+     * @param value the literal value
      */
-    record Add(Expr left, Expr right) implements Expr {
-    }
+    record LiteralInt(int value) implements Expr {}
 
     /**
-     * A Subtraction {@code left+right}*
+     * A literal float.
      *
-     * @param left  the left member of the subtraction
-     * @param right the right member of the subtraction
+     * @param value the literal value
      */
-    record Sub(Expr left, Expr right) implements Expr {
-    }
+    record LiteralFloat(double value) implements Expr {}
 
     /**
-     * A multiplication {@code left+right}*
-     *
-     * @param left  the left member of the multiplication
-     * @param right the right member of the multiplication
-     */
-    record Mul(Expr left, Expr right) implements Expr {
-    }
-
-    /**
-     * A Division {@code left+right}*
-     *
-     * @param left  the left member of the division
-     * @param right the right member of the division
-     */
-    record Div(Expr left, Expr right) implements Expr {
-    }
-
-    /**
-     * A combination {@code left+right}*
-     *
-     * @param left  the left member of the combination
-     * @param right the right member of the combination
-     */
-    record And(Expr left, Expr right) implements Expr {
-    }
-
-    /**
-     * A color {@code red, green, blue, opacity}*
+     * A RGBA literal color.
      *
      * @param red     the red color
      * @param green   the green color
      * @param blue    the blue color
      * @param opacity the opacity of the color chosen
      */
-    record LiteralColor(byte red, byte green, byte blue, byte opacity) implements Expr {
-    }
+    record LiteralColor(byte red, byte green, byte blue, byte opacity) implements Expr {}
 
     /**
-     * A Float {@code value}*
+     * A percentage.
      *
-     * @param value the float value wanted
+     * @param expr the value of the percent
      */
-    record LiteralFloat(double value) implements Expr {
-    }
+    record Percent(Expr expr) implements Expr {}
 
     /**
-     * A Negation {@code value}*
+     * A value negation.
      *
-     * @param value the negation value
+     * @param expr the expression to negate.
      */
-    record Negation(Expr value) implements Expr {
-    }
+    record Negation(Expr expr) implements Expr {}
 
     /**
-     * A not expression {@code value}*
+     * An addition {@code left+right}.
      *
-     * @param value the "negation" value in order to show a difference
+     * @param left  the left member of the addition
+     * @param right the right member of the addition
      */
-    record Not(Expr value) implements Expr {
-    }
+    record Add(Expr left, Expr right) implements Expr {}
 
     /**
-     * A Or = a "choice"{@code right and left}*
+     * A subtraction {@code left-right}.
      *
-     * @param left  the left member of the choice
-     * @param right the right member of the choice
+     * @param left  the left member of the subtraction
+     * @param right the right member of the subtraction
      */
-    record Or(Expr left, Expr right) implements Expr {
-    }
+    record Sub(Expr left, Expr right) implements Expr {}
 
     /**
-     * A Percent {@code value}*
+     * A multiplication {@code left*right}.
      *
-     * @param value the percent value
+     * @param left  the left member of the multiplication
+     * @param right the right member of the multiplication
      */
-    record Percent(Expr value) implements Expr {
-    }
+    record Mul(Expr left, Expr right) implements Expr {}
 
     /**
-     * A call for a value {@code name}*
+     * A division {@code left+right}.
      *
-     * @param name the name of the value called
+     * @param left  the left member of the division
+     * @param right the right member of the division
      */
-    record VarCall(String name) implements Expr {
-    }
+    record Div(Expr left, Expr right) implements Expr {}
+
 
     /**
-     * A Color {@code webColor}*
+     * A boolean NOT.
      *
-     * @param webColor the color wanted
+     * @param expr the inverted expression
      */
-    record Color(byte webColor) implements Expr {
-    }
+    record Not(Expr expr) implements Expr {}
 
     /**
-     * A Numeric value {@code name}*
+     * A boolean OR.
      *
-     * @param name the name of the numeric value
+     * @param left  the left member of the OR
+     * @param right the right member of the OR
      */
-    record Num(Expr name) implements Expr {
-    }
+    record Or(Expr left, Expr right) implements Expr {}
 
     /**
-     * A String value {@code name}*
+     * A boolean AND.
      *
-     * @param name the name of the string value
+     * @param left  the left member of the AND
+     * @param right the right member of the AND
      */
-    record Str(String name) implements Expr {
-    }
+    record And(Expr left, Expr right) implements Expr {}
 
     /**
-     * A Boolean {@code value}*
+     * Get the value of a variable.
      *
-     * @param value the boolean value
+     * @param name the name of variable
      */
-    record Bool(boolean value) implements Expr {
-    }
+    record VarCall(String name) implements Expr {}
 
     /**
-     * A Delete class {@code name}*
+     * Set the color of the current cursor.
      *
-     * @param name the name of the deleted value
+     * @param color the new color the cursor will use while drawing
      */
-    record Del(String name) implements Expr {
-    }
+    record Color(Expr color) implements Expr {}
+
+    /**
+     * A variable declaration.
+     *
+     * @param type the type of the variable
+     * @param name the name of the variable
+     * @param value the optional value assigned to the variable when declared
+     */
+    record VarDeclaration(Type type, String name, Optional<Value> value) implements Expr {}
+
+    /**
+     * Delete a variable.
+     *
+     * @param name the name of the variable to delete
+     */
+    record Del(String name) implements Expr {}
 }
 

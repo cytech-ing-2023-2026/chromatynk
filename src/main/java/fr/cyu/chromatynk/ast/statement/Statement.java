@@ -5,191 +5,182 @@ import fr.cyu.chromatynk.ast.expr.Expr;
 import java.util.List;
 
 /**
- * A Sealed interface Statement {}*
- * An interface named Statement with classes inside in order to use it
+ * The statements of the language.
  */
 public sealed interface Statement {
-    /**
-     * A forward {@code distance}*
-     *
-     * @param distance the value wanted in order to move forwards
-     */
-    record Forward(Expr distance) implements Statement {
-    }
 
     /**
-     * A backward {@code distance}*
+     * Move forward on the given distance.
      *
-     * @param distance the value wanted in order to move backwards
+     * @param distance the distance to travel
      */
-    record Backward(Expr distance) implements Statement {
-    }
+    record Forward(Expr distance) implements Statement {}
 
     /**
-     * A For loop {@code initialisation, condition, step, statement}*
+     * Move backward on the given distance.
      *
-     * @param initialisation the initialisation expression for the loop
-     * @param condition      the condition expression for the loop
-     * @param step           the step expression for the loop
-     * @param statement      the statements contained within the loop, the block being executed for each iteration
+     * @param distance the distance to travel
      */
-    record For(Expr initialisation, Expr condition, Expr step, Statement statement) implements Statement {
-    }
+    record Backward(Expr distance) implements Statement {}
 
     /**
-     * A Turn {@code angle}*
+     * A for loop, repeating while the iterator is less than `to`.
      *
-     * @param angle the value for the rotation of the turn
+     * <pre>
+     *     FOR iterator FROM from TO to STEP step {
+     *       body
+     *     }
+     * </pre>
+     *
+     * @param iterator the name of the iterator
+     * @param from     the initial thickness of the iterator
+     * @param to       the upper bound of the iterator
+     * @param step     the step to increment the iterator
+     * @param body     the statement to execute
      */
-    record Turn(Expr angle) implements Statement {
-    }
+    record For(String iterator, Expr from, Expr to, Expr step, Statement body) implements Statement {}
 
     /**
-     * A While loop {@code condition, body}*
+     * A Turn {@code angle}.
+     *
+     * @param angle the thickness for the rotation of the turn
+     */
+    record Turn(Expr angle) implements Statement {}
+
+    /**
+     * A While loop {@code condition, body}.
      *
      * @param condition the condition during which the while continues to loop
      * @param body      the body of the loop executed as long as the condition is true
      */
-    record While(Expr condition, Statement body) implements Statement {
-    }
+    record While(Expr condition, Statement body) implements Statement {}
 
     /**
-     * A position {@code x, y}*
+     * Teleport the cursor to the given position.
      *
-     * @param x the pixel or the percent value for the x
-     * @param y the pixel or the percent value for the y
+     * @param x the new X coordinate of the cursor
+     * @param y the new Y coordinate of the cursor
      */
-    record Pos(Expr x, Expr y) implements Statement {
-    }
+    record Pos(Expr x, Expr y) implements Statement {}
 
     /**
-     * A Block {@code list<Statement> statements}*
+     * A block containing zero or more statements.
      *
      * @param statements the statements
      */
-    record Block(List<Statement> statements) implements Statement {
-    }
+    record Block(List<Statement> statements) implements Statement {}
 
     /**
-     * A Move {@code distance_x, distance_y}*
+     * Move the current cursor relatively
      *
-     * @param distance_x the position wanted for the cursor
-     * @param distance_y the position wanted for the cursor
+     * @param distanceX the distance to translate on the X axis
+     * @param distanceY the distance to translate on the Y axis
      */
-    record Move(Expr distance_x, Expr distance_y) implements Statement {
-    }
+    record Move(Expr distanceX, Expr distanceY) implements Statement {}
 
     /**
-     * A Hide {@code isVisible, hideObject}*
+     * Hide the given cursor.
      *
-     * @param isVisible  the cursor visible or not
-     * @param hideObject the cursor we want to hide
+     * @param cursor the id of the cursor to move
      */
-    record Hide(boolean isVisible, Expr hideObject) implements Statement {
-    }
+    record Hide(Expr cursor) implements Statement {}
 
     /**
-     * A Show {@code isVisible, showObject}*
+     * Show the given cursor.
      *
-     * @param isVisible  the cursor visible or not
-     * @param showObject the cursor we want to the screen
+     * @param cursor the id of the cursor to move
      */
-    record Show(boolean isVisible, Expr showObject) implements Statement {
-    }
+    record Show(Expr cursor) implements Statement {}
 
     /**
-     * A Press {@code percentValue, intValue}*
+     * Set the opacity of the cursor.
      *
-     * @param percentValue the percent value wanted for the current pressure of the cursor
+     * @param opacity the opacity to apply when drawing
      */
-    record Press(Expr percentValue, int intValue) implements Statement {
-    }
+    record Press(Expr opacity) implements Statement {}
 
     /**
-     * A Thick {@code value}*
+     * Set the thickness of the cursor.
      *
-     * @param value the int value wanted for the thickness of the line
+     * @param thickness the thickness of the cursor
      */
-    record Thick(int value) implements Statement {
-    }
+    record Thick(int thickness) implements Statement {}
 
     /**
-     * A LookAtCursor {@code idCursor, idNewCursor}*
+     * Make the current cursor look at the given one.
      *
-     * @param idCursor    the string value of the cursor
-     * @param idNewCursor the string value (not existing yet) of the new cursor
+     * @param cursor
      */
-    record LookAtCursor(String idCursor, String idNewCursor) implements Statement {
-    }
+    record LookAtCursor(Expr cursor) implements Statement {}
 
     /**
-     * A LookAt {@code idCursor, position_x, position_y}*
+     * Make the current cursor look at the given position.
      *
-     * @param idCursor  the string value of the cursor
-     * @param positionX the position of the cursor
-     * @param positionY the position of the cursor
+     * @param targetX the X coordinate of the point to look at
+     * @param targetY the Y coordinate of the point to look at
      */
-    record LookAt(String idCursor, Expr positionX, Expr positionY) implements Statement {
-    }
+    record LookAtPos(Expr targetX, Expr targetY) implements Statement {}
 
     /**
-     * A CursorId {@code id}*
+     * Create a new cursor with the given id.
      *
-     * @param id the string value of the cursor
+     * @param id the id of the new cursor
      */
-    record CursorId(String id) implements Statement {
-    }
+    record CreateCursor(String id) implements Statement {}
 
     /**
-     * A SelectCursorId {@code id}*
+     * Select a cursor.
      *
-     * @param id the string id of the cursor we want to select
+     * @param id the id of the cursor to select
      */
-    record SelectCursorId(String id) implements Statement {
-    }
+    record SelectCursor(String id) implements Statement {}
 
     /**
-     * A RemoveCursorId {@code id}*
+     * Remove a cursor.
      *
-     * @param id the string value of the cursor we want to remove
+     * @param id the id of the cursor to remove
      */
-    record RemoveCursorId(String id) implements Statement {
-    }
+    record RemoveCursor(String id) implements Statement {}
 
     /**
-     * An If {@code initialisation, condition, step}*
+     * An if condition.
      *
-     * @param initialisation the beginning value
-     * @param condition      the condition(s) of the if
-     * @param step           the step of the condition(s)
+     * <pre>
+     *     IF condition {
+     *         ifTrue
+     *     } ELSE {
+     *         ifFalse
+     *     }
+     * </pre>
+     *
+     * @param condition
+     * @param ifTrue
+     * @param ifFalse
      */
-    record If(Expr initialisation, Expr condition, Expr step) implements Statement {
-    }
+    record If(Expr condition, Statement ifTrue, Statement ifFalse) implements Statement {}
 
     /**
-     * A Mimic {@code temporaryCursor, CursorId }*
+     * Create a new cursor mimicking the given one.
      *
-     * @param temporaryCursor the temporary cursor
-     * @param CursorId        the id of the new cursor
+     * @param mimicked the mimicked cursor
      */
-    record Mimic(String temporaryCursor, String CursorId) implements Statement {
-    }
+    record Mimic(String mimicked) implements Statement {}
 
     /**
-     * A MirrorDeuxPoints {@code value_x1, value_x2, value_y1, value_y2}*
+     * Duplicate the current cursor by making a central symmetry.
      *
-     * @param value_x1, value_x2, value_y1, value_y2 the position of the cursor
+     * @param centerX the X coordinate of the symmetry center
+     * @param centerY the Y coordinate of the symmetry center
      */
-    record MirrorDeuxPoints(Expr value_x1, Expr value_x2, Expr value_y1, Expr value_y2) implements Statement {
-    }
+    record MirrorCentral(Expr centerX, Expr centerY) implements Statement {}
 
     /**
-     * A MirrorUnPoint {@code value_x, value_y}*
+     * Duplicate the current cursor by making an axial symmetry.
      *
-     * @param value_x, value_y the position of the cursor
+     * @param axisStartX the X coordinate of the start of the axis
+     * @param axisStartY the Y coordinate of the start of the axis
+     * @param axisEndX   the X coordinate of the end of the axis
+     * @param axisEndY   the Y coordinate of the end of the axis
      */
-    record MirrorUnPoint(Expr value_x, Expr value_y) implements Statement {
-    }
-
-
+    record MirrorAxial(Expr axisStartX, Expr axisStartY, Expr axisEndX, Expr axisEndY) implements Statement {}
 }
