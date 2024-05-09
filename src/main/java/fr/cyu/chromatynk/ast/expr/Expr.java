@@ -22,9 +22,9 @@ public sealed interface Expr {
      * @param right the right member of the addition
      */
     record Add(Expr left, Expr right) implements Expr{}
-    /** A Substraction {@code left+right}*
-     * @param left the left member of the substraction
-     * @param right the right member of the substraction
+    /** A Subtraction {@code left+right}*
+     * @param left the left member of the subtraction
+     * @param right the right member of the subtraction
      */
     record Sub(Expr left, Expr right) implements Expr{}
     /** A multiplication {@code left+right}*
@@ -57,7 +57,7 @@ public sealed interface Expr {
      * @param value the negation value
      */
     record Negation(Expr value) implements Expr{}
-    /** An other type of a negation = Not {@code value}*
+    /** A not expression {@code value}*
      * @param value the "negation" value in order to show a difference
      */
     record Not(Expr value) implements Expr{}

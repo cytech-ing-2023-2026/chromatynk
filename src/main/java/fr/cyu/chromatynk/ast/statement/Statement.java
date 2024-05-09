@@ -56,7 +56,7 @@ public sealed interface Statement {
      */
     record Show(boolean isVisible, Expr showObject) implements Statement{}
     /** A Press {@code percentValue, intValue}*
-     * @param percentValue the percent value wanted for the pression of the cursor
+     * @param percentValue the percent value wanted for the current pressure of the cursor
      */
     record Press(Expr percentValue, int intValue) implements Statement{}
     /** A Thick {@code value}*
