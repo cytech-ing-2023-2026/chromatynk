@@ -1,6 +1,4 @@
-package fr.cyu.chromatynk.ast.statement;
-
-import fr.cyu.chromatynk.ast.expr.Expr;
+package fr.cyu.chromatynk.ast;
 
 import java.util.List;
 

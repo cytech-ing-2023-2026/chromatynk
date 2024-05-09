@@ -1,6 +1,5 @@
-package fr.cyu.chromatynk.ast.expr;
+package fr.cyu.chromatynk.ast;
 
-import fr.cyu.chromatynk.ast.Type;
 import fr.cyu.chromatynk.eval.Value;
 
 import java.util.Optional;
