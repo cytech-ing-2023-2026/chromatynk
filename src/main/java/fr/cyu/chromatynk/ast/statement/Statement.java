@@ -4,7 +4,7 @@ import fr.cyu.chromatynk.ast.expr.Expr;
 import java.util.List;
 
 /** A Sealed interface Statement {}*
- *An interface named Statement with classes inside
+ *An interface named Statement with classes inside in order to use it
  */
 public sealed interface Statement {
     /** A forward {@code distance}*
@@ -15,20 +15,20 @@ public sealed interface Statement {
      * @param distance the value wanted in order to move backwards
      */
     record Backward(Expr distance) implements Statement{}
-    /** A For {@code initialisation, condition, step, statement}*
-     * @param initialisation the initialisation value for the beginning of the condition(s)
-     * @param condition the condition value(s)
-     * @param step the step value
-     * @param statement the statements value(s)
+    /** A For loop {@code initialisation, condition, step, statement}*
+     * @param initialisation the initialisation expression for the loop
+     * @param condition the condition expression for the loop
+     * @param step the step expression for the loop
+     * @param statement the statements contained within the loop, the block being executed for each iteration
      */
     record For(Expr initialisation, Expr condition, Expr step, Statement statement) implements Statement{}
     /** A Turn {@code angle}*
      * @param angle the value for the rotation of the turn
      */
     record Turn(Expr angle) implements Statement{}
-    /** A While {@code condition, body}*
-     * @param condition the boolean value(s) for the condition(s)
-     * @param body the body of the condition
+    /** A While loop {@code condition, body}*
+     * @param condition the condition during which the while continues to loop
+     * @param body the body of the loop executed as long as the condition is true
      */
     record While(Expr condition, Statement body) implements Statement{}
     /** A position {@code x, y}*
@@ -62,18 +62,18 @@ public sealed interface Statement {
     /** A Thick {@code value}*
      * @param value the int value wanted for the thickness of the line
      */
-   /**mis en dehors de la hiérarchie scellée*/ record Thick(int value){}
+   /**placed outside the sealed hierarchy*/ record Thick(int value){}
     /** A LookAtCursor {@code idCursor, idNewCursor}*
      * @param idCursor the string value of the cursor
      * @param idNewCursor the string value (not existing yet) of the new cursor
      */
-    /**mis en dehors de la hiérarchie scellée*/record LookAtCursor(String idCursor, String idNewCursor){}
+    /**placed outside the sealed hierarchy*/record LookAtCursor(String idCursor, String idNewCursor){}
     /** A LookAt {@code idCursor, position_x, position_y}*
      * @param idCursor the string value of the cursor
-     * @param position_x the position of the cursor
-     * @param position_y the position of the cursor
+     * @param positionX the position of the cursor
+     * @param positionY the position of the cursor
      */
-    /**mis en dehors de la hiérarchie scellée*/record LookAt(String idCursor, Expr position_x, Expr position_y){}
+    /**mis en dehors de la hiérarchie scellée*/record LookAt(String idCursor, Expr positionX, Expr positionY){}
     /** A CursorId {@code id}*
      * @param id the string value of the cursor
      */

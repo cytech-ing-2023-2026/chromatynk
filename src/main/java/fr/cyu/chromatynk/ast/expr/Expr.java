@@ -1,7 +1,7 @@
 package fr.cyu.chromatynk.ast.expr;
 
 /** A Sealed interface Expr {}*
- *An interface named Expr with classes inside
+ *An interface named Expr with classes inside in order to use it
  */
 public sealed interface Expr {
     /** An int {@code value}*
@@ -27,12 +27,12 @@ public sealed interface Expr {
      * @param right the right member of the substraction
      */
     record Sub(Expr left, Expr right) implements Expr{}
-    /** A Substraction {@code left+right}*
+    /** A multiplication {@code left+right}*
      * @param left the left member of the multiplication
      * @param right the right member of the multiplication
      */
     record Mul(Expr left, Expr right) implements Expr{}
-    /** A multiplication {@code left+right}*
+    /** A Division {@code left+right}*
      * @param left the left member of the division
      * @param right the right member of the division
      */
@@ -46,11 +46,11 @@ public sealed interface Expr {
      * @param red the red color
      * @param green the green color
      * @param blue the blue color
-     * @param opacity the opacity of the color color
+     * @param opacity the opacity of the color chosen
      */
     record LiteralColor(byte red, byte green, byte blue, byte opacity) implements Expr{}
     /** A Float {@code value}*
-     * @param value the float value
+     * @param value the float value wanted
      */
     record LiteralFloat(double value) implements Expr{}
     /** A Negation {@code value}*
@@ -61,7 +61,7 @@ public sealed interface Expr {
      * @param value the "negation" value in order to show a difference
      */
     record Not(Expr value) implements Expr{}
-    /** A Or {@code right and left}*
+    /** A Or = a "choice"{@code right and left}*
      * @param left the left member of the choice
      * @param right the right member of the choice
      */
