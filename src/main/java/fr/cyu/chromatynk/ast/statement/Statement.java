@@ -62,18 +62,18 @@ public sealed interface Statement {
     /** A Thick {@code value}*
      * @param value the int value wanted for the thickness of the line
      */
-   record Thick(int value){}
+   record Thick(int value) implements Statement{}
     /** A LookAtCursor {@code idCursor, idNewCursor}*
      * @param idCursor the string value of the cursor
      * @param idNewCursor the string value (not existing yet) of the new cursor
      */
-    record LookAtCursor(String idCursor, String idNewCursor){}
+    record LookAtCursor(String idCursor, String idNewCursor) implements Statement{}
     /** A LookAt {@code idCursor, position_x, position_y}*
      * @param idCursor the string value of the cursor
      * @param positionX the position of the cursor
      * @param positionY the position of the cursor
      */
-    record LookAt(String idCursor, Expr positionX, Expr positionY){}
+    record LookAt(String idCursor, Expr positionX, Expr positionY) implements Statement{}
     /** A CursorId {@code id}*
      * @param id the string value of the cursor
      */
@@ -86,7 +86,7 @@ public sealed interface Statement {
      * @param id the string value of the cursor we want to remove
      */
     record RemoveCursorId(String id) implements Statement{}
-    /** A If {@code initialisation, condition, step}*
+    /** An If {@code initialisation, condition, step}*
      * @param initialisation the beginning value
      * @param condition the condition(s) of the if
      * @param step the step of the condition(s)
