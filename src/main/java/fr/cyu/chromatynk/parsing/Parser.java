@@ -2,6 +2,8 @@ package fr.cyu.chromatynk.parsing;
 
 import fr.cyu.chromatynk.util.Position;
 import fr.cyu.chromatynk.util.Range;
+import fr.cyu.chromatynk.util.TriFunction;
+import fr.cyu.chromatynk.util.Tuple2;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -116,6 +119,34 @@ public interface Parser<I, O> {
     }
 
     /**
+     * Repeat and reduce this parser according to the reduction produced when parsing the separator.
+     * Useful for parsing binary operators in a recursion-friendly way.
+     *
+     * @param reductionParser the separator parser used to determine how to reduce two results in a single one
+     * @return a parser using this one to parser elements reduced according to the result of the parsing of their separators
+     */
+    default Parser<I, O> repeatReduce(Parser<I, BiFunction<O, O, O>> reductionParser) {
+        return this.zip(reductionParser.zip(this).repeat()).map(tpl -> {
+            O result = tpl.a();
+            List<Tuple2<BiFunction<O, O, O>, O>> reductions = tpl.b();
+            for(Tuple2<BiFunction<O, O, O>, O> reduction : reductions) {
+                result = reduction.a().apply(result, reduction.b());
+            }
+
+            return result;
+        });
+    }
+
+    default <O2> Parser<I, Tuple2<O, O2>> zip(Parser<I, O2> next) {
+        return iterator -> {
+            Result<O> first = this.parse(iterator);
+            Result<O2> second = next.parse(iterator);
+
+            return new Result<>(new Range(first.range.from(), second.range().to()), new Tuple2<>(first.value, second.value));
+        };
+    }
+
+    /**
      * Require a suffix for this parser.
      *
      * @param parser the suffix parser
@@ -152,7 +183,7 @@ public interface Parser<I, O> {
             System.out.println("---");
             System.out.println("Position: " + iterator.getPosition());
             System.out.println("Cursor: " + iterator.getCursor());
-            System.out.println("Next input: " + iterator.peek());
+            System.out.println("Next input: " + (iterator.hasNext() ? iterator.peek() : "null"));
             try {
                 Result<O> result = this.parse(iterator);
                 System.out.println("Result: " + result);
@@ -184,6 +215,7 @@ public interface Parser<I, O> {
      */
     static <T> Parser<T, T> any() {
         return iterator -> {
+            if(!iterator.hasNext()) throw new ParsingException(iterator.getPosition(), ParsingIterator.EOF);
             Position start = iterator.getPosition();
             T value = iterator.next();
             return new Result<>(new Range(start, iterator.getPosition()), value);
