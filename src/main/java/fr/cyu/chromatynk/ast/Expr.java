@@ -60,7 +60,7 @@ public sealed interface Expr {
      * @param blue    the blue color
      * @param opacity the opacity of the color chosen
      */
-    record LiteralColor(Range range, byte red, byte green, byte blue, byte opacity) implements Expr {}
+    record LiteralColor(Range range, double red, double green, double blue, double opacity) implements Expr {}
 
     /**
      * A percentage.
@@ -140,6 +140,60 @@ public sealed interface Expr {
      * @param right the right member of the AND
      */
     record And(Range range, Expr left, Expr right) implements Expr {}
+
+    /**
+     * A comparison `left == right`.
+     *
+     * @param range the starting and ending {@link Position} of this expression
+     * @param left  the left member of the comparison
+     * @param right the right member of the comparison
+     */
+    record Equal(Range range, Expr left, Expr right) implements Expr {}
+
+    /**
+     * A comparison `left != right`.
+     *
+     * @param range the starting and ending {@link Position} of this expression
+     * @param left  the left member of the comparison
+     * @param right the right member of the comparison
+     */
+    record NotEqual(Range range, Expr left, Expr right) implements Expr {}
+
+    /**
+     * A comparison `left > right`.
+     *
+     * @param range the starting and ending {@link Position} of this expression
+     * @param left  the left member of the comparison
+     * @param right the right member of the comparison
+     */
+    record Greater(Range range, Expr left, Expr right) implements Expr {}
+
+    /**
+     * A comparison `left < right`.
+     *
+     * @param range the starting and ending {@link Position} of this expression
+     * @param left  the left member of the comparison
+     * @param right the right member of the comparison
+     */
+    record Less(Range range, Expr left, Expr right) implements Expr {}
+
+    /**
+     * A comparison `left >= right`.
+     *
+     * @param range the starting and ending {@link Position} of this expression
+     * @param left  the left member of the comparison
+     * @param right the right member of the comparison
+     */
+    record GreaterEqual(Range range, Expr left, Expr right) implements Expr {}
+
+    /**
+     * A comparison `left <= right`.
+     *
+     * @param range the starting and ending {@link Position} of this expression
+     * @param left  the left member of the comparison
+     * @param right the right member of the comparison
+     */
+    record LessEqual(Range range, Expr left, Expr right) implements Expr {}
 
     /**
      * Get the value of a variable.
