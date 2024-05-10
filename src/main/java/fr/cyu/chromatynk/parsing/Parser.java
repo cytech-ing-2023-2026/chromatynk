@@ -36,7 +36,7 @@ public interface Parser<I, O> {
      * @return a new parser equivalent to this one with f applied to the output
      * @param <T> the output type of `f`
      */
-    default <T> Parser<I, T> mapWithRange(BiFunction<Range, O, T> f) {
+    default <T> Parser<I, T> mapWithRange(ParsingBiFunction<Range, O, T> f) {
         return iterator -> {
             Result<O> result = this.parse(iterator);
             return new Result<>(result.range, f.apply(result.range, result.value));
@@ -50,7 +50,7 @@ public interface Parser<I, O> {
      * @return a new parser equivalent to this one with f applied to the output
      * @param <T> the output type of `f`
      */
-    default <T> Parser<I, T> map(Function<O, T> f) {
+    default <T> Parser<I, T> map(ParsingFunction<O, T> f) {
         return this.mapWithRange((r, o) -> f.apply(o));
     }
 
@@ -77,7 +77,7 @@ public interface Parser<I, O> {
      * @return a new parser equivalent to this one but with the result of `f` as output
      * @param <T> the output type of `f`
      */
-    default <T> Parser<I, T> valueWithRange(Function<Range, T> f) {
+    default <T> Parser<I, T> valueWithRange(ParsingFunction<Range, T> f) {
         return mapWithRange((r, v) -> f.apply(r));
     }
 
