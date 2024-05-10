@@ -2,7 +2,6 @@ package fr.cyu.chromatynk.parsing;
 
 import fr.cyu.chromatynk.util.Position;
 import fr.cyu.chromatynk.util.Range;
-import fr.cyu.chromatynk.util.TriFunction;
 import fr.cyu.chromatynk.util.Tuple2;
 
 import java.util.Arrays;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -100,19 +98,25 @@ public interface Parser<I, O> {
             try {
                 //The beginning of the result is the beginning of the first element.
                 if(lastLeftover.hasNext()) {
-                    Result<O> result = this.parse(lastLeftover);
+                    ParsingIterator<? extends I> copy = lastLeftover.copy();
+                    Result<O> result = this.parse(copy);
                     values.add(result.value);
                     from = result.range.from();
                     to = result.range.to();
+                    lastLeftover = copy;
                 }
 
                 while (lastLeftover.hasNext()) {
-                    Result<O> result = this.parse(lastLeftover);
+                    ParsingIterator<? extends I> copy = lastLeftover.copy();
+                    Result<O> result = this.parse(copy);
                     values.add(result.value);
                     to = result.range.to();
-                    lastLeftover = lastLeftover.copy();
+                    lastLeftover = copy;
                 }
             } catch (ParsingException ignored) {}
+
+            iterator.setCursor(lastLeftover.getCursor());
+            iterator.setPosition(lastLeftover.getPosition());
 
             return new Result<>(new Range(from, to), values);
         };
@@ -178,18 +182,22 @@ public interface Parser<I, O> {
      *
      * @return a new parser similar to this one printing input state and result/error in STDIN.
      */
-    default Parser<I, O> debug() {
+    default Parser<I, O> debug(String name) {
         return iterator -> {
-            System.out.println("---");
+            System.out.println("--- START " + name + " ---");
             System.out.println("Position: " + iterator.getPosition());
             System.out.println("Cursor: " + iterator.getCursor());
-            System.out.println("Next input: " + (iterator.hasNext() ? iterator.peek() : "null"));
+            System.out.println("Input: " + (iterator.hasNext() ? iterator.peek() : "null"));
             try {
                 Result<O> result = this.parse(iterator);
+                System.out.println("--- RESULT " + name + " ---");
                 System.out.println("Result: " + result);
+                System.out.println("Next cursor: " + iterator.getCursor());
                 return result;
             } catch (ParsingException e) {
+                System.out.println("--- ERROR " + name + " ---");
                 System.out.println("Exception at " + e.getPosition() + ": " + e.getMessage());
+                System.out.println("Next cursor: " + iterator.getCursor());
                 throw e;
             }
         };

@@ -7,6 +7,7 @@ import fr.cyu.chromatynk.parsing.UnexpectedInputException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.function.BiFunction;
 
 import static fr.cyu.chromatynk.parsing.Parser.*;
 import static fr.cyu.chromatynk.test.parsing.ParserTest.*;
@@ -84,12 +85,30 @@ public class CombinatorTestCase {
 
     @Test
     public void repeat() {
-        Parser<Integer, List<Integer>> parser = Parser.anyOf(1).repeat();
+        Parser<Integer, List<Integer>> parser = anyOf(1).repeat();
         assertParse(List.of(1), parser, 1);
         assertParse(List.of(1, 1), parser, 1, 1);
         assertParse(List.of(1, 1), parser, 1, 1, 2);
         assertParse(List.of(), parser, 2, 1, 2);
         assertParse(List.of(), parser);
+    }
+
+    @Test
+    public void repeatWithSep() {
+        //10 is addition
+        //11 is subtraction
+        Parser<Integer, BiFunction<Integer, Integer, Integer>> operatorParser = Parser.anyOf(10, 11)
+                .mapWithRange((r, v) -> switch (v) {
+                    case 10 -> (a, b) -> a + b;
+                    case 11 -> (a, b) -> a-b;
+                    default -> throw new UnexpectedInputException(r.from(), "Valid operator", String.valueOf(v));
+                });
+
+        Parser<Integer, Integer> parser = Parser.<Integer>any().repeatReduce(operatorParser);
+
+        assertParse(5, parser, 3, 10, 2);
+        assertParse(1, parser, 3, 11, 2);
+        assertParse(1, parser, 3, 10, 2, 11, 4);
     }
 
     @Test
