@@ -62,21 +62,26 @@ public class LexerTestCase {
     }
 
     @Test
+    public void operators() {
+        assertParseString(new Operator(Range.sameLine(0, 1), "%"), Lexer.OPERATOR_PARSER, "%");
+        assertParseString(new Operator(Range.sameLine(0, 1), "+"), Lexer.OPERATOR_PARSER, "+");
+        assertParseString(new Operator(Range.sameLine(0, 1), "-"), Lexer.OPERATOR_PARSER, "-");
+        assertParseString(new Operator(Range.sameLine(0, 1), "*"), Lexer.OPERATOR_PARSER, "*");
+        assertParseString(new Operator(Range.sameLine(0, 1), "/"), Lexer.OPERATOR_PARSER, "/");
+        assertParseString(new Operator(Range.sameLine(0, 1), "!"), Lexer.OPERATOR_PARSER, "!");
+        assertParseString(new Operator(Range.sameLine(0, 2), "&&"), Lexer.OPERATOR_PARSER, "&&");
+        assertParseString(new Operator(Range.sameLine(0, 2), "||"), Lexer.OPERATOR_PARSER, "||");
+        assertParseString(new Operator(Range.sameLine(0, 2), "=="), Lexer.OPERATOR_PARSER, "==");
+        assertParseString(new Operator(Range.sameLine(0, 2), "!="), Lexer.OPERATOR_PARSER, "!=");
+        assertParseString(new Operator(Range.sameLine(0, 2), ">="), Lexer.OPERATOR_PARSER, ">=");
+        assertParseString(new Operator(Range.sameLine(0, 2), "<="), Lexer.OPERATOR_PARSER, "<=");
+        assertParseString(new Operator(Range.sameLine(0, 1), ">"), Lexer.OPERATOR_PARSER, ">");
+        assertParseString(new Operator(Range.sameLine(0, 1), "<"), Lexer.OPERATOR_PARSER, "<");
+        assertParseFailure(ParsingException.class, Lexer.OPERATOR_PARSER, ParsingIterator.fromString("?"));
+    }
+
+    @Test
     public void symbols() {
-        assertParseString(new Percent(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, "%");
-        assertParseString(new Plus(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, "+");
-        assertParseString(new Minus(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, "-");
-        assertParseString(new Mul(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, "*");
-        assertParseString(new Div(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, "/");
-        assertParseString(new Not(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, "!");
-        assertParseString(new And(Range.sameLine(0, 2)), Lexer.SYMBOL_PARSER, "&&");
-        assertParseString(new Or(Range.sameLine(0, 2)), Lexer.SYMBOL_PARSER, "||");
-        assertParseString(new Equal(Range.sameLine(0, 2)), Lexer.SYMBOL_PARSER, "==");
-        assertParseString(new NotEqual(Range.sameLine(0, 2)), Lexer.SYMBOL_PARSER, "!=");
-        assertParseString(new GreaterEqual(Range.sameLine(0, 2)), Lexer.SYMBOL_PARSER, ">=");
-        assertParseString(new LessEqual(Range.sameLine(0, 2)), Lexer.SYMBOL_PARSER, "<=");
-        assertParseString(new Greater(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, ">");
-        assertParseString(new Less(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, "<");
         assertParseString(new ParenthesisOpen(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, "(");
         assertParseString(new ParenthesisClosed(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, ")");
         assertParseString(new BraceOpen(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, "{");
@@ -134,19 +139,19 @@ public class LexerTestCase {
         assertParseString(List.of(new LiteralInt(Range.sameLine(0, 1), 5)), Lexer.TOKENS_PARSER, "5");
 
         assertParseString(
-                List.of(new LiteralInt(Range.sameLine(0, 1), 5), new Percent(Range.sameLine(1, 2))),
+                List.of(new LiteralInt(Range.sameLine(0, 1), 5), new Operator(Range.sameLine(1, 2), "%")),
                 Lexer.TOKENS_PARSER,
                 "5%"
         );
 
         assertParseString(
-                List.of(new LiteralInt(Range.sameLine(0, 1), 5), new Percent(Range.sameLine(2, 3))),
+                List.of(new LiteralInt(Range.sameLine(0, 1), 5), new Operator(Range.sameLine(2, 3), "%")),
                 Lexer.TOKENS_PARSER,
                 "5 %"
         );
 
         assertParseString(
-                List.of(new Fwd(Range.sameLine(0, 3)), new LiteralInt(Range.sameLine(4, 5), 5), new Percent(Range.sameLine(5, 6))),
+                List.of(new Fwd(Range.sameLine(0, 3)), new LiteralInt(Range.sameLine(4, 5), 5), new Operator(Range.sameLine(5, 6), "%")),
                 Lexer.TOKENS_PARSER,
                 "FWD 5%"
         );
@@ -162,7 +167,7 @@ public class LexerTestCase {
                         new BraceOpen(Range.sameLine(18, 19)),
                         new Fwd(Range.sameLine(2, 5, 1)),
                         new Identifier(Range.sameLine(6, 7, 1), "i"),
-                        new Percent(Range.sameLine(7, 8, 1)),
+                        new Operator(Range.sameLine(7, 8, 1), "%"),
                         new BraceClosed(Range.sameLine(0, 1, 2))
                         ),
                 Lexer.TOKENS_PARSER,

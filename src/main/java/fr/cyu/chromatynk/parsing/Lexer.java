@@ -57,21 +57,39 @@ public class Lexer {
 
     //Symbols
 
-    private static final List<Map.Entry<String, Function<Range, Token>>> SYMBOLS = List.of(
-            Map.entry("&&", And::new),
-            Map.entry("||", Or::new),
-            Map.entry("==", Equal::new),
-            Map.entry("!=", NotEqual::new),
-            Map.entry(">=", GreaterEqual::new),
-            Map.entry("<=", LessEqual::new),
-            Map.entry("%", Percent::new),
-            Map.entry("+", Plus::new),
-            Map.entry("-", Minus::new),
-            Map.entry("*", Mul::new),
-            Map.entry("/", Div::new),
-            Map.entry("!", Not::new),
-            Map.entry(">", Greater::new),
-            Map.entry("<", Less::new),
+    private static final List<String> OPERATORS = List.of(
+            "&&",
+            "||",
+            "==",
+            "!=",
+            ">=",
+            "<=",
+            "%",
+            "+",
+            "-",
+            "*",
+            "/",
+            "!",
+            ">",
+            "<"
+//            "(",
+//            ")",
+//            "{",
+//            "}",
+//            "="
+    );
+
+    /**
+     * Parser for all non-operator symbols.
+     */
+    public static final Parser<Character, Operator> OPERATOR_PARSER = firstSucceeding(
+            OPERATORS
+                    .stream()
+                    .map(op -> symbol(op).valueWithRange(r -> new Operator(r, op)))
+                    .collect(Collectors.toList())
+    ).mapError(e -> new ParsingException(e.getPosition(), "Symbol expected"));
+
+    private static final List<Map.Entry<String, ParsingFunction<Range, Token>>> SYMBOLS = List.of(
             Map.entry("(", ParenthesisOpen::new),
             Map.entry(")", ParenthesisClosed::new),
             Map.entry("{", BraceOpen::new),
@@ -80,7 +98,7 @@ public class Lexer {
     );
 
     /**
-     * Parser for all symbols/operators.
+     * Parser for all non-operator symbols.
      */
     public static final Parser<Character, Token> SYMBOL_PARSER = firstSucceeding(
             SYMBOLS
@@ -91,7 +109,7 @@ public class Lexer {
 
     //Keywords
 
-    private static final List<Map.Entry<String, Function<Range, Token>>> KEYWORDS = List.of(
+    private static final List<Map.Entry<String, ParsingFunction<Range, Token>>> KEYWORDS = List.of(
             Map.entry("FWD", Fwd::new),
             Map.entry("BWD", Bwd::new),
             Map.entry("TURN", Turn::new),
@@ -151,6 +169,7 @@ public class Lexer {
             LITERAL_INT_PARSER,
             LITERAL_FLOAT_PARSER,
             LITERAL_COLOR_PARSER,
+            OPERATOR_PARSER,
             SYMBOL_PARSER,
             KEYWORD_PARSER,
             IDENTIFIER_PARSER

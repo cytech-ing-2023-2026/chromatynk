@@ -54,103 +54,12 @@ public sealed interface Token {
     record LiteralColor(Range range, String hex) implements Token {}
 
     /**
-     * A percent symbol.
+     * A lexical operator
      *
      * @param range the starting and ending position of this token
+     * @param operator the symbol of this operator
      */
-    record Percent(Range range) implements Token {}
-
-    /**
-     * A plus symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record Plus(Range range) implements Token {}
-
-    /**
-     * A minus symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record Minus(Range range) implements Token {}
-
-    /**
-     * A multiplication symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record Mul(Range range) implements Token {}
-
-    /**
-     * A division symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record Div(Range range) implements Token {}
-
-    /**
-     * A boolean not `!` symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record Not(Range range) implements Token {}
-
-    /**
-     * A boolean and `&&` symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record And(Range range) implements Token {}
-
-    /**
-     * A boolean or `||` symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record Or(Range range) implements Token {}
-
-    /**
-     * An equality `==` symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record Equal(Range range) implements Token {}
-
-    /**
-     * A non-equality `!=` symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record NotEqual(Range range) implements Token {}
-
-    /**
-     * A greater `>` symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record Greater(Range range) implements Token {}
-
-    /**
-     * A greater or equal `>=` symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record GreaterEqual(Range range) implements Token {}
-
-    /**
-     * A less `<` symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record Less(Range range) implements Token {}
-
-    /**
-     * A less or equal `<=` symbol.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record LessEqual(Range range) implements Token {}
-
+    record Operator(Range range, String operator) implements Token {}
 
     /**
      * An open parenthesis `(` symbol.
