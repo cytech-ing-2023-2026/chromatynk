@@ -32,6 +32,8 @@ public class CodeEditor extends Application {
 		// Interactive elements
 		TextArea codeArea = new TextArea();
 		Canvas canvas = new Canvas(300, 200);
+		Label infoLabel = new Label("INFO - Message d'information utile...");
+		Label statusLabel = new Label("Dessin en cours...");
 
 		// Create scene
 		Scene scene; {
@@ -157,12 +159,8 @@ public class CodeEditor extends Application {
 
 				// Set bottom status bar
 				HBox statusBox; {
-					Label infoLabel = new Label("INFO - Message d'information utile...");
-
 					Region spacer = new Region();
 					HBox.setHgrow(spacer, Priority.ALWAYS); // allow it to grow horizontally
-
-					Label statusLabel = new Label("Dessin en cours...");
 
 					statusBox = new HBox(infoLabel, spacer, statusLabel);
 					statusBox.setPadding(new Insets(10));
