@@ -12,87 +12,122 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
+import javafx.scene.layout.Priority;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Region;
 
 public class CodeEditor extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
+		// Interactive elements
+		TextArea codeArea = new TextArea();
+		Canvas canvas = new Canvas(300, 200);
 
-		// Create text zone
-		TextArea codeArea; {
-			codeArea = new TextArea();
-			codeArea.setPrefWidth(300);
-	 		codeArea.setPrefHeight(200);
-			codeArea.setWrapText(true);
-		}
-
-		// Execution / Deletion container
-		HBox buttonBox; {
-			Button deleteButton = new Button("Supprimer");
-			deleteButton.setOnAction(e -> codeArea.clear()); // Action du bouton pour supprimer le texte
-	
-			Button validateButton = new Button("Exécuter");
-			// This is where we run the draw system.
-
-			buttonBox = new HBox(deleteButton, validateButton);
-			buttonBox.setPadding(new Insets(10));
-			buttonBox.setSpacing(10);
-		}
-
-		// Create drawing zone for the result
-		Canvas canvas; {
-			canvas = new Canvas(300, 200);
-			// Configure white background
-			GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
-			graphicsContext.setFill(Color.WHITE);
-			graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-		}
-
-		// Create drawing zone container
-		BorderPane resultPane; {
-			resultPane = new BorderPane();
-			resultPane.setCenter(canvas);
-		};
-
-		// Création de la barre de menu
-		MenuBar menuBar; {
-			// Création du menu Fichier pour pouvoir enregistrer et ouvrir des images
-			Menu fileMenu; {
-				MenuItem openMenuItem = new MenuItem("Ouvrir");
-				MenuItem saveAsPngMenuItem = new MenuItem("Enregistrer sous");
-	
-				// Action pour le menu Ouvrir (à completer)
-	
-				// Action pour le menu Enregistrer en PNG (A completer)
-	
-				fileMenu = new Menu("Fichier");
-				// Ajout des éléments au menu Fichier
-				fileMenu.getItems().addAll(openMenuItem, saveAsPngMenuItem);
-			}
-			menuBar = new MenuBar();
-			menuBar.getMenus().add(fileMenu);
-		}
-
-		// Création de la scène
+		// Create scene
 		Scene scene; {
-			// Création du conteneur principal
-			BorderPane root = new BorderPane();
-			root.setLeft(codeArea);
-			root.setBottom(buttonBox);
-			root.setRight(resultPane);
-			root.setTop(menuBar);
+			// Create main container
+			BorderPane root; {
+				root = new BorderPane();
 
+				// Create menu bar
+				MenuBar menuBar; {
+					// Create File menu to open and save drawing instructions
+					Menu fileMenu; {
+						MenuItem openMenuItem = new MenuItem("Ouvrir");
+						MenuItem saveFileMenuItem = new MenuItem("Enregistrer sous");
+			
+						// The actions for both menu items should be implemented here
+						// Open menu
+
+						// Save menu
+			
+						fileMenu = new Menu("Fichier");
+						fileMenu.getItems().addAll(openMenuItem, saveFileMenuItem);
+					}
+					// Create Image menu to save the drawing as an image
+					Menu imageMenu; {
+						MenuItem saveImageMenuItem = new MenuItem("Enregistrer sous");
+						imageMenu = new Menu("Image");
+						imageMenu.getItems().addAll(saveImageMenuItem);
+					}
+					// Create about menu
+					Menu helpMenu; {
+						MenuItem helpMenuItem = new MenuItem("À propos");
+						helpMenu = new Menu("Aide");
+						helpMenu.getItems().add(helpMenuItem);
+					}
+
+					menuBar = new MenuBar();
+					menuBar.getMenus().addAll(fileMenu, imageMenu, helpMenu);
+				}
+				root.setTop(menuBar);
+				
+				HBox mainArea; {
+					VBox userControlArea; {
+						// Configure text zone
+						{
+							codeArea.setPrefWidth(300);
+							codeArea.setPrefHeight(300);
+							codeArea.setWrapText(true);
+							VBox.setVgrow(codeArea, Priority.ALWAYS);
+						}
+
+						// Execution / Deletion container
+						HBox buttonBox; {
+							Button validateButton = new Button("Exécuter");
+							// This is where we run the draw system.
+
+							Button deleteButton = new Button("Supprimer");
+							deleteButton.setOnAction(e -> codeArea.clear());
+
+							buttonBox = new HBox(validateButton, deleteButton);
+							buttonBox.setPadding(new Insets(10));
+							buttonBox.setSpacing(10);
+						}
+						userControlArea = new VBox(codeArea, buttonBox);
+					}
+
+					// Create drawing zone container
+					BorderPane resultPane; {
+						// Configure drawing zone
+						{
+							// Configure white background
+							GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+							graphicsContext.setFill(Color.WHITE);
+							graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+						}
+						resultPane = new BorderPane();
+						resultPane.setCenter(canvas);
+						HBox.setHgrow(resultPane, Priority.ALWAYS);
+					};
+					mainArea = new HBox(userControlArea, resultPane);
+					mainArea.setSpacing(10);
+					mainArea.setPadding(new Insets(10));
+				}
+				root.setCenter(mainArea);
+
+				// Set bottom status bar
+				HBox statusBox; {
+					Label infoLabel = new Label("INFO - Message d'information utile...");
+
+					Region spacer = new Region();
+					HBox.setHgrow(spacer, Priority.ALWAYS); // allow it to grow horizontally
+
+					Label statusLabel = new Label("Dessin en cours...");
+
+					statusBox = new HBox(infoLabel, spacer, statusLabel);
+					statusBox.setPadding(new Insets(10));
+					statusBox.setSpacing(10);
+				}
+				root.setBottom(statusBox);
+			}
 			scene = new Scene(root, 600, 400);
 		}
 
-		// Configuration de la scène et affichage de la fenêtre
 		primaryStage.setTitle("Chromatynk");
 		primaryStage.setScene(scene);
 		primaryStage.show();
