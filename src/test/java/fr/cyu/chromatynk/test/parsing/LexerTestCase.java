@@ -151,6 +151,12 @@ public class LexerTestCase {
         );
 
         assertParseString(
+                List.of(new ParenthesisOpen(Range.sameLine(0, 1)), new LiteralInt(Range.sameLine(1, 2), 5), new ParenthesisClosed(Range.sameLine(2, 3))),
+                Lexer.TOKENS_PARSER,
+                "(5)"
+        );
+
+        assertParseString(
                 List.of(new Fwd(Range.sameLine(0, 3)), new LiteralInt(Range.sameLine(4, 5), 5), new Operator(Range.sameLine(5, 6), "%")),
                 Lexer.TOKENS_PARSER,
                 "FWD 5%"

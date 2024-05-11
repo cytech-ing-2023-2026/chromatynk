@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -141,6 +142,13 @@ public interface Parser<I, O> {
         });
     }
 
+    /**
+     * Right-zip a parser to this one.
+     *
+     * @param next the parser to zip to this one
+     * @return a new parser using this one then `next`, zipping the results in a tuple.
+     * @param <O2> the output type of `next`
+     */
     default <O2> Parser<I, Tuple2<O, O2>> zip(Parser<I, O2> next) {
         return iterator -> {
             Result<O> first = this.parse(iterator);
@@ -184,13 +192,14 @@ public interface Parser<I, O> {
      */
     default Parser<I, O> debug(String name) {
         return iterator -> {
-            System.out.println("--- START " + name + " ---");
+            String fullName = name + "@" + this.hashCode();
+            System.out.println("--- START " + fullName + " ---");
             System.out.println("Position: " + iterator.getPosition());
             System.out.println("Cursor: " + iterator.getCursor());
             System.out.println("Input: " + (iterator.hasNext() ? iterator.peek() : "null"));
             try {
                 Result<O> result = this.parse(iterator);
-                System.out.println("--- RESULT " + name + " ---");
+                System.out.println("--- RESULT " + fullName + " ---");
                 System.out.println("Result: " + result);
                 System.out.println("Next cursor: " + iterator.getCursor());
                 return result;
@@ -259,6 +268,18 @@ public interface Parser<I, O> {
     @SafeVarargs
     static <T> Parser<T, T> anyOf(T... expected) {
         return anyOfSet(Set.of(expected));
+    }
+
+    /**
+     * A lazy proxy for a parser. Useful for recursive parsers like the one used for syntactic processing.
+     *
+     * @param lazyParser the parser supplier that will provide an instance when needed.
+     * @return a proxy for the given parser supplier
+     * @param <I> the parser input
+     * @param <O> the parser output
+     */
+    static <I, O> Parser<I, O> lazy(Supplier<Parser<I, O>> lazyParser) {
+        return iterator -> lazyParser.get().parse(iterator);
     }
 
     /**

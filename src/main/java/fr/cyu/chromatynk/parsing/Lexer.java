@@ -4,14 +4,13 @@ import fr.cyu.chromatynk.util.Range;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static fr.cyu.chromatynk.parsing.Parser.*;
 import static fr.cyu.chromatynk.parsing.Token.*;
 
 /**
- * The lexer of Chromat'ynk. Transform the source code in a sequence of tokens.
+ * The lexer of Chromat'ynk. Transforms the source code in a sequence of tokens.
  */
 public class Lexer {
 
@@ -72,11 +71,6 @@ public class Lexer {
             "!",
             ">",
             "<"
-//            "(",
-//            ")",
-//            "{",
-//            "}",
-//            "="
     );
 
     /**

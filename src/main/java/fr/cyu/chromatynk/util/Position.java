@@ -25,4 +25,30 @@ public record Position(int column, int row) {
     public Position nextRow() {
         return new Position(0, row + 1);
     }
+
+    /**
+     * Get the smallest position.
+     *
+     * @param a the first position to compare
+     * @param b the second position to compare
+     * @return `a` if `a` is smaller, `b` otherwise
+     */
+    public static Position min(Position a, Position b) {
+        if(a.row < b.row) return a;
+        else if(a.row > b.row) return b;
+        else return a.column < b.column ? a : b;
+    }
+
+    /**
+     * Get the greatest position.
+     *
+     * @param a the first position to compare
+     * @param b the second position to compare
+     * @return `a` if `a` is greater, `b` otherwise
+     */
+    public static Position max(Position a, Position b) {
+        if(a.row > b.row) return a;
+        else if(a.row < b.row) return b;
+        else return a.column > b.column ? a : b;
+    }
 }
