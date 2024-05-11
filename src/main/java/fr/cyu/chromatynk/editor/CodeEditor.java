@@ -1,10 +1,5 @@
 package fr.cyu.chromatynk.editor;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -19,7 +14,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.layout.Priority;
 import javafx.scene.control.Label;
@@ -48,49 +42,10 @@ public class CodeEditor extends Application {
 						MenuItem openMenuItem = new MenuItem("Ouvrir");
 						MenuItem saveFileMenuItem = new MenuItem("Enregistrer sous");
 			
-						// The actions for both menu items should be implemented here
-						// Open menu item action
-						openMenuItem.setOnAction(e -> {
-							FileChooser fileChooser = new FileChooser();
-							fileChooser.setTitle("Open File");
-							
-							// Add a file extension filter for .cty files
-							FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Fichiers Chromatynk (*.cty)", "*.cty");
-							fileChooser.getExtensionFilters().add(extFilter);
-							
-							File selectedFile = fileChooser.showOpenDialog(primaryStage);
-							if (selectedFile != null) {
-								try {
-									String content = new String(Files.readAllBytes(Paths.get(selectedFile.getAbsolutePath())));
-									codeArea.setText(content);
-								} catch (IOException ex) {
-									ex.printStackTrace();
-								}
-							}
-						});
-				
-						// Save menu item action
-						saveFileMenuItem.setOnAction(e -> {
-							FileChooser fileChooser = new FileChooser();
-							fileChooser.setTitle("Save File");
-							
-							// Add a file extension filter for .cty files
-							FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Fichiers Chromatynk (*.cty)", "*.cty");
-							fileChooser.getExtensionFilters().add(extFilter);
-							
-							File selectedFile = fileChooser.showSaveDialog(primaryStage);
-							if (selectedFile != null) {
-								try {
-									String filePath = selectedFile.getAbsolutePath();
-									if (!filePath.endsWith(".cty")) {
-										filePath += ".cty"; // Append .cty extension if not provided
-									}
-									Files.write(Paths.get(filePath), codeArea.getText().getBytes());
-								} catch (IOException ex) {
-									ex.printStackTrace();
-								}
-							}
-						});
+						// The actions for both menu items
+						FileMenuController fileMenuController = new FileMenuController(primaryStage, codeArea);
+						openMenuItem.setOnAction(e -> fileMenuController.openFile());
+						saveFileMenuItem.setOnAction(e -> fileMenuController.saveFile());
 			
 						fileMenu = new Menu("Fichier");
 						fileMenu.getItems().addAll(openMenuItem, saveFileMenuItem);
