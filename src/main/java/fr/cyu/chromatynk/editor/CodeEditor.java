@@ -31,7 +31,7 @@ public class CodeEditor extends Application {
 	public void start(@SuppressWarnings("exports") Stage primaryStage) {
 		// Interactive elements
 		TextArea codeArea = new TextArea();
-		Canvas canvas = new Canvas(300, 200);
+		Canvas canvas = new Canvas(400, 400);
 		Label infoLabel = new Label("INFO - Message d'information utile...");
 		Label statusLabel = new Label("Dessin en cours...");
 
@@ -168,7 +168,7 @@ public class CodeEditor extends Application {
 				}
 				root.setBottom(statusBox);
 			}
-			scene = new Scene(root, 600, 400);
+			scene = new Scene(root, 800, 500);
 		}
 
 		primaryStage.setTitle("Chromatynk");
