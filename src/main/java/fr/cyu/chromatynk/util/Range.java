@@ -9,6 +9,16 @@ package fr.cyu.chromatynk.util;
 public record Range(Position from, Position to) {
 
     /**
+     * Merge this range with another one.
+     *
+     * @param other the range to merge with
+     * @return a new range covering the two merged ranged
+     */
+    public Range merge(Range other) {
+        return new Range(Position.min(from, other.from), Position.max(to, other.to));
+    }
+
+    /**
      * Create a new {@link Range} starting and ending on the same line.
      *
      * @param from the starting column

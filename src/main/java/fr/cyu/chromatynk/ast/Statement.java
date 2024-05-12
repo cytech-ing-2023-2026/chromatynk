@@ -4,6 +4,7 @@ import fr.cyu.chromatynk.util.Position;
 import fr.cyu.chromatynk.util.Range;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The statements of the language.
@@ -16,6 +17,14 @@ public sealed interface Statement {
      * @return the starting and ending position of this statement
      */
     Range range();
+
+    /**
+     * A body of a control structure containing zero or more statements.
+     *
+     * @param range the starting and ending {@link Position} of this statement
+     * @param statements the statements of this body
+     */
+    record Body(Range range, List<Statement> statements) implements Statement {}
 
     /**
      * Move forward on the given distance.
@@ -46,10 +55,10 @@ public sealed interface Statement {
      * @param iterator the name of the iterator
      * @param from     the initial thickness of the iterator
      * @param to       the upper bound of the iterator
-     * @param step     the step to increment the iterator
-     * @param body     the statement to execute
+     * @param step     the optional step to increment the iterator
+     * @param body     the statements to execute
      */
-    record For(Range range, String iterator, Expr from, Expr to, Expr step, Statement body) implements Statement {}
+    record For(Range range, String iterator, Expr from, Expr to, Optional<Expr> step, Body body) implements Statement {}
 
     /**
      * A Turn {@code angle}.
@@ -66,7 +75,7 @@ public sealed interface Statement {
      * @param condition the condition during which the while continues to loop
      * @param body      the body of the loop executed as long as the condition is true
      */
-    record While(Range range, Expr condition, Statement body) implements Statement {}
+    record While(Range range, Expr condition, Body body) implements Statement {}
 
     /**
      * Teleport the cursor to the given position.
@@ -76,14 +85,6 @@ public sealed interface Statement {
      * @param y the new Y coordinate of the cursor
      */
     record Pos(Range range, Expr x, Expr y) implements Statement {}
-
-    /**
-     * A block containing zero or more statements.
-     *
-     * @param range the starting and ending {@link Position} of this statement
-     * @param statements the statements
-     */
-    record Block(Range range, List<Statement> statements) implements Statement {}
 
     /**
      * Move the current cursor relatively
@@ -98,17 +99,15 @@ public sealed interface Statement {
      * Hide the given cursor.
      *
      * @param range the starting and ending {@link Position} of this statement
-     * @param cursor the id of the cursor to move
      */
-    record Hide(Range range, Expr cursor) implements Statement {}
+    record Hide(Range range) implements Statement {}
 
     /**
      * Show the given cursor.
      *
      * @param range the starting and ending {@link Position} of this statement
-     * @param cursor the id of the cursor to move
      */
-    record Show(Range range, Expr cursor) implements Statement {}
+    record Show(Range range) implements Statement {}
 
     /**
      * Set the opacity of the cursor.
@@ -119,12 +118,30 @@ public sealed interface Statement {
     record Press(Range range, Expr opacity) implements Statement {}
 
     /**
+     * Set the color of the cursor.
+     *
+     * @param range the starting and ending {@link Position} of this statement
+     * @param color the color to use when drawing
+     */
+    record Color(Range range, Expr color) implements Statement {}
+
+    /**
+     * Set the color of the cursor. Takes 3 arguments: red, green, blue.
+     *
+     * @param range the starting and ending {@link Position} of this statement
+     * @param red the red color component
+     * @param green the green color component
+     * @param blue the blue color component
+     */
+    record ColorRGB(Range range, Expr red, Expr green, Expr blue) implements Statement {}
+
+    /**
      * Set the thickness of the cursor.
      *
      * @param range the starting and ending {@link Position} of this statement
      * @param thickness the thickness of the cursor
      */
-    record Thick(Range range, int thickness) implements Statement {}
+    record Thick(Range range, Expr thickness) implements Statement {}
 
     /**
      * Make the current cursor look at the given one.
@@ -149,7 +166,7 @@ public sealed interface Statement {
      * @param range the starting and ending {@link Position} of this statement
      * @param id the id of the new cursor
      */
-    record CreateCursor(Range range, String id) implements Statement {}
+    record CreateCursor(Range range, Expr id) implements Statement {}
 
     /**
      * Select a cursor.
@@ -157,7 +174,7 @@ public sealed interface Statement {
      * @param range the starting and ending {@link Position} of this statement
      * @param id the id of the cursor to select
      */
-    record SelectCursor(Range range, String id) implements Statement {}
+    record SelectCursor(Range range, Expr id) implements Statement {}
 
     /**
      * Remove a cursor.
@@ -165,7 +182,7 @@ public sealed interface Statement {
      * @param range the starting and ending {@link Position} of this statement
      * @param id the id of the cursor to remove
      */
-    record RemoveCursor(Range range, String id) implements Statement {}
+    record RemoveCursor(Range range, Expr id) implements Statement {}
 
     /**
      * An if condition.
@@ -179,11 +196,11 @@ public sealed interface Statement {
      * </pre>
      *
      * @param range the starting and ending {@link Position} of this statement
-     * @param condition
-     * @param ifTrue
-     * @param ifFalse
+     * @param condition the condition used to choose between `ifTrue` or `ifFalse`
+     * @param ifTrue the body to execute if the condition is true
+     * @param ifFalse the optional body to execute if the condition is false aka the "else" body
      */
-    record If(Range range, Expr condition, Statement ifTrue, Statement ifFalse) implements Statement {}
+    record If(Range range, Expr condition, Body ifTrue, Optional<Body> ifFalse) implements Statement {}
 
     /**
      * Create a new cursor mimicking the given one.
@@ -191,7 +208,7 @@ public sealed interface Statement {
      * @param range the starting and ending {@link Position} of this statement
      * @param mimicked the mimicked cursor
      */
-    record Mimic(Range range, String mimicked) implements Statement {}
+    record Mimic(Range range, Expr mimicked) implements Statement {}
 
     /**
      * Duplicate the current cursor by making a central symmetry.
@@ -212,4 +229,31 @@ public sealed interface Statement {
      * @param axisEndY   the Y coordinate of the end of the axis
      */
     record MirrorAxial(Range range, Expr axisStartX, Expr axisStartY, Expr axisEndX, Expr axisEndY) implements Statement {}
+
+    /**
+     * Declare a new variable.
+     *
+     * @param range the starting and ending {@link Position} of this statement
+     * @param type the type of the new variable
+     * @param name the name of the new variable
+     * @param value the optional value assigned at declaration
+     */
+    record DeclareVariable(Range range, Type type, String name, Optional<Expr> value) implements Statement {}
+
+    /**
+     *
+     * @param range the starting and ending {@link Position} of this statement
+     * @param name the name of the variable to mutate
+     * @param value the value to assign
+     */
+    record AssignVariable(Range range, String name, Expr value) implements Statement {}
+
+    /**
+     * Delete a variable.
+     *
+     * @param range the starting and ending {@link Position} of this statement
+     * @param variableName the name of the variable to delete
+     */
+    record DeleteVariable(Range range, Expr variableName) implements Statement {}
+
 }
