@@ -16,6 +16,12 @@
             <version>21.0.3</version>
             <scope>compile</scope>
         </dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-fxml</artifactId>
+			<version>21.0.3</version>
+			<scope>compile</scope>
+		</dependency>
         <!-- JUnit/Test dependency -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
