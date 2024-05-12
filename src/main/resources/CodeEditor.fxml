@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.effect.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+			xmlns:fx="http://javafx.com/fxml">
+	<top>
+		<MenuBar>
+			<menus>
+				<Menu text="Fichier">
+					<items>
+						<MenuItem text="Ouvrir" onAction="#openFile"/>
+						<MenuItem text="Enregistrer sous" onAction="#saveFile"/>
+					</items>
+				</Menu>
+				<Menu text="Image">
+					<items>
+						<MenuItem text="Enregistrer sous"/>
+					</items>
+				</Menu>
+				<Menu text="Aide">
+					<items>
+						<MenuItem text="À propos"/>
+					</items>
+				</Menu>
+			</menus>
+		</MenuBar>
+	</top>
+	<center>
+		<HBox spacing="10">
+			<padding>
+				<Insets topRightBottomLeft="10" />
+			</padding>
+			<VBox>
+				<TextArea fx:id="codeArea" prefWidth="300" prefHeight="300" wrapText="true" VBox.vgrow="ALWAYS"/>
+				<HBox spacing="10">
+					<padding>
+						<Insets top="10" />
+					</padding>
+					<Button text="Exécuter"/>
+					<Button text="Supprimer" onAction="#clearTextArea"/>
+				</HBox>
+			</VBox>
+			<BorderPane HBox.hgrow="ALWAYS">
+				<center>
+					<Canvas fx:id="canvas" width="400" height="400"/>
+				</center>
+			</BorderPane>
+		</HBox>
+	</center>
+	<bottom>
+		<HBox fx:id="bottomBar" spacing="10">
+			<padding>
+				<Insets topRightBottomLeft="10" />
+			</padding>
+			<Label fx:id="infoLabel" text="INFO - Message d'information utile..."/>
+			<Region HBox.hgrow="ALWAYS"/>
+			<Label fx:id="statusLabel" text="Dessin en cours..."/>
+		</HBox>
+	</bottom>
+</BorderPane>
