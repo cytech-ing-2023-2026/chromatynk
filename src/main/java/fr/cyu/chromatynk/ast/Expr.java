@@ -210,23 +210,5 @@ public sealed interface Expr {
      * @param color the new color the cursor will use while drawing
      */
     record Color(Range range, Expr color) implements Expr {}
-
-    /**
-     * A variable declaration.
-     *
-     * @param range the starting and ending {@link Position} of this expression
-     * @param type the type of the variable
-     * @param name the name of the variable
-     * @param value the optional value assigned to the variable when declared
-     */
-    record VarDeclaration(Range range, Type type, String name, Optional<Value> value) implements Expr {}
-
-    /**
-     * Delete a variable.
-     *
-     * @param range the starting and ending {@link Position} of this expression
-     * @param name the name of the variable to delete
-     */
-    record Del(Range range, String name) implements Expr {}
 }
 

@@ -7,6 +7,9 @@ import fr.cyu.chromatynk.util.TriFunction;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import static fr.cyu.chromatynk.parsing.CommonParser.anyToken;
+import static fr.cyu.chromatynk.parsing.CommonParser.tokenOf;
+
 /**
  * The expression parser of Chromat'ynk. Transforms tokens into AST expressions.
  */
@@ -54,17 +57,6 @@ public class ExprParser {
         };
     }
 
-    private static Parser<Token, Token> anyToken() {
-        return Parser.any();
-    }
-
-    private static Parser<Token, Token> tokenOf(Class<? extends Token> allowedType) {
-        return anyToken().map(result -> {
-            if(allowedType.isInstance(result)) return result;
-            else throw new UnexpectedInputException(result.range().from(), "Token " + allowedType.getSimpleName(), result.toString());
-        });
-    }
-
     /**
      * Literal parser.
      */
@@ -83,10 +75,7 @@ public class ExprParser {
      * Variable call parser.
      */
     public static Parser<Token, Expr> varCall() {
-        return anyToken().map(token -> switch (token) {
-            case Token.Identifier(Range range, String name) -> new Expr.VarCall(range, name);
-            default -> throw new UnexpectedInputException(token.range().from(), "Variable", token.toString());
-        });
+        return tokenOf(Token.Identifier.class).map(id -> new Expr.VarCall(id.range(), id.name()));
     }
 
     /**
@@ -105,7 +94,7 @@ public class ExprParser {
     public static Parser<Token, Expr> invokable() {
         return Parser
                 .firstSucceeding(literal(), varCall(), parenthesized())
-                .mapError(e -> new ParsingException(e.getPosition(), "Not invokable"));
+                .mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Illegal invokable expression"));
     }
 
     private static final Map<String, BiFunction<Range, Expr, Expr>> PREFIX_OPS = Map.ofEntries(
@@ -142,14 +131,11 @@ public class ExprParser {
             Map.entry("/", Expr.Div::new)
     );
 
-    private static Expr parseUnaryOperator(Token token, Expr expr, String opType, Map<String, BiFunction<Range, Expr, Expr>> operators) throws ParsingException {
-        return switch (token) {
-            case Token.Operator(Range range, String op) when operators.containsKey(op) ->
-                    operators.get(op).apply(range.merge(expr.range()), expr);
-            case Token.Operator(Range range, String op) ->
-                    throw new UnexpectedInputException(range.from(), opType + " operator", "Operator \"" + op + "\"");
-            default -> throw new UnexpectedInputException(token.range().from(), opType + " operator", token.toString());
-        };
+    private static Expr parseUnaryOperator(Token.Operator opToken, Expr expr, String opType, Map<String, BiFunction<Range, Expr, Expr>> operators) throws ParsingException {
+        if (operators.containsKey(opToken.operator()))
+            return operators.get(opToken.operator()).apply(opToken.range().merge(expr.range()), expr);
+        else
+            throw new UnexpectedInputException(opToken.range().from(), opType + " operator", "Operator \"" + opToken.operator() + "\"");
     }
 
     /**
@@ -174,17 +160,17 @@ public class ExprParser {
      * Unary (prefix or suffix) operator parser. Can parse an invocable without suffix/prefix operator.
      */
     public static Parser<Token, Expr> unaryOperator() {
-        return Parser.firstSucceeding(prefixOperator(), suffixOperator(), invokable());
+        return Parser
+                .firstSucceeding(prefixOperator(), suffixOperator(), invokable())
+                .mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Illegal prefixed/suffixed invokable expression"));
     }
 
     private static Parser<Token, Expr> binaryOperatorParser(Parser<Token, Expr> operand, String opType, Map<String, TriFunction<Range, Expr, Expr, Expr>> operators) {
-        return operand.repeatReduce(tokenOf(Token.Operator.class).map(token -> switch (token) {
-            case Token.Operator(Range ignored, String op) when operators.containsKey(op) ->
-                    (left, right) -> operators.get(op).apply(left.range().merge(right.range()), left, right);
-
-            case Token.Operator(Range range, String op) ->
-                    throw new UnexpectedInputException(range.from(), opType + " operator", "Operator \"" + op + "\"");
-            default -> throw new UnexpectedInputException(token.range().from(), opType + " operator", token.toString());
+        return operand.repeatReduce(tokenOf(Token.Operator.class).map(opToken -> {
+            if (operators.containsKey(opToken.operator()))
+                return (left, right) -> operators.get(opToken.operator()).apply(left.range().merge(right.range()), left, right);
+            else
+                throw new UnexpectedInputException(opToken.range().from(), opType + " operator", "Operator \"" + opToken.operator() + "\"");
         }));
     }
 
@@ -220,6 +206,6 @@ public class ExprParser {
      * Any expression parser.
      */
     public static Parser<Token, Expr> anyExpr() {
-        return booleanOperator();
+        return booleanOperator().mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Illegal start of expression"));
     }
 }

@@ -87,6 +87,7 @@ public class LexerTestCase {
         assertParseString(new BraceOpen(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, "{");
         assertParseString(new BraceClosed(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, "}");
         assertParseString(new Assign(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, "=");
+        assertParseString(new Comma(Range.sameLine(0, 1)), Lexer.SYMBOL_PARSER, ",");
         assertParseFailure(ParsingException.class, Lexer.SYMBOL_PARSER, ParsingIterator.fromString(""));
         assertParseFailure(ParsingException.class, Lexer.SYMBOL_PARSER, ParsingIterator.fromString("$"));
     }

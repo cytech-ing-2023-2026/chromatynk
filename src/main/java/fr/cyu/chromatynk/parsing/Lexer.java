@@ -81,14 +81,15 @@ public class Lexer {
                     .stream()
                     .map(op -> symbol(op).valueWithRange(r -> new Operator(r, op)))
                     .collect(Collectors.toList())
-    ).mapError(e -> new ParsingException(e.getPosition(), "Symbol expected"));
+    ).mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Symbol expected"));
 
     private static final List<Map.Entry<String, ParsingFunction<Range, Token>>> SYMBOLS = List.of(
             Map.entry("(", ParenthesisOpen::new),
             Map.entry(")", ParenthesisClosed::new),
             Map.entry("{", BraceOpen::new),
             Map.entry("}", BraceClosed::new),
-            Map.entry("=", Assign::new)
+            Map.entry("=", Assign::new),
+            Map.entry(",", Comma::new)
     );
 
     /**
@@ -99,7 +100,7 @@ public class Lexer {
                     .stream()
                     .map(e -> symbol(e.getKey()).valueWithRange(e.getValue()))
                     .collect(Collectors.toList())
-    ).mapError(e -> new ParsingException(e.getPosition(), "Symbol expected"));
+    ).mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Symbol expected"));
 
     //Keywords
 
@@ -141,7 +142,7 @@ public class Lexer {
                     .stream()
                     .map(e -> keyword(e.getKey()).valueWithRange(e.getValue()))
                     .collect(Collectors.toList())
-    ).mapError(e -> new ParsingException(e.getPosition(), "Keyword expected"));
+    ).mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Keyword expected"));
 
     //Misc
 
@@ -151,7 +152,7 @@ public class Lexer {
      */
     public static final Parser<Character, Identifier> IDENTIFIER_PARSER = matching("([A-Za-z]|_)([A-Za-z0-9]|_)*")
             .mapWithRange(Identifier::new)
-            .mapError(e -> new ParsingException(e.getPosition(), "Identifier expected"));
+            .mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Identifier expected"));
 
 
     /**

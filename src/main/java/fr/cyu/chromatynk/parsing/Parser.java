@@ -4,10 +4,7 @@ import fr.cyu.chromatynk.util.Position;
 import fr.cyu.chromatynk.util.Range;
 import fr.cyu.chromatynk.util.Tuple2;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -57,7 +54,7 @@ public interface Parser<I, O> {
     }
 
     /**
-     * Map the error thrown by this parser if any.
+     * Map non-fatal errors thrown by this parser if any.
      *
      * @param f the function to apply to the eventually thrown error
      * @return a new parser similar to this one but with `f` applied to any error thrown by it
@@ -66,10 +63,19 @@ public interface Parser<I, O> {
         return iterator -> {
             try {
                 return this.parse(iterator);
-            } catch (ParsingException e) {
+            } catch (ParsingException.NonFatal e) {
                 throw f.apply(e);
             }
         };
+    }
+
+    /**
+     * Make this parser unrecoverable in case of error.
+     *
+     * @return this parser with its errors marked as fatal
+     */
+    default Parser<I, O> fatal() {
+        return mapError(ParsingException.Fatal::new);
     }
 
     /**
@@ -81,6 +87,25 @@ public interface Parser<I, O> {
      */
     default <T> Parser<I, T> valueWithRange(ParsingFunction<Range, T> f) {
         return mapWithRange((r, v) -> f.apply(r));
+    }
+
+    /**
+     * Make this parser optional.
+     *
+     * @return the same parser wrapping the result in a `Optional` and recovering with `Optional.empty()` in case of failure
+     */
+    default Parser<I, Optional<O>> optional() {
+        return iterator -> {
+            ParsingIterator<? extends I> copy = iterator.copy();
+            try {
+                Result<O> result = this.parse(copy);
+                iterator.setCursor(copy.getCursor());
+                iterator.setPosition(copy.getPosition());
+                return new Result<>(result.range, Optional.of(result.value));
+            } catch (ParsingException.NonFatal e) {
+                return new Result<>(new Range(iterator.getPosition(), iterator.getPosition()), Optional.empty());
+            }
+        };
     }
 
     /**
@@ -114,7 +139,7 @@ public interface Parser<I, O> {
                     to = result.range.to();
                     lastLeftover = copy;
                 }
-            } catch (ParsingException ignored) {}
+            } catch (ParsingException.NonFatal ignored) {}
 
             iterator.setCursor(lastLeftover.getCursor());
             iterator.setPosition(lastLeftover.getPosition());
@@ -154,7 +179,7 @@ public interface Parser<I, O> {
             Result<O> first = this.parse(iterator);
             Result<O2> second = next.parse(iterator);
 
-            return new Result<>(new Range(first.range.from(), second.range().to()), new Tuple2<>(first.value, second.value));
+            return new Result<>(first.range.merge(second.range), new Tuple2<>(first.value, second.value));
         };
     }
 
@@ -167,8 +192,8 @@ public interface Parser<I, O> {
     default Parser<I, O> suffixed(Parser<I, ?> parser) {
         return iterator -> {
             Result<O> result = this.parse(iterator);
-            parser.parse(iterator);
-            return result;
+            Result<?> suffix = parser.parse(iterator);
+            return new Result<>(result.range.merge(suffix.range), result.value);
         };
     }
 
@@ -180,8 +205,9 @@ public interface Parser<I, O> {
      */
     default Parser<I, O> prefixed(Parser<I, ?> parser) {
         return iterator -> {
-            parser.parse(iterator);
-            return this.parse(iterator);
+            Result<?> prefix = parser.parse(iterator);
+            Result<O> result = this.parse(iterator);
+            return new Result<>(result.range.merge(prefix.range), result.value);
         };
     }
 
@@ -203,7 +229,7 @@ public interface Parser<I, O> {
                 System.out.println("Result: " + result);
                 System.out.println("Next cursor: " + iterator.getCursor());
                 return result;
-            } catch (ParsingException e) {
+            } catch (ParsingException.NonFatal e) {
                 System.out.println("--- ERROR " + name + " ---");
                 System.out.println("Exception at " + e.getPosition() + ": " + e.getMessage());
                 System.out.println("Next cursor: " + iterator.getCursor());
@@ -232,7 +258,7 @@ public interface Parser<I, O> {
      */
     static <T> Parser<T, T> any() {
         return iterator -> {
-            if(!iterator.hasNext()) throw new ParsingException(iterator.getPosition(), ParsingIterator.EOF);
+            if(!iterator.hasNext()) throw new ParsingException.NonFatal(iterator.getPosition(), ParsingIterator.EOF);
             Position start = iterator.getPosition();
             T value = iterator.next();
             return new Result<>(new Range(start, iterator.getPosition()), value);
@@ -301,10 +327,10 @@ public interface Parser<I, O> {
 
                     //Cast safe since Parser is supposed to be covariant in `O`.
                     return (Result<O>) result;
-                } catch (ParsingException ignored) {}
+                } catch (ParsingException.NonFatal ignored) {}
             }
             
-            throw new ParsingException(iterator.getPosition(), "No parser succeeded");
+            throw new ParsingException.NonFatal(iterator.getPosition(), "No parser succeeded");
         };
     }
 

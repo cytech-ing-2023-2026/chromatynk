@@ -1,5 +1,7 @@
 package fr.cyu.chromatynk.ast;
 
+import java.util.Optional;
+
 public enum Type {
 
     BOOLEAN("BOOL"), STRING("STR"), INT("INT"), FLOAT("NUM"), COLOR("CLR");
@@ -12,5 +14,19 @@ public enum Type {
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * Get a type from its name.
+     *
+     * @param name the textual name of the type
+     * @return the type corresponding to the given name
+     */
+    public static Optional<Type> fromName(String name) {
+        for(Type type : Type.values()) {
+            if(type.name.equals(name)) return Optional.of(type);
+        }
+
+        return Optional.empty();
     }
 }

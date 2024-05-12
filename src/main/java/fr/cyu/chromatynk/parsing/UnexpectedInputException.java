@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 /**
  * A {@link ParsingException} variant where the parser expected a kind of input and got another one.
  */
-public class UnexpectedInputException extends ParsingException {
+public final class UnexpectedInputException extends ParsingException.NonFatal {
 
     private final String expected;
     private final String actual;

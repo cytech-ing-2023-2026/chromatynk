@@ -90,6 +90,13 @@ public sealed interface Token {
     record BraceClosed(Range range) implements Token {}
 
     /**
+     * A comma.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Comma(Range range) implements Token {}
+
+    /**
      * An open parenthesis `=` symbol.
      *
      * @param range the starting and ending position of this token
