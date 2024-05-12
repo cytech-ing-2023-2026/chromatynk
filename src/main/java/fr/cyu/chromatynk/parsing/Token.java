@@ -76,14 +76,14 @@ public sealed interface Token {
     record ParenthesisClosed(Range range) implements Token {}
 
     /**
-     * An open parenthesis `{` symbol.
+     * An open brace `{` symbol.
      *
      * @param range the starting and ending position of this token
      */
     record BraceOpen(Range range) implements Token {}
 
     /**
-     * An open parenthesis `}` symbol.
+     * An closed brace `}` symbol.
      *
      * @param range the starting and ending position of this token
      */
@@ -97,7 +97,7 @@ public sealed interface Token {
     record Comma(Range range) implements Token {}
 
     /**
-     * An open parenthesis `=` symbol.
+     * An equal `=` symbol.
      *
      * @param range the starting and ending position of this token
      */
