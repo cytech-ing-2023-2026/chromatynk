@@ -14,6 +14,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.image.WritableImage;
+import javax.swing.SwingUtilities;
+
+
+
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -23,58 +28,78 @@ public class CodeEditor extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Création de la zone de texte pour l'éditeur de code
+        // Creating the text box for the code editor
 
         TextArea codeArea = new TextArea();
         codeArea.setPrefWidth(300);
         codeArea.setPrefHeight(200);
         codeArea.setWrapText(true); // Activer le retour à la ligne automatique
 
-        // Création du bouton supprimer
+        // delete button
         Button deleteButton = new Button("Supprimer");
         deleteButton.setOnAction(e -> codeArea.clear()); // Action du bouton pour supprimer le texte
 
 
 
-        // Création boutton "Valider"
+        // valid button
         Button validateButton = new Button("Valider");
         //définir l'action (A completer)
 
-        // Création du conteneur pour le bouton supprimer et valider
+        // Creating the container for the delete and validate button
         HBox buttonBox = new HBox(deleteButton, validateButton);
         buttonBox.setPadding(new Insets(10));
         buttonBox.setSpacing(10);
 
-        // Création de la zone de dessin pour le résultat
+        // Creating the drawing area for the result
         Canvas canvas = new Canvas(300, 200);
         GraphicsContext gc = canvas.getGraphicsContext2D();
+        
 
-
-        // Création du conteneur pour la zone de dessin
+        // Creating the container for the drawing area
         BorderPane resultPane = new BorderPane();
         resultPane.setCenter(canvas);
 
-        // Création du menu Fichier pour pouvoir enregistrer et ouvrir des images
+        // Creation of the File menu to be able to save and open images
         Menu fileMenu = new Menu("Fichier");
         MenuItem openMenuItem = new MenuItem("Ouvrir");
         MenuItem saveAsPngMenuItem = new MenuItem("Enregistrer sous");
+        fileMenu.getItems().add(saveAsPngMenuItem);
+
+        saveAsPngMenuItem.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
+            fileChooser.getExtensionFilters().add(extFilter);
+
+            // Show Save As Dialog
+            File file = fileChooser.showSaveDialog(primaryStage);
+
+            if (file != null) {
+                try {
+                    // Enregistrer le canevas en tant qu'image PNG
+                    WritableImage writableImage = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
+                    canvas.snapshot(null, writableImage);
+                    ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
+                } catch (IOException ex) {
+                    System.out.println("Erreur lors de l'enregistrement du fichier : " + ex.getMessage());
+                }
+            }
+        });
 
         // Action pour le menu Ouvrir (à completer)
 
 
-        // Action pour le menu Enregistrer en PNG (A completer)
 
 
-        // Ajout des éléments au menu Fichier
+        // Adding items to the File menu
         fileMenu.getItems().addAll(openMenuItem, saveAsPngMenuItem);
 
-        // Création de la barre de menu
+        // Creating the menu bar
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(fileMenu);
 
 
 
-        // Création du conteneur principal
+        // Creating the main container
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(10));
         root.setLeft(codeArea);
@@ -83,10 +108,10 @@ public class CodeEditor extends Application {
         root.setTop(menuBar);
 
 
-        // Création de la scène
+        // Creating the scene
         Scene scene = new Scene(root, 600, 400);
 
-        // Configuration de la scène et affichage de la fenêtre
+        // Setting up the scene and displaying the window
         primaryStage.setTitle("Cromatynk");
         primaryStage.setScene(scene);
         primaryStage.show();
