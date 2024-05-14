@@ -16,11 +16,32 @@
 					<items>
 						<MenuItem text="Ouvrir" onAction="#openFile"/>
 						<MenuItem text="Enregistrer sous" onAction="#saveFile"/>
+						<SeparatorMenuItem/>
+						<MenuItem text="Quitter" onAction="#quit"/>
 					</items>
 				</Menu>
 				<Menu text="Image">
 					<items>
 						<MenuItem text="Enregistrer sous"/>
+					</items>
+				</Menu>
+				<Menu text="Exécution">
+					<items>
+						<Menu text="Vitesse">
+							<items>
+								<fx:define>
+									<ToggleGroup fx:id="radioSpeedGroup"/>
+								</fx:define>
+								<RadioMenuItem text="Pleine puissance" toggleGroup="$radioSpeedGroup"/>
+								<RadioMenuItem text="16 instructions/s" toggleGroup="$radioSpeedGroup"/>
+								<RadioMenuItem text="8 instructions/s" toggleGroup="$radioSpeedGroup"/>
+								<RadioMenuItem text="4 instructions/s" toggleGroup="$radioSpeedGroup"/>
+								<RadioMenuItem text="2 instructions/s" toggleGroup="$radioSpeedGroup"/>
+								<RadioMenuItem text="1 instructions/s" toggleGroup="$radioSpeedGroup"/>
+							</items>
+						</Menu>
+						<SeparatorMenuItem/>
+						<CheckMenuItem text="Mode étape par étape" fx:id="stepByStepCheckbox"/> <!-- fx:id="" -->
 					</items>
 				</Menu>
 				<Menu text="Aide">
@@ -31,13 +52,13 @@
 			</menus>
 		</MenuBar>
 	</top>
+
 	<center>
 		<HBox spacing="10">
-			<padding>
-				<Insets topRightBottomLeft="10" />
-			</padding>
+			<padding><Insets topRightBottomLeft="10"/></padding>
+
 			<VBox>
-				<TextArea fx:id="codeArea" prefWidth="300" prefHeight="300" wrapText="true" VBox.vgrow="ALWAYS"/>
+				<TextArea fx:id="codeArea" prefWidth="400" prefHeight="300" wrapText="true" VBox.vgrow="ALWAYS"/>
 				<HBox spacing="10">
 					<padding>
 						<Insets top="10" />
@@ -46,13 +67,22 @@
 					<Button text="Supprimer" onAction="#clearTextArea"/>
 				</HBox>
 			</VBox>
-			<BorderPane HBox.hgrow="ALWAYS">
-				<center>
-					<Canvas fx:id="canvas" width="400" height="400"/>
-				</center>
-			</BorderPane>
+
+			<VBox HBox.hgrow="ALWAYS">
+				<BorderPane VBox.vgrow="ALWAYS">
+					<center>
+						<Canvas fx:id="canvas" width="400" height="400"/>
+					</center>
+				</BorderPane>
+				<HBox fx:id="stepByStepControls" spacing="10" alignment="CENTER">
+					<Label text="Étape 1"/>
+					<Button fx:id="stepByStepForwardButton" text="Avancer"/>
+				</HBox>
+			</VBox>
+
 		</HBox>
 	</center>
+
 	<bottom>
 		<HBox fx:id="bottomBar" spacing="10">
 			<padding>
