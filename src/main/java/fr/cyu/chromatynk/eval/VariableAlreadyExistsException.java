@@ -1,7 +1,9 @@
 package fr.cyu.chromatynk.eval;
 
+import fr.cyu.chromatynk.util.Range;
+
 public class VariableAlreadyExistsException extends EvalException {
-    public VariableAlreadyExistsException(EvalContext context, String name) {
-        super(context,"The variable " + name + " already exists");
+    public VariableAlreadyExistsException(Range range, String name) {
+        super(range,"The variable " + name + " already exists");
     }
 }
