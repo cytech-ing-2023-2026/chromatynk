@@ -29,4 +29,12 @@ public class Variable {
     public void setValue(Value value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "Variable{" +
+                "type=" + type +
+                ", value=" + value +
+                '}';
+    }
 }

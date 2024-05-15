@@ -1,4 +1,6 @@
-package fr.cyu.chromatynk.eval;
+package fr.cyu.chromatynk.draw;
+
+import javafx.scene.canvas.GraphicsContext;
 
 public class TangibleCursor implements Cursor {
 
@@ -88,5 +90,12 @@ public class TangibleCursor implements Cursor {
     @Override
     public void setThickness(double thickness) {
         this.thickness = thickness;
+    }
+
+    @Override
+    public void drawLineAt(GraphicsContext graphics, double x, double y, double dx, double dy) {
+        graphics.setStroke(new javafx.scene.paint.Color(getColor().red(), getColor().green(), getColor().blue(), opacity));
+        graphics.setLineWidth(getThickness());
+        graphics.strokeLine(x, y, dx, dy);
     }
 }

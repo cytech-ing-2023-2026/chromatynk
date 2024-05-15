@@ -1,4 +1,6 @@
-package fr.cyu.chromatynk.eval;
+package fr.cyu.chromatynk.draw;
+
+import javafx.scene.canvas.GraphicsContext;
 
 public interface Cursor {
 
@@ -29,6 +31,12 @@ public interface Cursor {
     double getThickness();
 
     void setThickness(double thickness);
+
+    void drawLineAt(GraphicsContext graphics, double x, double y, double dx, double dy);
+
+    default void move(GraphicsContext graphics, double dx, double dy) {
+        drawLineAt(graphics, getX(), getY(), getX()+dx, getY()+dy);
+    }
 
     default Cursor copyTangible() {
         return new TangibleCursor(getX(), getY(), getDirX(), getDirY(), getColor(), getOpacity(), getThickness());

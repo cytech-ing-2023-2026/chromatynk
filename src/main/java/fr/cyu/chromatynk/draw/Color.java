@@ -1,4 +1,4 @@
-package fr.cyu.chromatynk.eval;
+package fr.cyu.chromatynk.draw;
 
 import java.util.Map;
 
