@@ -1,15 +1,17 @@
 package fr.cyu.chromatynk.eval;
 
+import fr.cyu.chromatynk.util.Range;
+
 public class EvalException extends Exception {
 
-    private final EvalContext context;
+    private final Range range;
 
-    public EvalException(EvalContext context, String message) {
+    public EvalException(Range range, String message) {
         super(message);
-        this.context = context;
+        this.range = range;
     }
 
-    public EvalContext getContext() {
-        return context;
+    public Range getRange() {
+        return range;
     }
 }
