@@ -9,6 +9,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ * The controller for the file menu
+ * @author JordanViknar
+ * @see CodeEditor
+ * @see CodeEditorController
+ */
 public class FileMenuController {
 
 	private final Stage primaryStage;
@@ -20,6 +26,9 @@ public class FileMenuController {
 		this.codeArea = codeArea;
 	}
 
+	/**
+	 * Opens a file dialog and loads the content of the selected file into the text area
+	 */
 	public void openFile() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Ouvrir un fichier");
@@ -39,6 +48,9 @@ public class FileMenuController {
 		}
 	}
 
+	/**
+	 * Opens a file dialog and saves the content of the text area into the selected file
+	 */
 	public void saveFile() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Enregistrer sous...");
