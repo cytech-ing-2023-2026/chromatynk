@@ -14,17 +14,24 @@ import javafx.scene.control.TextArea;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.layout.HBox;
+import javafx.scene.control.Button;
 
 /**
  * The controller for the code editor
  * @author JordanViknar
  */
 public class CodeEditorController {
-	// The 2 main elements
+	// The main elements
 	@FXML
 	private TextArea codeArea;
 	@FXML
 	private Canvas canvas;
+
+	// Interaction buttons
+	@FXML
+	private Button runButton;
+	@FXML
+	private Button clearTextAreaButton;
 
 	// Bottom bar
 	@FXML
@@ -112,4 +119,16 @@ public class CodeEditorController {
 	public void saveFile() {fileMenuController.saveFile();}
 	public void clearTextArea() {codeArea.clear();}
 	public void quit() {primaryStage.close();}
+
+	public void runScript() {
+		// Disable tab system, code area, and buttons
+		tabPane.setDisable(true);
+		codeArea.setDisable(true);
+		runButton.setDisable(true);
+		clearTextAreaButton.setDisable(true);
+
+		// Wait for drawing to be finished
+
+		// The features would be re-enabled here.
+	}
 }
