@@ -67,33 +67,33 @@
 	</top>
 
 	<center>
-		<HBox spacing="10">
+		<SplitPane dividerPositions="0.5" prefWidth="600.0" prefHeight="400.0">
 			<padding><Insets topRightBottomLeft="10"/></padding>
 
-			<VBox>
-				<TextArea fx:id="codeArea" prefWidth="400" prefHeight="300" wrapText="true" VBox.vgrow="ALWAYS"/>
-				<HBox spacing="10">
-					<padding>
-						<Insets top="10" />
-					</padding>
-					<Button text="Exécuter" fx:id="runButton" onAction="#runScript"/>
-					<Button text="Supprimer" fx:id="clearTextAreaButton" onAction="#clearTextArea"/>
-				</HBox>
-			</VBox>
-
-			<VBox HBox.hgrow="ALWAYS">
-				<BorderPane VBox.vgrow="ALWAYS">
-					<center>
-						<Canvas fx:id="canvas" width="400" height="400"/>
-					</center>
-				</BorderPane>
-				<HBox fx:id="stepByStepControls" spacing="10" alignment="CENTER">
-					<Label text="Étape 1"/>
-					<Button fx:id="stepByStepForwardButton" text="Avancer"/>
-				</HBox>
-			</VBox>
-
-		</HBox>
+			<items>
+				<VBox>
+					<TextArea fx:id="codeArea" prefWidth="400" prefHeight="300" wrapText="true" VBox.vgrow="ALWAYS"/>
+					<HBox spacing="10">
+						<padding>
+							<Insets top="10" />
+						</padding>
+						<Button text="Exécuter" fx:id="runButton" onAction="#runScript"/>
+						<Button text="Supprimer" fx:id="clearTextAreaButton" onAction="#clearTextArea"/>
+					</HBox>
+				</VBox>
+				<VBox HBox.hgrow="ALWAYS">
+					<BorderPane VBox.vgrow="ALWAYS">
+						<center>
+							<Canvas fx:id="canvas" width="400" height="400"/>
+						</center>
+					</BorderPane>
+					<HBox fx:id="stepByStepControls" spacing="10" alignment="CENTER">
+						<Label text="Étape 1"/>
+						<Button fx:id="stepByStepForwardButton" text="Avancer"/>
+					</HBox>
+				</VBox>
+			</items>
+		</SplitPane>
 	</center>
 
 	<bottom>
