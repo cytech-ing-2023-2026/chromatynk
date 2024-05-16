@@ -116,9 +116,6 @@ public class LexerTestCase {
         assertParseString(new While(Range.sameLine(0, 5)), Lexer.KEYWORD_PARSER, "WHILE");
         assertParseString(new Mimic(Range.sameLine(0, 5)), Lexer.KEYWORD_PARSER, "MIMIC");
         assertParseString(new Mirror(Range.sameLine(0, 6)), Lexer.KEYWORD_PARSER, "MIRROR");
-        assertParseString(new Num(Range.sameLine(0, 3)), Lexer.KEYWORD_PARSER, "NUM");
-        assertParseString(new Str(Range.sameLine(0, 3)), Lexer.KEYWORD_PARSER, "STR");
-        assertParseString(new Bool(Range.sameLine(0, 4)), Lexer.KEYWORD_PARSER, "BOOL");
         assertParseString(new Del(Range.sameLine(0, 3)), Lexer.KEYWORD_PARSER, "DEL");
         assertParseFailure(ParsingException.class, Lexer.KEYWORD_PARSER, ParsingIterator.fromString(""));
         assertParseFailure(ParsingException.class, Lexer.KEYWORD_PARSER, ParsingIterator.fromString("VAR"));

@@ -265,27 +265,6 @@ public sealed interface Token {
     record Mirror(Range range) implements Token {}
 
     /**
-     * A `NUM` keyword.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record Num(Range range) implements Token {}
-
-    /**
-     * A `STR` keyword.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record Str(Range range) implements Token {}
-
-    /**
-     * A `BOOL` keyword.
-     *
-     * @param range the starting and ending position of this token
-     */
-    record Bool(Range range) implements Token {}
-
-    /**
      * A `DEL` keyword.
      *
      * @param range the starting and ending position of this token

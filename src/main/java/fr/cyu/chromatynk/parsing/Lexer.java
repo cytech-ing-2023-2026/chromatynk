@@ -128,9 +128,6 @@ public class Lexer {
             Map.entry("WHILE", While::new),
             Map.entry("MIMIC", Mimic::new),
             Map.entry("MIRROR", Mirror::new),
-            Map.entry("NUM", Num::new),
-            Map.entry("STR", Str::new),
-            Map.entry("BOOL", Bool::new),
             Map.entry("DEL", Del::new)
     );
 

@@ -254,6 +254,6 @@ public class StatementParser {
      * Parser of a full program.
      */
     public static Parser<Token, Program> program() {
-        return anyStatement().repeat().map(Program::new);
+        return anyStatement().fatal().repeat().map(Program::new);
     }
 }
