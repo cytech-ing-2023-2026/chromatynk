@@ -22,6 +22,10 @@ public class TangibleCursor implements Cursor {
         this.thickness = thickness;
     }
 
+    public TangibleCursor(double x, double y) {
+        this(x, y, 0, 0, new Color(0, 0, 0), 1, 1);
+    }
+
     @Override
     public double getX() {
         return x;
