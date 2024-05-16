@@ -19,10 +19,12 @@
 
 ## How to run
 
-## Architecture
+## Architecture (dependency tree)
+*(Note : This tree does not include external dependencies.)*
+
 
 ```mermaid
-graph TD;
+graph LR;
 	subgraph ast
 		Expr.java;
 		Program.java;
@@ -48,6 +50,7 @@ graph TD;
 	DuplicatedCursor.java --> Cursor.java;
 	MimickedCursor.java --> DuplicatedCursor.java;
 	TangibleCursor.java --> Cursor.java;
+	TangibleCursor.java --> Color.java;
 
 	subgraph editor
 		CodeEditor.java;
@@ -69,6 +72,28 @@ graph TD;
 		Variable.java;
 		VariableAlreadyExistsException.java;
 	end
+	CursorAlreadyExistsException.java --> CursorId.java;
+	CursorAlreadyExistsException.java --> Range.java;
+	CursorAlreadyExistsException.java --> EvalException.java;
+	EvalContext.java --> Cursor.java;
+	EvalContext.java --> CursorId.java;
+	EvalException.java --> Range.java;
+	MissingCursorException.java --> CursorId.java;
+	MissingCursorException.java --> Range.java;
+	MissingCursorException.java --> EvalException.java;
+	MissingVariableException.java --> Range.java;
+	MissingVariableException.java --> EvalException.java;
+	Scope.java --> Type.java;
+	Scope.java --> Cursor.java;
+	Scope.java --> CursorId.java;
+	Scope.java --> Range.java;
+	TypeMismatchException.java --> Type.java;
+	TypeMismatchException.java --> Range.java;
+	TypeMismatchException.java --> EvalException.java;
+	Value.java --> Type.java;
+	Variable.java --> Type.java;
+	VariableAlreadyExistsException.java --> Range.java;
+	VariableAlreadyExistsException.java --> EvalException.java;
 
 	subgraph parsing
 		CommonParser.java;
@@ -83,6 +108,28 @@ graph TD;
 		Token.java;
 		UnexpectedInputException.java;
 	end
+	ExprParser.java --> CommonParser.java;
+	ExprParser.java --> Expr.java;
+	ExprParser.java --> Range.java;
+	ExprParser.java --> TriFunction.java;
+	Lexer.java --> Range.java;
+	Lexer.java --> Parser.java;
+	Lexer.java --> Token.java;
+	Parser.java --> Position.java;
+	Parser.java --> Range.java;
+	Parser.java --> Tuple2.java;
+	ParsingException.java --> Position.java;
+	ParsingIterator.java --> Position.java;
+	StatementParser.java --> Expr.java;
+	StatementParser.java --> Program.java;
+	StatementParser.java --> Statement.java;
+	StatementParser.java --> Type.java;
+	StatementParser.java --> QuadriFunction.java;
+	StatementParser.java --> Range.java;
+	StatementParser.java --> TriFunction.java;
+	StatementParser.java --> Tuple2.java;
+	Token.java --> Range.java;
+	UnexpectedInputException.java --> Position.java;
 
 	subgraph util
 		Position.java;
@@ -91,7 +138,11 @@ graph TD;
 		TriFunction.java;
 		Tuple2.java;
 	end
+	Range.java --> Position.java;
 
-	App.java;
-	Chromatynk.java;
+	Chromatynk.java --> Program.java;
+	Chromatynk.java --> Lexer.java;
+	Chromatynk.java --> ParsingException.java;
+	Chromatynk.java --> ParsingIterator.java;
+	Chromatynk.java --> StatementParser.java;
 ```
