@@ -7,6 +7,7 @@ import fr.cyu.chromatynk.util.Range;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * The scope of an evaluated block.
@@ -109,7 +110,7 @@ public class Scope {
     public void setValue(String name, Value value, Range range) throws MissingVariableException, TypeMismatchException {
         Variable variable = getVariable(name).orElseThrow(() -> new MissingVariableException(range, name));
         if (variable.getType() == value.getType()) variable.setValue(value);
-        else throw new TypeMismatchException(range, variable.getType(), value.getType());
+        else throw new TypeMismatchException(range, Set.of(variable.getType()), value.getType());
     }
 
     /**
@@ -124,7 +125,7 @@ public class Scope {
     public void declareVariable(String name, Variable variable, Range range) throws TypeMismatchException, VariableAlreadyExistsException {
         if (directVariables.containsKey(name)) throw new VariableAlreadyExistsException(range, name);
         else if(variable.getValue().map(v -> v.getType() == variable.getType()).orElse(true)) directVariables.put(name, variable);
-        else throw new TypeMismatchException(range, variable.getType(), variable.getValue().get().getType());
+        else throw new TypeMismatchException(range, Set.of(variable.getType()), variable.getValue().get().getType());
     }
 
     /**

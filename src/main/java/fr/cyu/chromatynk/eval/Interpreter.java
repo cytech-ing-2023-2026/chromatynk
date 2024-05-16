@@ -211,10 +211,10 @@ public class Interpreter {
                 };
 
                 case Value.Str(String leftValue) -> switch (getValue(context, right)) {
-                    case Value.Str(String rightValue) -> new Value.Str(leftValue == rightValue);
+                    case Value.Str(String rightValue) -> new Value.Bool(leftValue.equals(rightValue));
                     case Value rightValue -> throw new TypeMismatchException(right.range(), Set.of(Type.BOOLEAN), rightValue.getType());
                 };
-
+                default -> throw new RuntimeException("default"); //TODO remove
             };
 
 

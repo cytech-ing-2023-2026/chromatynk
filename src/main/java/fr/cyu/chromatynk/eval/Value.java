@@ -26,7 +26,14 @@ public sealed interface Value {
      *
      * @param value the value of this floating number
      */
-    record Float(float value) implements Value {}
+    record Float(double value) implements Value {}
+
+    /**
+     * A percentage.
+     *
+     * @param value the value of this percentage
+     */
+    record Percentage(double value) implements Value {}
 
     /**
      * A string.
@@ -50,10 +57,11 @@ public sealed interface Value {
      */
     default Type getType() {
         return switch (this) {
-            case Bool x  -> Type.BOOLEAN;
-            case Int x   -> Type.INT;
+            case Bool x -> Type.BOOLEAN;
+            case Int x -> Type.INT;
             case Float x -> Type.FLOAT;
-            case Str x   -> Type.STRING;
+            case Percentage x -> Type.PERCENTAGE;
+            case Str x -> Type.STRING;
             case Color x -> Type.COLOR;
         };
     }
