@@ -2,11 +2,21 @@ package fr.cyu.chromatynk.draw;
 
 import javafx.scene.canvas.GraphicsContext;
 
+/**
+ * A cursor mirrored according to a symmetry center.
+ */
 public class CentralMirroredCursor extends DuplicatedCursor {
 
     private final double centerX;
     private final double centerY;
 
+    /**
+     * Create a new central-mirrored cursor.
+     *
+     * @param duplicated the mirrored cursor
+     * @param centerX the X coordinate of the center
+     * @param centerY the Y coordinate of the center
+     */
     public CentralMirroredCursor(Cursor duplicated, double centerX, double centerY) {
         super(duplicated);
         this.centerX = centerX;

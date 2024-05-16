@@ -2,6 +2,9 @@ package fr.cyu.chromatynk.draw;
 
 import javafx.scene.canvas.GraphicsContext;
 
+/**
+ * A tangible/real cursor.
+ */
 public class TangibleCursor implements Cursor {
 
     private double x;
@@ -12,6 +15,17 @@ public class TangibleCursor implements Cursor {
     private double opacity;
     private double thickness;
 
+    /**
+     * Create a new tangible cursor.
+     *
+     * @param x the X coordinate of this cursor
+     * @param y the Y coordinate of this cursor
+     * @param dirX the X direction of this cursor
+     * @param dirY the Y direction of this cursor
+     * @param color the color to use when drawing with this cursor
+     * @param opacity the opacity to use when drawing with this cursor
+     * @param thickness the thickness to use when drawing with this cursor
+     */
     public TangibleCursor(double x, double y, double dirX, double dirY, Color color, double opacity, double thickness) {
         this.x = x;
         this.y = y;
@@ -20,6 +34,16 @@ public class TangibleCursor implements Cursor {
         this.color = color;
         this.opacity = opacity;
         this.thickness = thickness;
+    }
+
+    /**
+     * Create a new tangible cursor with default values.
+     *
+     * @param x the X coordinate of this cursor
+     * @param y the Y coordinate of this cursor
+     */
+    public TangibleCursor(double x, double y) {
+        this(x, y, 0, 0, new Color(0, 0, 0), 1, 1);
     }
 
     @Override
