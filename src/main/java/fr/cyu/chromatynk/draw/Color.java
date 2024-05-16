@@ -2,16 +2,38 @@ package fr.cyu.chromatynk.draw;
 
 import java.util.Map;
 
+/**
+ * A RGB color.
+ *
+ * @param red the red component between 0 and 1
+ * @param green the green component between 0 and 1
+ * @param blue the blue component between 0 and 1
+ */
 public record Color(double red, double green, double blue) {
 
+    /**
+     * Get this color's brightness.
+     *
+     * @return this color's brightness according to YUV conversion
+     */
     public double getBrightness() {
         return 0.257 * red + 0.504 * green + 0.098 * blue + 16;
     }
 
+    /**
+     * Get this color's blue projection.
+     *
+     * @return this color's blue projection according to YUV conversion
+     */
     public double getBlueProjection() {
         return -0.148 * red - 0.291 * green + 0.439 * blue + 128;
     }
 
+    /**
+     * Get this color's red projection.
+     *
+     * @return this color's red projection according to YUV conversion
+     */
     public double getRedProjection() {
         return 0.439 * red - 0.368 * green - 0.071 * blue + 128;
     }
@@ -24,6 +46,11 @@ public record Color(double red, double green, double blue) {
         return dy * dy + du * du + dv * dv;
     }
 
+    /**
+     * Convert this color to ANSI.
+     *
+     * @return the closest corresponding ANSI background color code
+     */
     public String toANSI() {
         return ANSI_COLORS
                 .entrySet()
