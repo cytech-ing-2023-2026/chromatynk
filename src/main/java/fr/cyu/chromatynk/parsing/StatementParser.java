@@ -40,15 +40,13 @@ public class StatementParser {
             Map.entry(Token.Cursor.class, Statement.CreateCursor::new),
             Map.entry(Token.Select.class, Statement.SelectCursor::new),
             Map.entry(Token.Remove.class, Statement.RemoveCursor::new),
-            Map.entry(Token.Mimic.class, Statement.Mimic::new),
             Map.entry(Token.Del.class, Statement.DeleteVariable::new)
     );
 
     private static final Map<Class<? extends Token>, TriFunction<Range, Expr, Expr, Statement>> TWO_ARG_STATEMENTS = Map.ofEntries(
             Map.entry(Token.Mov.class, Statement.Move::new),
             Map.entry(Token.Pos.class, Statement.Pos::new),
-            Map.entry(Token.LookAt.class, Statement.LookAtPos::new),
-            Map.entry(Token.Mirror.class, Statement.MirrorCentral::new)
+            Map.entry(Token.LookAt.class, Statement.LookAtPos::new)
     );
 
     private static final Map<Class<? extends Token>, QuadriFunction<Range, Expr, Expr, Expr, Statement>> THREE_ARG_STATEMENTS = Map.ofEntries(
@@ -132,8 +130,11 @@ public class StatementParser {
         return type()
                 .zip(tokenOf(Token.Identifier.class).fatal())
                 .zip(ExprParser.anyExpr().fatal().prefixed(tokenOf(Token.Assign.class)).optional())
-                .map(tpl -> switch(tpl) {
-                    case Tuple2(Tuple2(Tuple2(Range typeRange, Type type), Token.Identifier identifier), Optional<Expr> initialExpr) -> {
+                .map(tpl -> switch (tpl) {
+                    case Tuple2(
+                            Tuple2(Tuple2(Range typeRange, Type type), Token.Identifier identifier),
+                            Optional<Expr> initialExpr
+                    ) -> {
                         Range endingRange = initialExpr.map(Expr::range).orElse(identifier.range());
                         yield new Statement.DeclareVariable(typeRange.merge(endingRange), type, identifier.name(), initialExpr);
                     }
@@ -234,6 +235,56 @@ public class StatementParser {
     }
 
     /**
+     * MIMIC cursor {...} parser
+     */
+    public static Parser<Token, Statement> mimic() {
+        return tokenOf(Token.Mimic.class)
+                .zip(ExprParser.anyExpr().fatal())
+                .zip(body().fatal())
+                .map(tpl -> switch (tpl) {
+                    case Tuple2(Tuple2(Token mimicToken, Expr mimicked), Statement.Body body) ->
+                            new Statement.Mimic(mimicToken.range().merge(body.range()), mimicked, body);
+                });
+    }
+
+    /**
+     * MIRROR centerX, centerY {...} parser
+     */
+    public static Parser<Token, Statement> mirrorCentral() {
+        return tokenOf(Token.Mirror.class)
+                .zip(ExprParser.anyExpr().fatal())
+                .zip(ExprParser.anyExpr().prefixed(tokenOf(Token.Comma.class)).fatal())
+                .zip(body().fatal())
+                .map(tpl -> switch (tpl) {
+                    case Tuple2(Tuple2(Tuple2(Token mirrorToken, Expr centerX), Expr centerY), Statement.Body body) ->
+                            new Statement.MirrorCentral(mirrorToken.range().merge(body.range()), centerX, centerY, body);
+                });
+    }
+
+    /**
+     * MIRROR axisStartX, axisStartY, axisEndX, axisEndY {...} parser
+     */
+    public static Parser<Token, Statement> mirrorAxial() {
+        return tokenOf(Token.Mirror.class)
+                .zip(ExprParser.anyExpr().fatal())
+                .zip(ExprParser.anyExpr().prefixed(tokenOf(Token.Comma.class)).fatal())
+                .zip(ExprParser.anyExpr().fatal().prefixed(tokenOf(Token.Comma.class)))
+                .zip(ExprParser.anyExpr().fatal().prefixed(tokenOf(Token.Comma.class)))
+                .zip(body().fatal())
+                .map(tpl -> switch (tpl) {
+                    case Tuple2(
+                            Tuple2(
+                                    Tuple2(
+                                            Tuple2(Tuple2(Token mirrorToken, Expr axisStartX), Expr axisStartY),
+                                            Expr axisEndX
+                                    ), Expr axisEndY
+                            ), Statement.Body body
+                    ) ->
+                            new Statement.MirrorAxial(mirrorToken.range().merge(body.range()), axisStartX, axisStartY, axisEndX, axisEndY, body);
+                });
+    }
+
+    /**
      * Type (BOOL, NUM...) parser.
      */
     public static Parser<Token, Tuple2<Range, Type>> type() {
@@ -250,7 +301,7 @@ public class StatementParser {
      */
     public static Parser<Token, Statement> anyStatement() {
         return Parser
-                .firstSucceeding(whileLoop(), forLoop(), ifCondition(), instruction())
+                .firstSucceeding(whileLoop(), forLoop(), ifCondition(), mimic(), mirrorAxial(), mirrorCentral(), instruction())
                 .mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Illegal statement"));
     }
 
