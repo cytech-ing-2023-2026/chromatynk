@@ -149,6 +149,23 @@ public interface Parser<I, O> {
     }
 
     /**
+     * Repeat this parser until the given one succeeds.
+     *
+     * @param parser the parser signaling the end of the repetition
+     * @return a parser parsing zero or multiple outputs of this parser until it fails or `parser` succeeds
+     */
+    default Parser<I, List<O>> repeatUntil(Parser<I, ?> parser) {
+        Parser<I, ?> stopIfEnd = parser
+                .optional()
+                .mapWithRange((r, opt) -> {
+                    if(opt.isPresent()) throw new ParsingException.NonFatal(r.from(), "End");
+                    else return opt;
+                });
+
+        return this.prefixed(stopIfEnd).repeat();
+    }
+
+    /**
      * Repeat and reduce this parser according to the reduction produced when parsing the separator.
      * Useful for parsing binary operators in a recursion-friendly way.
      *
@@ -216,6 +233,7 @@ public interface Parser<I, O> {
      *
      * @return a new parser similar to this one printing input state and result/error in STDIN.
      */
+    @SuppressWarnings("unused")
     default Parser<I, O> debug(String name) {
         return iterator -> {
             String fullName = name + "@" + this.hashCode();
@@ -316,6 +334,7 @@ public interface Parser<I, O> {
      * @param <I> the parser input
      * @param <O> the common output type of each parser
      */
+    @SuppressWarnings("unchecked")
     static <I, O> Parser<I, O> firstSucceeding(Iterable<Parser<I, ? extends O>> parsers) {
         return iterator -> {
             for(Parser<I, ? extends O> parser : parsers) {
@@ -393,7 +412,7 @@ public interface Parser<I, O> {
      *
      * @param word the keyword to parse
      * @return a parser outputting the given keyword if the input matches it.
-     * @see {@link #symbol(String)}
+     * @see #symbol(String)
      */
     static Parser<Character, String> keyword(String word) {
         return iterator -> {
@@ -429,7 +448,7 @@ public interface Parser<I, O> {
      *
      * @param symbol the keyword to parse
      * @return a parser outputting the given symbol if the input matches it.
-     * @see {@link #keyword(String)}
+     * @see #keyword(String)
      */
     static Parser<Character, String> symbol(String symbol) {
         return iterator -> {
