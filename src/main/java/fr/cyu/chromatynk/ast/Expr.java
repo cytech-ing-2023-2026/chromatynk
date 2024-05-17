@@ -1,10 +1,7 @@
 package fr.cyu.chromatynk.ast;
 
-import fr.cyu.chromatynk.eval.Value;
 import fr.cyu.chromatynk.util.Position;
 import fr.cyu.chromatynk.util.Range;
-
-import java.util.Optional;
 
 /**
  * A Sealed interface Expr {}*
