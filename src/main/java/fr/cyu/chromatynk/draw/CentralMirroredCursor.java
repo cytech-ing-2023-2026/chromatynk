@@ -34,6 +34,6 @@ public class CentralMirroredCursor extends DuplicatedCursor {
     @Override
     public void drawLineAt(GraphicsContext graphics, double x, double y, double dx, double dy) {
         getDuplicated().drawLineAt(graphics, x, y, dx, dy);
-        getDuplicated().drawLineAt(graphics, getSymmetricX(x), getSymmetricY(y), getSymmetricX(x), getSymmetricY(y));
+        getDuplicated().drawLineAt(graphics, getSymmetricX(x), getSymmetricY(y), getSymmetricX(dx), getSymmetricY(dy));
     }
 }
