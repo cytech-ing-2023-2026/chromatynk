@@ -207,8 +207,9 @@ public sealed interface Statement {
      *
      * @param range the starting and ending {@link Position} of this statement
      * @param mimicked the mimicked cursor
+     * @param body the statements to execute while mimicking the given cursor
      */
-    record Mimic(Range range, Expr mimicked) implements Statement {}
+    record Mimic(Range range, Expr mimicked, Body body) implements Statement {}
 
     /**
      * Duplicate the current cursor by making a central symmetry.
@@ -216,8 +217,9 @@ public sealed interface Statement {
      * @param range the starting and ending {@link Position} of this statement
      * @param centerX the X coordinate of the symmetry center
      * @param centerY the Y coordinate of the symmetry center
+     * @param body the statements to execute while mirroring the given cursor
      */
-    record MirrorCentral(Range range, Expr centerX, Expr centerY) implements Statement {}
+    record MirrorCentral(Range range, Expr centerX, Expr centerY, Body body) implements Statement {}
 
     /**
      * Duplicate the current cursor by making an axial symmetry.
@@ -227,8 +229,9 @@ public sealed interface Statement {
      * @param axisStartY the Y coordinate of the start of the axis
      * @param axisEndX   the X coordinate of the end of the axis
      * @param axisEndY   the Y coordinate of the end of the axis
+     * @param body the statements to execute while mirroring the given cursor
      */
-    record MirrorAxial(Range range, Expr axisStartX, Expr axisStartY, Expr axisEndX, Expr axisEndY) implements Statement {}
+    record MirrorAxial(Range range, Expr axisStartX, Expr axisStartY, Expr axisEndX, Expr axisEndY, Body body) implements Statement {}
 
     /**
      * Declare a new variable.

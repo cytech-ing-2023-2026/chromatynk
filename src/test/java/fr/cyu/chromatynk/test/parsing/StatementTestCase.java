@@ -4,7 +4,6 @@ import fr.cyu.chromatynk.ast.Expr;
 import fr.cyu.chromatynk.ast.Program;
 import fr.cyu.chromatynk.ast.Statement;
 import fr.cyu.chromatynk.ast.Type;
-import fr.cyu.chromatynk.parsing.ExprParser;
 import fr.cyu.chromatynk.parsing.ParsingIterator;
 import fr.cyu.chromatynk.parsing.StatementParser;
 import fr.cyu.chromatynk.parsing.Token;
@@ -330,6 +329,117 @@ public class StatementTestCase {
     }
 
     @Test
+    public void mimic() {
+        /*
+        MIMIC "cursor" {
+          FWD 5
+        }
+         */
+        assertParse(
+                new Statement.Mimic(
+                        new Range(new Position(0, 0), new Position(1, 2)),
+                        new Expr.LiteralString(Range.sameLine(6, 14), "cursor"),
+                        new Statement.Body(
+                                new Range(new Position(15, 0), new Position(1, 2)),
+                                List.of(
+                                        new Statement.Forward(
+                                                Range.sameLine(2, 7, 1),
+                                                new Expr.LiteralInt(Range.sameLine(6, 7, 1), 5)
+                                        )
+                                )
+                        )
+                ),
+                StatementParser.mimic(),
+                ParsingIterator.of(
+                        new Token.Mimic(Range.sameLine(0, 5)),
+                        new Token.LiteralString(Range.sameLine(6, 14), "cursor"),
+                        new Token.BraceOpen(Range.sameLine(15, 16)),
+                        new Token.Fwd(Range.sameLine(2, 5, 1)),
+                        new Token.LiteralInt(Range.sameLine(6, 7, 1), 5),
+                        new Token.BraceClosed(Range.sameLine(0, 1, 2))
+                )
+        );
+    }
+
+    @Test
+    public void mirrorCentral() {
+        /*
+        MIRROR 0, 0 {
+          FWD 5
+        }
+         */
+        assertParse(
+                new Statement.MirrorCentral(
+                        new Range(new Position(0, 0), new Position(1, 2)),
+                        new Expr.LiteralInt(Range.sameLine(7, 8), 0),
+                        new Expr.LiteralInt(Range.sameLine(10, 11), 0),
+                        new Statement.Body(
+                                new Range(new Position(12, 0), new Position(1, 2)),
+                                List.of(
+                                        new Statement.Forward(
+                                                Range.sameLine(2, 7, 1),
+                                                new Expr.LiteralInt(Range.sameLine(6, 7, 1), 5)
+                                        )
+                                )
+                        )
+                ),
+                StatementParser.mirrorCentral(),
+                ParsingIterator.of(
+                        new Token.Mirror(Range.sameLine(0, 6)),
+                        new Token.LiteralInt(Range.sameLine(7, 8), 0),
+                        new Token.Comma(Range.sameLine(8, 9)),
+                        new Token.LiteralInt(Range.sameLine(10, 11), 0),
+                        new Token.BraceOpen(Range.sameLine(12, 13)),
+                        new Token.Fwd(Range.sameLine(2, 5, 1)),
+                        new Token.LiteralInt(Range.sameLine(6, 7, 1), 5),
+                        new Token.BraceClosed(Range.sameLine(0, 1, 2))
+                )
+        );
+    }
+
+    @Test
+    public void mirrorAxial() {
+        /*
+        MIRROR 0, 0, 5, 5 {
+          FWD 5
+        }
+         */
+        assertParse(
+                new Statement.MirrorAxial(
+                        new Range(new Position(0, 0), new Position(1, 2)),
+                        new Expr.LiteralInt(Range.sameLine(7, 8), 0),
+                        new Expr.LiteralInt(Range.sameLine(10, 11), 0),
+                        new Expr.LiteralInt(Range.sameLine(13, 14), 5),
+                        new Expr.LiteralInt(Range.sameLine(16, 17), 5),
+                        new Statement.Body(
+                                new Range(new Position(18, 0), new Position(1, 2)),
+                                List.of(
+                                        new Statement.Forward(
+                                                Range.sameLine(2, 7, 1),
+                                                new Expr.LiteralInt(Range.sameLine(6, 7, 1), 5)
+                                        )
+                                )
+                        )
+                ),
+                StatementParser.mirrorAxial(),
+                ParsingIterator.of(
+                        new Token.Mirror(Range.sameLine(0, 6)),
+                        new Token.LiteralInt(Range.sameLine(7, 8), 0),
+                        new Token.Comma(Range.sameLine(8, 9)),
+                        new Token.LiteralInt(Range.sameLine(10, 11), 0),
+                        new Token.Comma(Range.sameLine(11, 12)),
+                        new Token.LiteralInt(Range.sameLine(13, 14), 5),
+                        new Token.Comma(Range.sameLine(14, 15)),
+                        new Token.LiteralInt(Range.sameLine(16, 17), 5),
+                        new Token.BraceOpen(Range.sameLine(18, 19)),
+                        new Token.Fwd(Range.sameLine(2, 5, 1)),
+                        new Token.LiteralInt(Range.sameLine(6, 7, 1), 5),
+                        new Token.BraceClosed(Range.sameLine(0, 1, 2))
+                )
+        );
+    }
+
+    @Test
     public void program() {
         /*
         INT n = 5
@@ -404,7 +514,10 @@ public class StatementTestCase {
                         new Token.Identifier(Range.sameLine(8, 9, 3), "i"),
 
                         //}
-                        new Token.BraceClosed(Range.sameLine(0, 1, 4))
+                        new Token.BraceClosed(Range.sameLine(0, 1, 4)),
+
+                        //END
+                        new Token.EndOfFile(new Position(1, 4))
                 )
         );
     }
