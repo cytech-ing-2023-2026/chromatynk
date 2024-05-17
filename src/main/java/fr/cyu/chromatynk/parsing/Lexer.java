@@ -165,7 +165,10 @@ public class Lexer {
             SYMBOL_PARSER,
             KEYWORD_PARSER,
             IDENTIFIER_PARSER
-    ).repeat();
+    ).repeat().mapWithRange((r, list) -> {
+        list.add(new EndOfFile(r.to()));
+        return list;
+    });
 
 
 }

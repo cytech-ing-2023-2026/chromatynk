@@ -1,5 +1,6 @@
 package fr.cyu.chromatynk.parsing;
 
+import fr.cyu.chromatynk.util.Position;
 import fr.cyu.chromatynk.util.Range;
 
 /**
@@ -278,4 +279,17 @@ public sealed interface Token {
      * @param name the name of this identifier
      */
     record Identifier(Range range, String name) implements Token {}
+
+    /**
+     * End of file.
+     *
+     * @param position the position of the end of the file
+     */
+    record EndOfFile(Position position) implements Token {
+
+        @Override
+        public Range range() {
+            return new Range(position, position);
+        }
+    }
 }

@@ -4,6 +4,7 @@ import fr.cyu.chromatynk.parsing.Lexer;
 import fr.cyu.chromatynk.parsing.ParsingException;
 import fr.cyu.chromatynk.parsing.ParsingIterator;
 import fr.cyu.chromatynk.parsing.UnexpectedInputException;
+import fr.cyu.chromatynk.util.Position;
 import fr.cyu.chromatynk.util.Range;
 import org.junit.jupiter.api.Test;
 
@@ -134,28 +135,28 @@ public class LexerTestCase {
 
     @Test
     public void tokens() {
-        assertParseString(List.of(new LiteralInt(Range.sameLine(0, 1), 5)), Lexer.TOKENS_PARSER, "5");
+        assertParseString(List.of(new LiteralInt(Range.sameLine(0, 1), 5), new EndOfFile(new Position(1, 0))), Lexer.TOKENS_PARSER, "5");
 
         assertParseString(
-                List.of(new LiteralInt(Range.sameLine(0, 1), 5), new Operator(Range.sameLine(1, 2), "%")),
+                List.of(new LiteralInt(Range.sameLine(0, 1), 5), new Operator(Range.sameLine(1, 2), "%"), new EndOfFile(new Position(2, 0))),
                 Lexer.TOKENS_PARSER,
                 "5%"
         );
 
         assertParseString(
-                List.of(new LiteralInt(Range.sameLine(0, 1), 5), new Operator(Range.sameLine(2, 3), "%")),
+                List.of(new LiteralInt(Range.sameLine(0, 1), 5), new Operator(Range.sameLine(2, 3), "%"), new EndOfFile(new Position(3, 0))),
                 Lexer.TOKENS_PARSER,
                 "5 %"
         );
 
         assertParseString(
-                List.of(new ParenthesisOpen(Range.sameLine(0, 1)), new LiteralInt(Range.sameLine(1, 2), 5), new ParenthesisClosed(Range.sameLine(2, 3))),
+                List.of(new ParenthesisOpen(Range.sameLine(0, 1)), new LiteralInt(Range.sameLine(1, 2), 5), new ParenthesisClosed(Range.sameLine(2, 3)), new EndOfFile(new Position(3, 0))),
                 Lexer.TOKENS_PARSER,
                 "(5)"
         );
 
         assertParseString(
-                List.of(new Fwd(Range.sameLine(0, 3)), new LiteralInt(Range.sameLine(4, 5), 5), new Operator(Range.sameLine(5, 6), "%")),
+                List.of(new Fwd(Range.sameLine(0, 3)), new LiteralInt(Range.sameLine(4, 5), 5), new Operator(Range.sameLine(5, 6), "%"), new EndOfFile(new Position(6, 0))),
                 Lexer.TOKENS_PARSER,
                 "FWD 5%"
         );
@@ -172,7 +173,8 @@ public class LexerTestCase {
                         new Fwd(Range.sameLine(2, 5, 1)),
                         new Identifier(Range.sameLine(6, 7, 1), "i"),
                         new Operator(Range.sameLine(7, 8, 1), "%"),
-                        new BraceClosed(Range.sameLine(0, 1, 2))
+                        new BraceClosed(Range.sameLine(0, 1, 2)),
+                        new EndOfFile(new Position(1, 2))
                         ),
                 Lexer.TOKENS_PARSER,
                 """
