@@ -149,6 +149,23 @@ public interface Parser<I, O> {
     }
 
     /**
+     * Repeat this parser until the given one succeeds.
+     *
+     * @param parser the parser signaling the end of the repetition
+     * @return a parser parsing zero or multiple outputs of this parser until it fails or `parser` succeeds
+     */
+    default Parser<I, List<O>> repeatUntil(Parser<I, ?> parser) {
+        Parser<I, ?> stopIfEnd = parser
+                .optional()
+                .mapWithRange((r, opt) -> {
+                    if(opt.isPresent()) throw new ParsingException.NonFatal(r.from(), "End");
+                    else return opt;
+                });
+
+        return this.prefixed(stopIfEnd).repeat();
+    }
+
+    /**
      * Repeat and reduce this parser according to the reduction produced when parsing the separator.
      * Useful for parsing binary operators in a recursion-friendly way.
      *
