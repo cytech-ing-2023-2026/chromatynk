@@ -4,7 +4,12 @@ import java.util.Optional;
 
 public enum Type {
 
-    BOOLEAN("BOOL"), STRING("STR"), INT("INT"), FLOAT("NUM"), COLOR("CLR");
+    BOOLEAN("BOOL"),
+    STRING("STR"),
+    INT("INT"),
+    FLOAT("NUM"),
+    PERCENTAGE("PCRT"),
+    COLOR("CLR");
 
     final String name;
 
