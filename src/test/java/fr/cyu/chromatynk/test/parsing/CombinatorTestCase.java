@@ -101,7 +101,7 @@ public class CombinatorTestCase {
                 .mapWithRange((r, v) -> switch (v) {
                     case 10 -> (a, b) -> a + b;
                     case 11 -> (a, b) -> a-b;
-                    default -> throw new UnexpectedInputException(r.from(), "Valid operator", String.valueOf(v));
+                    default -> throw new UnexpectedInputException(r, "Valid operator", String.valueOf(v));
                 });
 
         Parser<Integer, Integer> parser = Parser.<Integer>any().repeatReduce(operatorParser);

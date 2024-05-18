@@ -1,6 +1,6 @@
 package fr.cyu.chromatynk.parsing;
 
-import fr.cyu.chromatynk.util.Position;
+import fr.cyu.chromatynk.util.Range;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,12 +16,12 @@ public final class UnexpectedInputException extends ParsingException.NonFatal {
     /**
      * Create a new unexpected input.
      *
-     * @param position the position where the error occurred
+     * @param range the position where the error occurred
      * @param expected the expected type of input
      * @param actual the input actually parsed
      */
-    public UnexpectedInputException(Position position, String expected, String actual) {
-        super(position, "Unexpected input.\nExpected: " + expected + "\nGot: " + actual);
+    public UnexpectedInputException(Range range, String expected, String actual) {
+        super(range, "Unexpected input.\nExpected: " + expected + "\nGot:      " + actual);
         this.expected = expected;
         this.actual = actual;
     }
@@ -53,7 +53,7 @@ public final class UnexpectedInputException extends ParsingException.NonFatal {
      * @return a new {@link UnexpectedInputException} from the given expected values
      * @param <T> the type of the expected values
      */
-    public static <T> UnexpectedInputException anyOf(Position position, Set<T> expected, String actual) {
+    public static <T> UnexpectedInputException anyOf(Range position, Set<T> expected, String actual) {
         String expectedString = expected
                 .stream()
                 .map(Object::toString)
@@ -71,7 +71,7 @@ public final class UnexpectedInputException extends ParsingException.NonFatal {
      * @return a new {@link UnexpectedInputException} from the given expected values
      * @param <T> the type of the expected values
      */
-    public static <T> UnexpectedInputException anyOfValue(Position position, Set<T> expected, T actual) {
+    public static <T> UnexpectedInputException anyOfValue(Range position, Set<T> expected, T actual) {
         return anyOf(position, expected, actual == null ? "null" : actual.toString());
     }
 }

@@ -53,7 +53,7 @@ public class ExprParser {
                     parseColorComponent(hex.substring(6, 8), 255)
             );
 
-            default -> throw new UnexpectedInputException(range.from(), "RGB/RGBA hexadecimal color", hex);
+            default -> throw new UnexpectedInputException(range, "RGB/RGBA hexadecimal color", hex);
         };
     }
 
@@ -67,7 +67,7 @@ public class ExprParser {
             case Token.LiteralInt(Range range, int value) -> new Expr.LiteralInt(range, value);
             case Token.LiteralFloat(Range range, double value) -> new Expr.LiteralFloat(range, value);
             case Token.LiteralColor(Range range, String hex) -> parseHexColor(range, hex.substring(1));
-            default -> throw new UnexpectedInputException(token.range().from(), "Literal value", token.toPrettyString());
+            default -> throw new UnexpectedInputException(token.range(), "Literal value", token.toPrettyString());
         });
     }
 
@@ -94,7 +94,7 @@ public class ExprParser {
     public static Parser<Token, Expr> invokable() {
         return Parser
                 .firstSucceeding(literal(), varCall(), parenthesized())
-                .mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Illegal invokable expression"));
+                .mapError(e -> new ParsingException.NonFatal(e.getRange(), "Illegal invokable expression"));
     }
 
     private static final Map<String, BiFunction<Range, Expr, Expr>> PREFIX_OPS = Map.ofEntries(
@@ -135,7 +135,7 @@ public class ExprParser {
         if (operators.containsKey(opToken.operator()))
             return operators.get(opToken.operator()).apply(opToken.range().merge(expr.range()), expr);
         else
-            throw new UnexpectedInputException(opToken.range().from(), opType + " operator", "Operator \"" + opToken.toPrettyString() + "\"");
+            throw new UnexpectedInputException(opToken.range(), opType + " operator", "Operator \"" + opToken.toPrettyString() + "\"");
     }
 
     /**
@@ -162,7 +162,7 @@ public class ExprParser {
     public static Parser<Token, Expr> unaryOperator() {
         return Parser
                 .firstSucceeding(prefixOperator(), suffixOperator(), invokable())
-                .mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Illegal prefixed/suffixed invokable expression"));
+                .mapError(e -> new ParsingException.NonFatal(e.getRange(), "Illegal prefixed/suffixed invokable expression"));
     }
 
     private static Parser<Token, Expr> binaryOperatorParser(Parser<Token, Expr> operand, String opType, Map<String, TriFunction<Range, Expr, Expr, Expr>> operators) {
@@ -170,7 +170,7 @@ public class ExprParser {
             if (operators.containsKey(opToken.operator()))
                 return (left, right) -> operators.get(opToken.operator()).apply(left.range().merge(right.range()), left, right);
             else
-                throw new UnexpectedInputException(opToken.range().from(), opType + " operator", "Operator \"" + opToken.toPrettyString() + "\"");
+                throw new UnexpectedInputException(opToken.range(), opType + " operator", "Operator \"" + opToken.toPrettyString() + "\"");
         }));
     }
 
@@ -206,6 +206,6 @@ public class ExprParser {
      * Any expression parser.
      */
     public static Parser<Token, Expr> anyExpr() {
-        return booleanOperator().mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Illegal start of expression"));
+        return booleanOperator().mapError(e -> new ParsingException.NonFatal(e.getRange(), "Illegal start of expression"));
     }
 }

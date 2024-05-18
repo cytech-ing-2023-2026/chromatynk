@@ -1,5 +1,8 @@
 package fr.cyu.chromatynk.util;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 /**
  * A range between two {@link Position}.
  *
@@ -16,6 +19,32 @@ public record Range(Position from, Position to) {
      */
     public Range merge(Range other) {
         return new Range(Position.min(from, other.from), Position.max(to, other.to));
+    }
+
+    /**
+     * Check if the range is on a single line.
+     *
+     * @return `true` if the starting and ending row is the same
+     */
+    public boolean isSameLine() {
+        return from.row() == to.row();
+    }
+
+    /**
+     * Get the lines overlapped by this range.
+     *
+     * @param source the source code to extract the lines from
+     * @return the lines of the source code overlapped by this range.
+     */
+    public String subLines(String source) {
+        StringBuilder result = new StringBuilder();
+
+        String[] lines = source.split("(\r\n|\r|\n)");
+        for(int i = from.row(); i <= to.row(); i++) {
+            if(i >= 0 && i < lines.length) result.append('\n').append(lines[i]);
+        }
+
+        return result.substring(1);
     }
 
     /**

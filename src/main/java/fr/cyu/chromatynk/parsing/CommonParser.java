@@ -15,10 +15,11 @@ public class CommonParser {
     /**
      * Accept any token of the given type.
      */
+    @SuppressWarnings("unchecked")
     public static <T extends Token> Parser<Token, T> tokenOf(Class<T> allowedType, String expectedLabel) {
         return anyToken().map(result -> {
             if(allowedType.isInstance(result)) return (T) result;
-            else throw new UnexpectedInputException(result.range().from(), expectedLabel, result.toPrettyString());
+            else throw new UnexpectedInputException(result.range(), expectedLabel, result.toPrettyString());
         });
     }
 

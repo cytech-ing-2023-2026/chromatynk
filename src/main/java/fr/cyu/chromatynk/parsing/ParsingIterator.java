@@ -1,6 +1,7 @@
 package fr.cyu.chromatynk.parsing;
 
 import fr.cyu.chromatynk.util.Position;
+import fr.cyu.chromatynk.util.Range;
 
 import java.util.Iterator;
 import java.util.List;
