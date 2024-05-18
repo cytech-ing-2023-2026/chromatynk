@@ -15,10 +15,18 @@ public class CommonParser {
     /**
      * Accept any token of the given type.
      */
-    public static <T extends Token> Parser<Token, T> tokenOf(Class<T> allowedType) {
+    @SuppressWarnings("unchecked")
+    public static <T extends Token> Parser<Token, T> tokenOf(Class<T> allowedType, String expectedLabel) {
         return anyToken().map(result -> {
             if(allowedType.isInstance(result)) return (T) result;
-            else throw new UnexpectedInputException(result.range().from(), "Token " + allowedType.getSimpleName(), result.toString());
+            else throw new UnexpectedInputException(result.range(), expectedLabel, result.toPrettyString());
         });
+    }
+
+    /**
+     * Alias for `tokenOf(allowedType, allowedType.getSimpleName())`
+     */
+    public static <T extends Token> Parser<Token, T> tokenOf(Class<T> allowedType) {
+        return tokenOf(allowedType, allowedType.getSimpleName());
     }
 }

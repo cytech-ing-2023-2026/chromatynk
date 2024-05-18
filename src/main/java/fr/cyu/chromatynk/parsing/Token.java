@@ -1,13 +1,14 @@
 package fr.cyu.chromatynk.parsing;
 
 import fr.cyu.chromatynk.util.Position;
+import fr.cyu.chromatynk.util.PrettyPrintable;
 import fr.cyu.chromatynk.util.Range;
 
 /**
  * A lexical token. For example {@code FWD 5%} is parsed to {@code Fwd() LiteralInt(5) Percent()},
  * each token containing its starting and ending positions.
  */
-public sealed interface Token {
+public sealed interface Token extends PrettyPrintable {
 
     /**
      * The starting and ending position of this {@link Token}.
@@ -291,5 +292,25 @@ public sealed interface Token {
         public Range range() {
             return new Range(position, position);
         }
+    }
+
+    @Override
+    default String toPrettyString() {
+        return switch (this) {
+            case LiteralBool(Range ignored, boolean value) -> String.valueOf(value);
+            case LiteralString(Range ignored, String value) -> String.valueOf(value);
+            case LiteralInt(Range ignored, int value) -> String.valueOf(value);
+            case LiteralFloat(Range ignored, double value) -> String.valueOf(value);
+            case LiteralColor(Range ignored, String hex) -> hex;
+            case Operator(Range ignored, String operator) -> operator;
+            case ParenthesisOpen ignored -> "(";
+            case ParenthesisClosed ignored -> ")";
+            case BraceOpen ignored -> "{";
+            case BraceClosed ignored -> "}";
+            case Comma ignored -> ",";
+            case Assign ignored -> "=";
+            case Identifier(Range ignored, String name) -> name;
+            case Token token -> token.getClass().getSimpleName().toUpperCase();
+        };
     }
 }

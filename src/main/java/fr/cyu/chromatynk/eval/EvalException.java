@@ -1,13 +1,12 @@
 package fr.cyu.chromatynk.eval;
 
+import fr.cyu.chromatynk.ChromatynkException;
 import fr.cyu.chromatynk.util.Range;
 
 /**
  * An exception occurring while evaluating the AST.
  */
-public class EvalException extends Exception {
-
-    private final Range range;
+public class EvalException extends ChromatynkException {
 
     /**
      * Create a new evaluation exception.
@@ -16,14 +15,7 @@ public class EvalException extends Exception {
      * @param message the error message
      */
     public EvalException(Range range, String message) {
-        super(message);
-        this.range = range;
+        super(range, message);
     }
 
-    /**
-     * Get the range where the error occurred.
-     */
-    public Range getRange() {
-        return range;
-    }
 }

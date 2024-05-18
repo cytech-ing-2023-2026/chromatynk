@@ -22,14 +22,14 @@ public class Lexer {
     public static final Parser<Character, LiteralBool> LITERAL_BOOL_PARSER = firstSucceeding(keyword("true"), keyword("false"))
             .map(Boolean::parseBoolean)
             .mapWithRange(LiteralBool::new)
-            .mapError(e -> new UnexpectedInputException(e.getPosition(), "true or false", "Invalid boolean"));
+            .mapError(e -> new UnexpectedInputException(e.getRange(), "true or false", "Invalid boolean"));
 
     /**
      * Parser for String literals (e.g `"Hello World"`).
      */
     public static final Parser<Character, LiteralString> LITERAL_STRING_PARSER = matching("\"[^\"]*\"")
             .mapWithRange((r, value) -> new LiteralString(r, value.substring(1, value.length() - 1)))
-            .mapError(e -> new UnexpectedInputException(e.getPosition(), "Actual string between quotes", ((UnexpectedInputException) e).getActual()));
+            .mapError(e -> new UnexpectedInputException(e.getRange(), "Actual string between quotes", ((UnexpectedInputException) e).getActual()));
 
     /**
      * Parser for integer literals (e.g 1, 2, 54...).
@@ -37,7 +37,7 @@ public class Lexer {
     public static final Parser<Character, LiteralInt> LITERAL_INT_PARSER = matching("[0-9]+")
             .map(Integer::parseInt)
             .mapWithRange(LiteralInt::new)
-            .mapError(e -> new UnexpectedInputException(e.getPosition(), "Actual integer", ((UnexpectedInputException) e).getActual()));
+            .mapError(e -> new UnexpectedInputException(e.getRange(), "Actual integer", ((UnexpectedInputException) e).getActual()));
 
     /**
      * Parser for float literals (e.g 1, 1.5, 0.42...).
@@ -45,14 +45,14 @@ public class Lexer {
     public static final Parser<Character, LiteralFloat> LITERAL_FLOAT_PARSER = matching("[0-9]+(\\.[0-9]+)?")
             .map(Double::parseDouble)
             .mapWithRange(LiteralFloat::new)
-            .mapError(e -> new UnexpectedInputException(e.getPosition(), "Actual float", ((UnexpectedInputException) e).getActual()));
+            .mapError(e -> new UnexpectedInputException(e.getRange(), "Actual float", ((UnexpectedInputException) e).getActual()));
 
     /**
      * Parser for color literals (e.g #FFF, #AA0000, #FFFF...). Must have a length of 3, 4, 6 or 8 hexadecimal digits.
      */
     public static final Parser<Character, LiteralColor> LITERAL_COLOR_PARSER = matching("#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})")
             .mapWithRange(LiteralColor::new)
-            .mapError(e -> new UnexpectedInputException(e.getPosition(), "Color in format #XXX or #XXXX or #XXXXXX or #XXXXXXXX where X is an hexadecimal digit", ((UnexpectedInputException) e).getActual()));
+            .mapError(e -> new UnexpectedInputException(e.getRange(), "Color in format #XXX or #XXXX or #XXXXXX or #XXXXXXXX where X is an hexadecimal digit", ((UnexpectedInputException) e).getActual()));
 
     //Symbols
 
@@ -81,7 +81,7 @@ public class Lexer {
                     .stream()
                     .map(op -> symbol(op).valueWithRange(r -> new Operator(r, op)))
                     .collect(Collectors.toList())
-    ).mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Symbol expected"));
+    ).mapError(e -> new ParsingException.NonFatal(e.getRange(), "Symbol expected"));
 
     private static final List<Map.Entry<String, ParsingFunction<Range, Token>>> SYMBOLS = List.of(
             Map.entry("(", ParenthesisOpen::new),
@@ -100,7 +100,7 @@ public class Lexer {
                     .stream()
                     .map(e -> symbol(e.getKey()).valueWithRange(e.getValue()))
                     .collect(Collectors.toList())
-    ).mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Symbol expected"));
+    ).mapError(e -> new ParsingException.NonFatal(e.getRange(), "Symbol expected"));
 
     //Keywords
 
@@ -139,7 +139,7 @@ public class Lexer {
                     .stream()
                     .map(e -> keyword(e.getKey()).valueWithRange(e.getValue()))
                     .collect(Collectors.toList())
-    ).mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Keyword expected"));
+    ).mapError(e -> new ParsingException.NonFatal(e.getRange(), "Keyword expected"));
 
     //Misc
 
@@ -149,7 +149,7 @@ public class Lexer {
      */
     public static final Parser<Character, Identifier> IDENTIFIER_PARSER = matching("([A-Za-z]|_)([A-Za-z0-9]|_)*")
             .mapWithRange(Identifier::new)
-            .mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Identifier expected"));
+            .mapError(e -> new ParsingException.NonFatal(e.getRange(), "Identifier expected"));
 
 
     /**

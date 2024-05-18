@@ -61,7 +61,7 @@ public class StatementParser {
             if (ZERO_ARG_STATEMENTS.containsKey(token.getClass()))
                 return ZERO_ARG_STATEMENTS.get(token.getClass()).apply(token.range());
             else
-                throw new ParsingException.Fatal(new UnexpectedInputException(token.range().from(), "0-arg statement", token.getClass().getSimpleName()));
+                throw new ParsingException.Fatal(new UnexpectedInputException(token.range(), "0-arg statement", token.toPrettyString()));
         });
     }
 
@@ -76,7 +76,7 @@ public class StatementParser {
             if (ONE_ARG_STATEMENTS.containsKey(token.getClass()))
                 return ONE_ARG_STATEMENTS.get(token.getClass()).apply(range, expr);
             else
-                throw new ParsingException.Fatal(new UnexpectedInputException(token.range().from(), "1-arg statement", token.getClass().getSimpleName()));
+                throw new ParsingException.Fatal(new UnexpectedInputException(token.range(), "1-arg statement", token.toPrettyString()));
         });
     }
 
@@ -96,7 +96,7 @@ public class StatementParser {
                     if (TWO_ARG_STATEMENTS.containsKey(token.getClass()))
                         return TWO_ARG_STATEMENTS.get(token.getClass()).apply(range, first, second);
                     else
-                        throw new ParsingException.Fatal(new UnexpectedInputException(token.range().from(), "2-args statement", token.getClass().getSimpleName()));
+                        throw new ParsingException.Fatal(new UnexpectedInputException(token.range(), "2-args statement", token.toPrettyString()));
                 });
     }
 
@@ -119,7 +119,7 @@ public class StatementParser {
                     if (THREE_ARG_STATEMENTS.containsKey(token.getClass()))
                         return THREE_ARG_STATEMENTS.get(token.getClass()).apply(range, first, second, third);
                     else
-                        throw new ParsingException.Fatal(new UnexpectedInputException(token.range().from(), "3-args statement", token.getClass().getSimpleName()));
+                        throw new ParsingException.Fatal(new UnexpectedInputException(token.range(), "3-args statement", token.toPrettyString()));
                 });
     }
 
@@ -159,20 +159,20 @@ public class StatementParser {
     public static Parser<Token, Statement> instruction() {
         return Parser
                 .firstSucceeding(variableDeclaration(), variableAssignment(), threeArgs(), twoArgs(), oneArg(), zeroArg())
-                .mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Illegal instruction"));
+                .mapError(e -> new ParsingException.NonFatal(e.getRange(), "Illegal instruction"));
     }
 
     /**
      * Body `{...}` parser.
      */
     public static Parser<Token, Statement.Body> body() {
-        return tokenOf(Token.BraceOpen.class)
+        return tokenOf(Token.BraceOpen.class, "{")
                 .zip(Parser.lazy(
                         () -> anyStatement()
                                 .fatal()
-                                .repeatUntil(Parser.firstSucceeding(tokenOf(Token.EndOfFile.class), tokenOf(Token.BraceClosed.class)))
+                                .repeatUntil(Parser.firstSucceeding(tokenOf(Token.EndOfFile.class, "EOF"), tokenOf(Token.BraceClosed.class, "}")))
                 ))
-                .zip(tokenOf(Token.BraceClosed.class).mapError(e -> new ParsingException.Fatal(e.getPosition(), "Unclosed brace")))
+                .zip(tokenOf(Token.BraceClosed.class).mapError(e -> new ParsingException.Fatal(e.getRange(), "Missing closing brace `}`")))
                 .map(tpl -> switch (tpl) {
                     case Tuple2(Tuple2(Token.BraceOpen open, List<Statement> statements), Token.BraceClosed closed) ->
                             new Statement.Body(open.range().merge(closed.range()), statements);
@@ -292,7 +292,7 @@ public class StatementParser {
                 .map(id -> Type
                         .fromName(id.name())
                         .map(tpe -> new Tuple2<>(id.range(), tpe))
-                        .orElseThrow(() -> new UnexpectedInputException(id.range().from(), "Existing type", id.name()))
+                        .orElseThrow(() -> new UnexpectedInputException(id.range(), "Existing type", id.toPrettyString()))
                 );
     }
 
@@ -302,7 +302,7 @@ public class StatementParser {
     public static Parser<Token, Statement> anyStatement() {
         return Parser
                 .firstSucceeding(whileLoop(), forLoop(), ifCondition(), mimic(), mirrorAxial(), mirrorCentral(), instruction())
-                .mapError(e -> new ParsingException.NonFatal(e.getPosition(), "Illegal statement"));
+                .mapError(e -> new ParsingException.NonFatal(e.getRange(), "Illegal statement"));
     }
 
     /**

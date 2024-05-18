@@ -1,32 +1,21 @@
 package fr.cyu.chromatynk.parsing;
 
-import fr.cyu.chromatynk.util.Position;
+import fr.cyu.chromatynk.ChromatynkException;
+import fr.cyu.chromatynk.util.Range;
 
 /**
  * An exception occurring while parsing a wrong input.
  */
-public sealed class ParsingException extends Exception {
-
-    private final Position position;
+public sealed class ParsingException extends ChromatynkException {
 
     /**
      * Create a new {@link ParsingException}.
      *
-     * @param position the position of the parsing failure
+     * @param range the range of the parsing failure
      * @param message the error message
      */
-    private ParsingException(Position position, String message) {
-        super(message);
-        this.position = position;
-    }
-
-    /**
-     * Get position of the parsing failure.
-     *
-     * @return the row and column where the parsing failed
-     */
-    public Position getPosition() {
-        return position;
+    private ParsingException(Range range, String message) {
+        super(range, message);
     }
 
     /**
@@ -40,7 +29,7 @@ public sealed class ParsingException extends Exception {
          * @param position the position of the parsing failure
          * @param message  the error message
          */
-        public Fatal(Position position, String message) {
+        public Fatal(Range position, String message) {
             super(position, message);
         }
 
@@ -50,7 +39,7 @@ public sealed class ParsingException extends Exception {
          * @param exception the exception to wrap
          */
         public Fatal(ParsingException exception) {
-            super(exception.getPosition(), exception.getMessage());
+            super(exception.getRange(), exception.getMessage());
         }
     }
 
@@ -65,7 +54,7 @@ public sealed class ParsingException extends Exception {
          * @param position the position of the parsing failure
          * @param message  the error message
          */
-        public NonFatal(Position position, String message) {
+        public NonFatal(Range position, String message) {
             super(position, message);
         }
     }

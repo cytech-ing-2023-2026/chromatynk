@@ -158,7 +158,7 @@ public interface Parser<I, O> {
         Parser<I, ?> stopIfEnd = parser
                 .optional()
                 .mapWithRange((r, opt) -> {
-                    if(opt.isPresent()) throw new ParsingException.NonFatal(r.from(), "End");
+                    if(opt.isPresent()) throw new ParsingException.NonFatal(r, "End");
                     else return opt;
                 });
 
@@ -249,7 +249,7 @@ public interface Parser<I, O> {
                 return result;
             } catch (ParsingException.NonFatal e) {
                 System.out.println("--- ERROR " + name + " ---");
-                System.out.println("Exception at " + e.getPosition() + ": " + e.getMessage());
+                System.out.println("Exception at " + e.getRange() + ": " + e.getMessage());
                 System.out.println("Next cursor: " + iterator.getCursor());
                 throw e;
             }
@@ -275,9 +275,11 @@ public interface Parser<I, O> {
      * @param <T> the token type
      */
     static <T> Parser<T, T> any() {
+
         return iterator -> {
-            if(!iterator.hasNext()) throw new ParsingException.NonFatal(iterator.getPosition(), ParsingIterator.EOF);
             Position start = iterator.getPosition();
+            if(!iterator.hasNext()) throw new ParsingException.NonFatal(new Range(start, start.nextColumn()), ParsingIterator.EOF);
+
             T value = iterator.next();
             return new Result<>(new Range(start, iterator.getPosition()), value);
         };
@@ -292,12 +294,12 @@ public interface Parser<I, O> {
      */
     static <T> Parser<T, T> anyOfSet(Set<T> expected) {
         return iterator -> {
-            if(!iterator.hasNext()) throw UnexpectedInputException.anyOf(iterator.getPosition(), expected, ParsingIterator.EOF);
+            Position start = iterator.getPosition();
+            if(!iterator.hasNext()) throw UnexpectedInputException.anyOf(new Range(start, start.nextColumn()), expected, ParsingIterator.EOF);
             else {
-                Position start = iterator.getPosition();
                 T value = iterator.next();
                 if(expected.contains(value)) return new Result<>(new Range(start, iterator.getPosition()), value);
-                else throw UnexpectedInputException.anyOfValue(iterator.getPosition(), expected, value);
+                else throw UnexpectedInputException.anyOfValue(new Range(start, iterator.getPosition()), expected, value);
             }
         };
     }
@@ -349,7 +351,7 @@ public interface Parser<I, O> {
                 } catch (ParsingException.NonFatal ignored) {}
             }
             
-            throw new ParsingException.NonFatal(iterator.getPosition(), "No parser succeeded");
+            throw new ParsingException.NonFatal(new Range(iterator.getPosition(), iterator.getPosition()), "No parser succeeded");
         };
     }
 
@@ -389,7 +391,7 @@ public interface Parser<I, O> {
 
                 return new Result<>(new Range(from, to), remainingInput.substring(matcher.start(), matcher.end()));
             } else throw new UnexpectedInputException(
-                    iterator.getPosition(),
+                    new Range(iterator.getPosition(), iterator.getPosition()),
                     "String matching regex: " + regex.replace("\\", "\\\\").translateEscapes(),
                     remainingInput.toString()
             );
@@ -416,22 +418,23 @@ public interface Parser<I, O> {
      */
     static Parser<Character, String> keyword(String word) {
         return iterator -> {
-            if(!iterator.hasNext()) throw new UnexpectedInputException(iterator.getPosition(), word, ParsingIterator.EOF);
-            int matching = 0;
             Position from = iterator.getPosition();
+            if(!iterator.hasNext()) throw new UnexpectedInputException(new Range(from, from.nextColumn()), word, ParsingIterator.EOF);
+            int matching = 0;
 
             while(iterator.hasNext() && Character.isAlphabetic(iterator.peek())) {
                     char next = iterator.nextKeepWhitespaces();
                     if(matching < word.length() && word.charAt(matching) == next) matching++;
-                    else throw new UnexpectedInputException(iterator.getPosition(), word, word.substring(0, matching) + next);
+                    else throw new UnexpectedInputException(new Range(from, iterator.getPosition()), word, word.substring(0, matching) + next);
             }
 
-            if(matching != word.length()) throw new UnexpectedInputException(iterator.getPosition(), word, word.substring(0, matching));
-            Position to = iterator.getPosition();
+            Range range = new Range(from, iterator.getPosition());
+
+            if(matching != word.length()) throw new UnexpectedInputException(range, word, word.substring(0, matching));
 
             iterator.handleWhitespaces();
 
-            return new Result<>(new Range(from, to), word);
+            return new Result<>(range, word);
         };
     }
 
@@ -452,24 +455,22 @@ public interface Parser<I, O> {
      */
     static Parser<Character, String> symbol(String symbol) {
         return iterator -> {
-            if(!iterator.hasNext()) throw new UnexpectedInputException(iterator.getPosition(), symbol, ParsingIterator.EOF);
-            int matching = 0;
-
             Position from = iterator.getPosition();
+            if(!iterator.hasNext()) throw new UnexpectedInputException(new Range(from, from.nextColumn()), symbol, ParsingIterator.EOF);
+            int matching = 0;
 
             while(iterator.hasNext() && matching < symbol.length()) {
                 char next = iterator.nextKeepWhitespaces();
                 if(symbol.charAt(matching) == next) matching++;
-                else throw new UnexpectedInputException(iterator.getPosition(), symbol, symbol.substring(0, matching) + next);
+                else throw new UnexpectedInputException(new Range(from, iterator.getPosition()), symbol, symbol.substring(0, matching) + next);
             }
 
-            if(matching != symbol.length()) throw new UnexpectedInputException(iterator.getPosition(), symbol, symbol.substring(0, matching));
-
-            Position to = iterator.getPosition();
+            Range range = new Range(from, iterator.getPosition());
+            if(matching != symbol.length()) throw new UnexpectedInputException(range, symbol, symbol.substring(0, matching));
 
             iterator.handleWhitespaces();
 
-            return new Result<>(new Range(from, to), symbol);
+            return new Result<>(range, symbol);
         };
     }
 
