@@ -1,24 +1,32 @@
 package fr.cyu.chromatynk.ast;
 
+import fr.cyu.chromatynk.eval.Value;
+
 import java.util.Optional;
 
 public enum Type {
 
-    BOOLEAN("BOOL"),
-    STRING("STR"),
-    INT("INT"),
-    FLOAT("NUM"),
-    PERCENTAGE("PCRT"),
-    COLOR("CLR");
+    BOOLEAN("BOOL", new Value.Bool(false)),
+    STRING("STR", new Value.Str("")),
+    INT("INT", new Value.Int(0)),
+    FLOAT("NUM", new Value.Float(0)),
+    PERCENTAGE("PCRT", new Value.Percentage(0)),
+    COLOR("CLR", new Value.Color(0, 0, 0, 1));
 
     final String name;
+    final Value defaultValue;
 
-    Type(String name) {
+    Type(String name, Value defaultValue) {
         this.name = name;
+        this.defaultValue = defaultValue;
     }
 
     public String getName() {
         return name;
+    }
+
+    public Value getDefaultValue() {
+        return defaultValue;
     }
 
     /**

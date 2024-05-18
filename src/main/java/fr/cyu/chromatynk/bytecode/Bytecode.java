@@ -1,5 +1,6 @@
 package fr.cyu.chromatynk.bytecode;
 
+import fr.cyu.chromatynk.ast.Type;
 import fr.cyu.chromatynk.eval.Value;
 import fr.cyu.chromatynk.util.Position;
 import fr.cyu.chromatynk.util.Range;
@@ -43,6 +44,14 @@ public sealed interface Bytecode {
     record Store(Range range, String name) implements Bytecode {}
 
     /**
+     * Declare a variable.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     * @param name the name of the declared variable
+     */
+    record Declare(Range range, Type type, String name) implements Bytecode {}
+
+    /**
      * Delete a variable.
      *
      * @param range the starting and ending {@link Position} of this instruction
@@ -59,13 +68,26 @@ public sealed interface Bytecode {
     record GoTo(Range range, int address) implements Bytecode {}
 
     /**
-     * Pop a value from the stack then jump to an address or another depending on the popped value.
+     * Pop a value from the stack then jump to an address if the popped value is `false`.
      *
      * @param range the starting and ending {@link Position} of this instruction
-     * @param addressTrue the address to jump to if the popped value is `true`
      * @param addressFalse the address to jump to if the popped value is `false`
      */
-    record IfElse(Range range, int addressTrue, int addressFalse) implements Bytecode {}
+    record GoToIfFalse(Range range, int addressFalse) implements Bytecode {}
+
+    /**
+     * Create a new enclosed scope.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
+    record NewScope(Range range) implements Bytecode {}
+
+    /**
+     * Use the parent scope and discard the current one.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
+    record ExitScope(Range range) implements Bytecode {}
 
     //Operations
 
@@ -185,5 +207,16 @@ public sealed interface Bytecode {
     record Move(Range range) implements Bytecode {}
     record Hide(Range range) implements Bytecode {}
     record Show(Range range) implements Bytecode {}
-
+    record Press(Range range) implements Bytecode {}
+    record Color(Range range) implements Bytecode {}
+    record ColorRGB(Range range) implements Bytecode {}
+    record Thick(Range range) implements Bytecode {}
+    record LookAtCursor(Range range) implements Bytecode {}
+    record LookAtPos(Range range) implements Bytecode {}
+    record CreateCursor(Range range) implements Bytecode {}
+    record SelectCursor(Range range) implements Bytecode {}
+    record RemoveCursor(Range range) implements Bytecode {}
+    record Mimic(Range range) implements Bytecode {}
+    record MirrorCentral(Range range) implements Bytecode {}
+    record MirrorAxial(Range range) implements Bytecode {}
 }
