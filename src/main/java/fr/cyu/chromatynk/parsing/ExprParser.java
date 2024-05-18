@@ -67,7 +67,7 @@ public class ExprParser {
             case Token.LiteralInt(Range range, int value) -> new Expr.LiteralInt(range, value);
             case Token.LiteralFloat(Range range, double value) -> new Expr.LiteralFloat(range, value);
             case Token.LiteralColor(Range range, String hex) -> parseHexColor(range, hex.substring(1));
-            default -> throw new UnexpectedInputException(token.range().from(), "Literal value", token.toString());
+            default -> throw new UnexpectedInputException(token.range().from(), "Literal value", token.toPrettyString());
         });
     }
 
@@ -82,9 +82,9 @@ public class ExprParser {
      * Parenthesized expression parser.
      */
     public static Parser<Token, Expr> parenthesized() {
-        return tokenOf(Token.ParenthesisOpen.class)
+        return tokenOf(Token.ParenthesisOpen.class, "(")
                 .zip(Parser.lazy(ExprParser::anyExpr))
-                .zip(tokenOf(Token.ParenthesisClosed.class))
+                .zip(tokenOf(Token.ParenthesisClosed.class, ")"))
                 .map(result -> result.a().b());
     }
 
@@ -135,7 +135,7 @@ public class ExprParser {
         if (operators.containsKey(opToken.operator()))
             return operators.get(opToken.operator()).apply(opToken.range().merge(expr.range()), expr);
         else
-            throw new UnexpectedInputException(opToken.range().from(), opType + " operator", "Operator \"" + opToken.operator() + "\"");
+            throw new UnexpectedInputException(opToken.range().from(), opType + " operator", "Operator \"" + opToken.toPrettyString() + "\"");
     }
 
     /**
@@ -170,7 +170,7 @@ public class ExprParser {
             if (operators.containsKey(opToken.operator()))
                 return (left, right) -> operators.get(opToken.operator()).apply(left.range().merge(right.range()), left, right);
             else
-                throw new UnexpectedInputException(opToken.range().from(), opType + " operator", "Operator \"" + opToken.operator() + "\"");
+                throw new UnexpectedInputException(opToken.range().from(), opType + " operator", "Operator \"" + opToken.toPrettyString() + "\"");
         }));
     }
 
