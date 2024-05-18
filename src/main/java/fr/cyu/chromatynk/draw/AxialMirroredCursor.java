@@ -1,5 +1,6 @@
 package fr.cyu.chromatynk.draw;
 
+import fr.cyu.chromatynk.util.Tuple2;
 import javafx.scene.canvas.GraphicsContext;
 
 /**
@@ -7,37 +8,49 @@ import javafx.scene.canvas.GraphicsContext;
  */
 public class AxialMirroredCursor extends DuplicatedCursor {
 
-    private final double lineX;
-    private final double lineY;
+    private final double lineAX;
+    private final double lineAY;
+    private final double lineBX;
+    private final double lineBY;
 
     /**
      * Create a new axial-mirrored cursor.
      *
      * @param duplicated the mirrored cursor
-     * @param lineX the X direction of the axis
-     * @param lineY the Y direction of the axis
+     * @param lineAX the starting X of the A point of the axis
+     * @param lineAY the starting Y of the A point of the axis
+     * @param lineBX the starting X of the B point of the axis
+     * @param lineBY the starting Y of the B point of the axis
+     *
      */
-    public AxialMirroredCursor(Cursor duplicated, double lineX, double lineY) {
+    public AxialMirroredCursor(Cursor duplicated, double lineAX, double lineAY, double lineBX, double lineBY) {
         super(duplicated);
-        this.lineX = lineX;
-        this.lineY = lineY;
+        this.lineAX = lineAX;
+        this.lineAY = lineAY;
+        this.lineBX = lineBX;
+        this.lineBY = lineBY;
     }
 
-    private double getSymmetricX(double x, double y) {
-        double factorToY = y / lineY;
-        double xAtY = lineX*factorToY;
-        return xAtY + (xAtY - x);
-    }
+    private Tuple2<Double, Double> getSymmetric(double x1, double y1) {
+        if(lineAX == lineBX) return new Tuple2<>(lineAX + (lineAX - x1), y1);
 
-    private double getSymmetricY(double x, double y) {
-        double factorToX = x / lineX;
-        double yAtX = lineY*factorToX;
-        return yAtX + (yAtX - y);
+        double slope = (lineBY-lineAY)/(lineBX-lineAX);
+        double yIntersection = (lineBX*lineAY-lineAX*lineBY)/(lineBX-lineAX);
+        double d = (x1 + (y1 - yIntersection)*slope)/(1 + slope*slope);
+
+        return new Tuple2<>(
+                2*d - x1,
+                2*d*slope - y1 + 2*yIntersection
+        );
     }
 
     @Override
     public void drawLineAt(GraphicsContext graphics, double x, double y, double dx, double dy) {
         getDuplicated().drawLineAt(graphics, x, y, dx, dy);
-        getDuplicated().drawLineAt(graphics, getSymmetricX(x, y), getSymmetricY(x, y), getSymmetricX(dx, dy), getSymmetricY(dx, dy));
+
+        Tuple2<Double, Double> symmetricStart = getSymmetric(x, y);
+        Tuple2<Double, Double> symmetricEnd = getSymmetric(dx, dy);
+
+        getDuplicated().drawLineAt(graphics, symmetricStart.a(), symmetricStart.b(), symmetricEnd.a(), symmetricEnd.b());
     }
 }
