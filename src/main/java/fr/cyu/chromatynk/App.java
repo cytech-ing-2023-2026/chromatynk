@@ -25,12 +25,11 @@ public class App extends Application {
         graphics.fillRect(0, 0, 500, 500);
 
         var cursor = new TangibleCursor(100, 100, 0, 0, new Color(1, 0, 0), 1, 5);
-        var dupli = new CentralMirroredCursor(cursor, 250, 250);
+        var dupli = new AxialMirroredCursor(cursor, 100, 200, 300, 400);
         dupli.move(graphics, 100, 100);
         dupli.setColor(new Color(0, 1, 0));
         dupli.setThickness(1);
-        dupli.move(graphics, 100, -100);
-        cursor.move(graphics, 100, 100);
+        dupli.move(graphics, -100, 100);
 
         stage.setScene(scene);
         stage.show();
