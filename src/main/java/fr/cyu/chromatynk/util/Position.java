@@ -26,6 +26,10 @@ public record Position(int column, int row) {
         return new Position(0, row + 1);
     }
 
+    public boolean isBefore(Position other) {
+        return row < other.row || (row == other.row && column < other.column);
+    }
+
     /**
      * Get the smallest position.
      *
@@ -34,9 +38,7 @@ public record Position(int column, int row) {
      * @return `a` if `a` is smaller, `b` otherwise
      */
     public static Position min(Position a, Position b) {
-        if(a.row < b.row) return a;
-        else if(a.row > b.row) return b;
-        else return a.column < b.column ? a : b;
+        return a.isBefore(b) ? a : b;
     }
 
     /**
@@ -47,8 +49,6 @@ public record Position(int column, int row) {
      * @return `a` if `a` is greater, `b` otherwise
      */
     public static Position max(Position a, Position b) {
-        if(a.row > b.row) return a;
-        else if(a.row < b.row) return b;
-        else return a.column > b.column ? a : b;
+        return a.isBefore(b) ? b : a;
     }
 }

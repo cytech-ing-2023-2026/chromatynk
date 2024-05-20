@@ -1,5 +1,7 @@
 package fr.cyu.chromatynk.util;
 
+import fr.cyu.chromatynk.parsing.ParsingIterator;
+
 /**
  * A range between two {@link Position}.
  *
@@ -42,6 +44,34 @@ public record Range(Position from, Position to) {
         }
 
         return result.substring(1);
+    }
+
+    /**
+     * Transform this 2D range to 1D.
+     *
+     * @param source the source code to use for the 2D -> 1D map
+     * @return this range as a starting and ending cursor 1D coordinates.
+     */
+    public Tuple2<Integer, Integer> toCursorRange(String source) {
+        int start = -1;
+        int end = -1;
+
+        ParsingIterator<Character> it = ParsingIterator.fromString(source);
+
+        while(it.hasNext() && it.getPosition().isBefore(to)) {
+            if(from.isBefore(it.getPosition()) || from.equals(it.getPosition())) {
+                if(start == -1) start = it.getCursor();
+                end = it.getCursor()+1;
+            }
+            it.next();
+        }
+
+        if(start == -1) {
+            start = it.getCursor();
+            end = it.getCursor();
+        }
+
+        return new Tuple2<>(start, end);
     }
 
     /**

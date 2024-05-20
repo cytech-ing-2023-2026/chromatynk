@@ -1,11 +1,11 @@
 package fr.cyu.chromatynk.editor;
 
+import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.scene.control.TextArea;
+import org.fxmisc.richtext.CodeArea;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -18,10 +18,10 @@ import java.nio.file.Paths;
 public class FileMenuController {
 
 	private final Stage primaryStage;
-	private final TextArea codeArea;
+	private final CodeArea codeArea;
 
 	@SuppressWarnings("exports")
-	public FileMenuController(Stage primaryStage, TextArea codeArea) {
+	public FileMenuController(Stage primaryStage, CodeArea codeArea) {
 		this.primaryStage = primaryStage;
 		this.codeArea = codeArea;
 	}
@@ -33,17 +33,21 @@ public class FileMenuController {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Ouvrir un fichier");
 
-		// Add a file extension filter for .cty files
-		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Fichiers Chromatynk (*.cty)", "*.cty");
-		fileChooser.getExtensionFilters().add(extFilter);
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers Chromatynk", "*.cty"));
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Autres fichiers", "*"));
 
 		File selectedFile = fileChooser.showOpenDialog(primaryStage);
 		if (selectedFile != null) {
 			try {
 				String content = new String(Files.readAllBytes(Paths.get(selectedFile.getAbsolutePath())));
-				codeArea.setText(content);
+				codeArea.replaceText(content);
 			} catch (IOException ex) {
 				ex.printStackTrace();
+				StringWriter sw = new StringWriter();
+				ex.printStackTrace(new PrintWriter(sw));
+
+				Alert alert = new Alert(Alert.AlertType.ERROR, "An error occurred while reading the file.\n" + sw.getBuffer());
+				alert.showAndWait();
 			}
 		}
 	}

@@ -1,29 +1,37 @@
 package fr.cyu.chromatynk.editor;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import fr.cyu.chromatynk.Chromatynk;
+import fr.cyu.chromatynk.parsing.ParsingException;
+import fr.cyu.chromatynk.parsing.Token;
+import fr.cyu.chromatynk.util.Tuple2;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.scene.layout.HBox;
-import javafx.scene.control.Button;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.reactfx.Subscription;
+
+import java.net.URL;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * The controller for the code editor
  * @author JordanViknar
  */
-public class CodeEditorController {
+public class CodeEditorController implements Initializable {
 	// The main elements
 	@FXML
-	private TextArea codeArea;
+	private CodeArea codeArea;
 	@FXML
 	private Canvas canvas;
 
@@ -66,7 +74,21 @@ public class CodeEditorController {
 	 * This function is used to setup the UI elements of the code editor Java-side.
 	 * Basically : it's for things we cannot do in FXML.
 	 */
-	public void initialize() {
+	@Override
+	public void initialize(URL url, ResourceBundle resourceBundle) {
+		Executor executor = Executors.newSingleThreadExecutor();
+
+		Subscription subscription = this.codeArea
+				.multiPlainChanges()
+				.successionEnds(Duration.ofMillis(125))
+				.retainLatestUntilLater(executor)
+				.supplyTask(() -> computeHighlighting(executor))
+				.awaitLatest(codeArea.multiPlainChanges())
+				.subscribe(tr -> {
+					tr.ifSuccess(highlighting -> codeArea.setStyleSpans(0, highlighting));
+					tr.ifFailure(Throwable::printStackTrace);
+				});
+
 		this.fileMenuController = new FileMenuController(primaryStage, codeArea);
 
 		// Set background color of the canvas
@@ -91,7 +113,7 @@ public class CodeEditorController {
 			}
 			if (newTab != null && newTab != plusTab) {
 				// Load content of the new tab
-				codeArea.setText(tabContentMap.getOrDefault(newTab, ""));
+				codeArea.replaceText(tabContentMap.getOrDefault(newTab, ""));
 			}
 			if (newTab == plusTab) {
 				// Create a new tab
@@ -113,6 +135,44 @@ public class CodeEditorController {
 				tabPane.getSelectionModel().select(newTabInstance);
 			}
 		});
+	}
+
+	public Task<StyleSpans<Collection<String>>> computeHighlighting(Executor executor) {
+		String text = codeArea.getText();
+		Task<StyleSpans<Collection<String>>> task = new Task<>() {
+            @Override
+            protected StyleSpans<Collection<String>> call() throws ParsingException {
+				List<Token> tokens = Chromatynk.lexProgram(text);
+				StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+
+				int lastKeywordEnd = 0;
+
+				for(Token token : tokens) {
+					String cssClass = switch (token) {
+						case Token.LiteralBool ignored -> "boolean";
+						case Token.LiteralString ignored -> "string";
+						case Token.LiteralInt ignored -> "num";
+						case Token.LiteralFloat ignored -> "num";
+						case Token.LiteralColor ignored -> "color";
+						case Token.Identifier ignored -> "identifier";
+						case Token.Keyword ignored -> "keyword";
+						default -> "default";
+					};
+
+					Tuple2<Integer, Integer> range1d = token.range().toCursorRange(text);
+
+					spansBuilder.add(Collections.singleton("default"), Math.max(0, range1d.a() - lastKeywordEnd));
+					spansBuilder.add(Collections.singleton(cssClass), range1d.b() - range1d.a());
+					lastKeywordEnd = range1d.b();
+				}
+
+				var res = spansBuilder.create();
+                return res;
+            }
+        };
+
+		executor.execute(task);
+		return task;
 	}
 
 	public void openFile() {fileMenuController.openFile();}
