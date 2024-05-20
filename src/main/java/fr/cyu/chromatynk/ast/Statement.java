@@ -51,7 +51,7 @@ public sealed interface Statement {
      *     }
      * </pre>
      *
-     * @param range the starting and ending {@link Position} of this statement
+     * @param range    the starting and ending {@link Position} of this statement
      * @param iterator the name of the iterator
      * @param from     the initial thickness of the iterator
      * @param to       the upper bound of the iterator
@@ -147,7 +147,7 @@ public sealed interface Statement {
      * Make the current cursor look at the given one.
      *
      * @param range the starting and ending {@link Position} of this statement
-     * @param cursor
+     * @param cursor the cursor
      */
     record LookAtCursor(Range range, Expr cursor) implements Statement {}
 

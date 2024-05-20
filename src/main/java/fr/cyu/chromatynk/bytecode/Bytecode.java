@@ -198,25 +198,136 @@ public sealed interface Bytecode {
 
     //Statements
 
-    //TODO javadoc
-
+    /**
+     * Move forward on the given distance.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record Forward(Range range) implements Bytecode {}
+
+    /**
+     * Move backward on the given distance.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record Backward(Range range) implements Bytecode {}
+
+    /**
+     * A Turn {@code angle}.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record Turn(Range range) implements Bytecode {}
+
+    /**
+     * Teleport the cursor to the given position.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record Pos(Range range) implements Bytecode {}
+
+    /**
+     * Move the current cursor relatively
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record Move(Range range) implements Bytecode {}
+
+    /**
+     * Hide the given cursor.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record Hide(Range range) implements Bytecode {}
+
+    /**
+     * Show the given cursor.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record Show(Range range) implements Bytecode {}
+
+    /**
+     * Set the opacity of the cursor.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record Press(Range range) implements Bytecode {}
+
+    /**
+     * Set the color of the cursor.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record Color(Range range) implements Bytecode {}
+
+    /**
+     * Set the color of the cursor. Takes 3 arguments: red, green, blue.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record ColorRGB(Range range) implements Bytecode {}
+
+    /**
+     * Set the thickness of the cursor.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record Thick(Range range) implements Bytecode {}
+
+    /**
+     * Make the current cursor look at the given one.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record LookAtCursor(Range range) implements Bytecode {}
+
+    /**
+     * Make the current cursor look at the given position.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record LookAtPos(Range range) implements Bytecode {}
+
+    /**
+     * Create a new cursor with the given id.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record CreateCursor(Range range) implements Bytecode {}
+
+    /**
+     * Select a cursor.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record SelectCursor(Range range) implements Bytecode {}
+
+    /**
+     * Remove a cursor.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record RemoveCursor(Range range) implements Bytecode {}
+
+    /**
+     * Create a new cursor mimicking the given one.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record Mimic(Range range) implements Bytecode {}
+
+    /**
+     * Duplicate the current cursor by making a central symmetry.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record MirrorCentral(Range range) implements Bytecode {}
+
+    /**
+     * Duplicate the current cursor by making an axial symmetry.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
     record MirrorAxial(Range range) implements Bytecode {}
 }
