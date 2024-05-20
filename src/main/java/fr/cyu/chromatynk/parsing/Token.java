@@ -106,172 +106,177 @@ public sealed interface Token extends PrettyPrintable {
     record Assign(Range range) implements Token {}
 
     /**
+     * A keyword token.
+     */
+    sealed interface Keyword extends Token {}
+
+    /**
      * A `FWD` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Fwd(Range range) implements Token {}
+    record Fwd(Range range) implements Keyword {}
 
     /**
      * A `BWD` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Bwd(Range range) implements Token {}
+    record Bwd(Range range) implements Keyword {}
 
     /**
      * A `TURN` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Turn(Range range) implements Token {}
+    record Turn(Range range) implements Keyword {}
 
     /**
      * A `MOV` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Mov(Range range) implements Token {}
+    record Mov(Range range) implements Keyword {}
 
     /**
      * A `POS` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Pos(Range range) implements Token {}
+    record Pos(Range range) implements Keyword {}
 
     /**
      * A `HIDE` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Hide(Range range) implements Token {}
+    record Hide(Range range) implements Keyword {}
 
     /**
      * A `SHOW` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Show(Range range) implements Token {}
+    record Show(Range range) implements Keyword {}
 
     /**
      * A `PRESS` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Press(Range range) implements Token {}
+    record Press(Range range) implements Keyword {}
 
     /**
      * A `COLOR` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Color(Range range) implements Token {}
+    record Color(Range range) implements Keyword {}
 
     /**
      * A `THICK` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Thick(Range range) implements Token {}
+    record Thick(Range range) implements Keyword {}
 
     /**
      * A `LOOKAT` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record LookAt(Range range) implements Token {}
+    record LookAt(Range range) implements Keyword {}
 
     /**
      * A `CURSOR` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Cursor(Range range) implements Token {}
+    record Cursor(Range range) implements Keyword {}
 
     /**
      * A `SELECT` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Select(Range range) implements Token {}
+    record Select(Range range) implements Keyword {}
 
     /**
      * A `REMOVE` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Remove(Range range) implements Token {}
+    record Remove(Range range) implements Keyword {}
 
     /**
      * A `IF` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record If(Range range) implements Token {}
+    record If(Range range) implements Keyword {}
 
     /**
      * A `ELSE` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Else(Range range) implements Token {}
+    record Else(Range range) implements Keyword {}
 
     /**
      * A `FOR` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record For(Range range) implements Token {}
+    record For(Range range) implements Keyword {}
 
     /**
      * A `FROM` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record From(Range range) implements Token {}
+    record From(Range range) implements Keyword {}
 
     /**
      * A `TO` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record To(Range range) implements Token {}
+    record To(Range range) implements Keyword {}
 
     /**
      * A `STEP` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Step(Range range) implements Token {}
+    record Step(Range range) implements Keyword {}
 
     /**
      * A `WHILE` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record While(Range range) implements Token {}
+    record While(Range range) implements Keyword {}
 
     /**
      * A `MIMIC` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Mimic(Range range) implements Token {}
+    record Mimic(Range range) implements Keyword {}
 
     /**
      * A `MIRROR` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Mirror(Range range) implements Token {}
+    record Mirror(Range range) implements Keyword {}
 
     /**
      * A `DEL` keyword.
      *
      * @param range the starting and ending position of this token
      */
-    record Del(Range range) implements Token {}
+    record Del(Range range) implements Keyword {}
 
     /**
      * An identifier for a variable or a function.
