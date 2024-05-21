@@ -6,6 +6,7 @@ import fr.cyu.chromatynk.ast.Type;
 import fr.cyu.chromatynk.bytecode.Bytecode;
 import fr.cyu.chromatynk.bytecode.Compiler;
 import fr.cyu.chromatynk.eval.Value;
+import fr.cyu.chromatynk.util.Position;
 import fr.cyu.chromatynk.util.Range;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +26,7 @@ public class CompilerTestCase {
 
     private void assertCompileStatement(List<Bytecode> expected, Statement statement) {
         List<Bytecode> result = new LinkedList<>();
-        Compiler.compileStatement(statement, result);
+        Compiler.compileStatement(statement, result, 0);
         assertEquals(expected, result);
     }
 
@@ -172,7 +173,67 @@ public class CompilerTestCase {
         );
     }
 
-    //TODO test assign
+    @Test
+    public void assign() {
+        assertCompileStatement(
+                List.of(
+                        new Bytecode.Push(Range.sameLine(4, 5), new Value.Int(0)),
+                        new Bytecode.Store(Range.sameLine(0, 5), "x")
+                ),
+                new Statement.AssignVariable(
+                        Range.sameLine(0, 5),
+                        "x",
+                        new Expr.LiteralInt(Range.sameLine(4, 5), 0)
+                )
+        );
+    }
+
+    @Test
+    public void ifCondition() {
+
+        Range wholeRange = new Range(new Position(0, 0), new Position(1, 4));
+
+        /*
+        IF condition {
+          FWD 5
+        } ELSE {
+          FWD 10
+        }
+         */
+        assertCompileStatement(
+                List.of(
+                        new Bytecode.Load(Range.sameLine(3, 12), "condition"),
+                        new Bytecode.GoToIfFalse(wholeRange, 7),
+                        new Bytecode.NewScope(new Range(new Position(13, 0), new Position(1, 2))),
+                        new Bytecode.Push(Range.sameLine(6, 7, 1), new Value.Int(5)),
+                        new Bytecode.Forward(Range.sameLine(2, 7, 1)),
+                        new Bytecode.ExitScope(new Range(new Position(13, 0), new Position(1, 2))),
+                        new Bytecode.GoTo(wholeRange, 11),
+                        new Bytecode.NewScope(new Range(new Position(7, 2), new Position(1, 4))),
+                        new Bytecode.Push(Range.sameLine(6, 8, 3), new Value.Int(10)),
+                        new Bytecode.Forward(Range.sameLine(2, 8, 3)),
+                        new Bytecode.ExitScope(new Range(new Position(7, 2), new Position(1, 4)))
+                ),
+                new Statement.If(
+                        wholeRange,
+                        new Expr.VarCall(Range.sameLine(3, 12), "condition"),
+                        new Statement.Body(
+                                new Range(new Position(13, 0), new Position(1, 2)),
+                                List.of(new Statement.Forward(
+                                        Range.sameLine(2, 7, 1),
+                                        new Expr.LiteralInt(Range.sameLine(6, 7, 1), 5)
+                                ))
+                        ),
+                        Optional.of(new Statement.Body(
+                                new Range(new Position(7, 2), new Position(1, 4)),
+                                List.of(new Statement.Forward(
+                                        Range.sameLine(2, 8, 3),
+                                        new Expr.LiteralInt(Range.sameLine(6, 8, 3), 10)
+                                ))
+                        ))
+                )
+        );
+    }
 
     //TODO test if/while/for
 }

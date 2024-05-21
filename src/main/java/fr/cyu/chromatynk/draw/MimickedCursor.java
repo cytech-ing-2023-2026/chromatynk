@@ -38,6 +38,6 @@ public class MimickedCursor extends DuplicatedCursor {
      * @return a new {@link MimickedCursor} with `mimicked` as the cursor being mimicked
      */
     public static MimickedCursor at(Cursor mimicked, double x, double y) {
-        return new MimickedCursor(mimicked, x- mimicked.getX(), y-mimicked.getY());
+        return new MimickedCursor(mimicked, x - mimicked.getX(), y - mimicked.getY());
     }
 }

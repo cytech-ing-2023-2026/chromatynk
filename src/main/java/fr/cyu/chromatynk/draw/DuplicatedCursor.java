@@ -56,6 +56,16 @@ public abstract class DuplicatedCursor implements Cursor {
     }
 
     @Override
+    public boolean isVisible() {
+        return duplicated.isVisible();
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        duplicated.setVisible(visible);
+    }
+
+    @Override
     public double getDirY() {
         return duplicated.getDirY();
     }

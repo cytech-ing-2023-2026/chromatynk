@@ -44,7 +44,7 @@ public sealed interface Bytecode {
     record Store(Range range, String name) implements Bytecode {}
 
     /**
-     * Declare a variable.
+     * Declare a variable and pop a value from the stack to assign to it.
      *
      * @param range the starting and ending {@link Position} of this instruction
      * @param name the name of the declared variable
@@ -330,4 +330,11 @@ public sealed interface Bytecode {
      * @param range the starting and ending {@link Position} of this instruction
      */
     record MirrorAxial(Range range) implements Bytecode {}
+
+    /**
+     * The end of the scope.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
+    record End(Range range) implements Bytecode {}
 }

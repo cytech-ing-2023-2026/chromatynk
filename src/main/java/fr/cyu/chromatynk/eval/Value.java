@@ -50,7 +50,13 @@ public sealed interface Value {
      * @param blue the blue component between 0 and 1
      * @param alpha the opacity between 0 and 1
      */
-    record Color(double red, double green, double blue, double alpha) implements Value {}
+    record Color(double red, double green, double blue, double alpha) implements Value {
+
+        @Override
+        public String toString() {
+            return "#" + Integer.toHexString((int) red * 255) + Integer.toHexString((int) green * 255) + Integer.toHexString((int) blue * 255) + Integer.toHexString((int) alpha * 255);
+        }
+    }
 
     /**
      * Get the type of this value.

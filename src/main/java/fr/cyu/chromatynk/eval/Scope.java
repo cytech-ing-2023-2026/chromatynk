@@ -5,6 +5,7 @@ import fr.cyu.chromatynk.draw.CursorId;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Stack;
 
 /**
  * The scope of an evaluated block.
@@ -79,7 +80,7 @@ public class Scope {
      *
      * @param id the id of the cursor
      */
-    public void deleteVariable(CursorId id) {
+    public void deleteCursor(CursorId id) {
         cursors.remove(id);
     }
 

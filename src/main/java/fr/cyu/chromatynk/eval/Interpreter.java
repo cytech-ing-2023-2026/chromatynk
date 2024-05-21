@@ -16,6 +16,14 @@ import java.util.Set;
  */
 public class Interpreter {
 
+    private static boolean asBoolean(Range range, Value value) throws TypeMismatchException {
+        return switch (value) {
+            case Value.Bool(boolean v) -> v;
+            case Value actual ->
+                    throw new TypeMismatchException(range, Set.of(Type.BOOLEAN), actual.getType());
+        };
+    }
+
     private static boolean isNumeric(Value value) {
         return value.getType() == Type.INT || value.getType() == Type.FLOAT;
     }
@@ -85,7 +93,9 @@ public class Interpreter {
                     context.declareVariable(name, new Variable(type, context.popValue()));
             case Bytecode.Delete(Range ignored, String name) -> context.deleteVariable(name);
             case Bytecode.GoTo(Range ignored, int address) -> context.setNextAddress(address);
-            case Bytecode.GoToIfFalse(Range ignored, int addressFalse) -> context.setNextAddress(addressFalse);
+            case Bytecode.GoToIfFalse(Range range, int addressFalse) -> {
+                if(!asBoolean(range, context.popValue())) context.setNextAddress(addressFalse);
+            }
             case Bytecode.NewScope ignored -> context.createScope();
             case Bytecode.ExitScope ignored -> context.exitScope();
             case Bytecode.Percent(Range range) -> context.pushValue(
@@ -116,7 +126,7 @@ public class Interpreter {
                         };
 
                         case Value.Int(int right) -> switch (context.popValue()) {
-                            case Value.Int left -> new Value.Int(left.value());
+                            case Value.Int left -> new Value.Int(left.value() + right);
                             case Value.Float left -> new Value.Float(left.value() + right);
                             case Value.Str left -> new Value.Str(left.value() + right);
                             case Value actual ->
@@ -585,7 +595,7 @@ public class Interpreter {
                             && green >= 0 && green <= 255
                             && blue >= 0 && blue <= 255
                     ) ->
-                            new Color(red/255, green/255, blue/255);
+                            new Color(red/255.0, green/255.0, blue/255.0);
 
                     case Tuple3(Value blue, Value green, Value red) when (
                             isNumeric(blue) && isNumeric(green) && isNumeric(red)
@@ -663,7 +673,7 @@ public class Interpreter {
                 CursorId mimickedId = asCursorId(range, context.popValue());
                 context.declareCursor(
                         mimickedId,
-                        new MimickedCursor(
+                        MimickedCursor.at(
                                 context.getCursor(mimickedId).orElseThrow(() -> new MissingCursorException(range, mimickedId)),
                                 context.getCurrentCursor().getX(),
                                 context.getCurrentCursor().getY()
@@ -698,8 +708,10 @@ public class Interpreter {
         }
     }
 
-    public static EvalContext evaluateAll(EvalContext context, List<Bytecode> instructions) throws EvalException {
-        //TODO impl
-        throw new RuntimeException("TODO");
+    public static EvalContext evaluateAll(EvalContext context, Clock clock) throws EvalException {
+        while (context.hasNext() && clock.tick()){
+            evaluate(context, context.next());
+        }
+        return context;
     }
 }

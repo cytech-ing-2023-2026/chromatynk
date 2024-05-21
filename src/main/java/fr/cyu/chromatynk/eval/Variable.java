@@ -42,8 +42,8 @@ public class Variable {
     /**
      * Get the value of this variable if it exists.
      */
-    public Optional<Value> getValue() {
-        return Optional.ofNullable(value);
+    public Value getValue() {
+        return value;
     }
 
     /**

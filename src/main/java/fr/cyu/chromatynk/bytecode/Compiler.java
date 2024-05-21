@@ -1,11 +1,14 @@
 package fr.cyu.chromatynk.bytecode;
 
 import fr.cyu.chromatynk.ast.Expr;
+import fr.cyu.chromatynk.ast.Program;
 import fr.cyu.chromatynk.ast.Statement;
 import fr.cyu.chromatynk.ast.Type;
 import fr.cyu.chromatynk.eval.Value;
+import fr.cyu.chromatynk.util.Position;
 import fr.cyu.chromatynk.util.Range;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -121,12 +124,10 @@ public class Compiler {
         }
     }
 
-    public static void compileStatement(Statement statement, List<Bytecode> instructions) {
+    public static void compileStatement(Statement statement, List<Bytecode> instructions, int offset) {
         switch (statement) {
             case Statement.Body(Range range, List<Statement> statements) -> {
-                instructions.add(new Bytecode.NewScope(range));
-                for(Statement stat : statements) compileStatement(stat, instructions);
-                instructions.add(new Bytecode.ExitScope(range));
+                for (Statement stat : statements) compileStatement(stat, instructions, offset);
             }
 
             case Statement.Forward(Range range, Expr distance) -> {
@@ -150,9 +151,8 @@ public class Compiler {
               i = i + 1
             }
 
-            Declare(Type.INT, "i")
             Push(0)
-            Store("i")
+            Declare(Type.INT, "i")
             Load("i") //3
             Push(10)
             Less()
@@ -166,34 +166,41 @@ public class Compiler {
             GoTo(3)
             ... //14
              */
-            case Statement.For(Range range, String iterator, Expr from, Expr to, Optional<Expr> step, Statement.Body body) -> {
+            case Statement.For(
+                    Range range, String iterator, Expr from, Expr to, Optional<Expr> step, Statement.Body body
+            ) -> {
                 //INT iterator = from
-                compileStatement(new Statement.DeclareVariable(
-                        range,
-                        Type.INT,
-                        iterator,
-                        Optional.of(from)
-                ), instructions);
 
-                compileStatement(new Statement.While(
+                List<Statement> bodyStatements = new ArrayList<>(body.statements());
+                bodyStatements.add(new Statement.AssignVariable(
                         range,
-                        new Expr.Less(range, new Expr.VarCall(range, iterator), to),
-                        new Statement.Body(
+                        iterator,
+                        new Expr.Add(
                                 range,
-                                List.of(
-                                        body,
-                                        new Statement.AssignVariable(
+                                new Expr.VarCall(range, iterator),
+                                step.orElse(new Expr.LiteralInt(range, 1))
+                        )
+                ));
+
+                compileStatement(new Statement.Body(
+                        range,
+                        List.of(
+                                new Statement.DeclareVariable(
+                                        range,
+                                        Type.INT,
+                                        iterator,
+                                        Optional.of(from)
+                                ),
+                                new Statement.While(
+                                        range,
+                                        new Expr.Less(range, new Expr.VarCall(range, iterator), to),
+                                        new Statement.Body(
                                                 range,
-                                                iterator,
-                                                new Expr.Add(
-                                                        range,
-                                                        new Expr.VarCall(range, iterator),
-                                                        step.orElse(new Expr.LiteralInt(range, 1))
-                                                )
+                                                bodyStatements
                                         )
                                 )
                         )
-                ), instructions);
+                ), instructions, offset);
             }
 
             case Statement.Turn(Range range, Expr angle) -> {
@@ -215,13 +222,15 @@ public class Compiler {
             ... //5
              */
             case Statement.While(Range range, Expr condition, Statement.Body body) -> {
-                int conditionAddr = instructions.size();
+                int conditionAddr = instructions.size() + offset;
                 compileExpression(condition, instructions);
 
-                int whileAddr = instructions.size();
+                int whileAddr = instructions.size() + offset;
 
                 List<Bytecode> bodyInstructions = new LinkedList<>();
-                compileStatement(body, bodyInstructions);
+                bodyInstructions.add(new Bytecode.NewScope(body.range()));
+                compileStatement(body, bodyInstructions, whileAddr + 1);
+                bodyInstructions.add(new Bytecode.ExitScope(body.range()));
 
                 int endAddr = whileAddr + bodyInstructions.size() + 2;
 
@@ -255,7 +264,7 @@ public class Compiler {
                 compileExpression(color, instructions);
                 instructions.add(new Bytecode.Color(range));
             }
-            
+
             case Statement.ColorRGB(Range range, Expr red, Expr green, Expr blue) -> {
                 compileExpression(red, instructions);
                 compileExpression(green, instructions);
@@ -314,15 +323,22 @@ public class Compiler {
             case Statement.If(Range range, Expr condition, Statement.Body ifTrue, Optional<Statement.Body> ifFalse) -> {
                 compileExpression(condition, instructions);
 
-                int ifAddr = instructions.size();
+                int ifAddr = instructions.size() + offset;
 
                 List<Bytecode> ifTrueInstructions = new LinkedList<>();
-                compileStatement(ifTrue, ifTrueInstructions);
-
-                List<Bytecode> ifFalseInstructions = new LinkedList<>();
-                ifFalse.ifPresent(ifFalsePresent -> compileStatement(ifFalsePresent, ifFalseInstructions));
+                ifTrueInstructions.add(new Bytecode.NewScope(ifTrue.range()));
+                compileStatement(ifTrue, ifTrueInstructions, ifAddr + 1);
+                ifTrueInstructions.add(new Bytecode.ExitScope(ifTrue.range()));
 
                 int elseAddr = ifAddr + ifTrueInstructions.size() + 2;
+
+                List<Bytecode> ifFalseInstructions = new LinkedList<>();
+                ifFalse.ifPresent(ifFalsePresent -> {
+                    ifFalseInstructions.add(new Bytecode.NewScope(ifFalsePresent.range()));
+                    compileStatement(ifFalsePresent, ifFalseInstructions, elseAddr);
+                    ifFalseInstructions.add(new Bytecode.ExitScope(ifFalsePresent.range()));
+                });
+
                 int endAddr = elseAddr + ifFalseInstructions.size();
 
                 instructions.add(new Bytecode.GoToIfFalse(range, elseAddr));
@@ -333,24 +349,32 @@ public class Compiler {
 
             case Statement.Mimic(Range range, Expr mimicked, Statement.Body body) -> {
                 compileExpression(mimicked, instructions);
+                instructions.add(new Bytecode.NewScope(range));
                 instructions.add(new Bytecode.Mimic(range));
-                compileStatement(body, instructions);
+                compileStatement(body, instructions, offset);
+                instructions.add(new Bytecode.ExitScope(range));
             }
 
             case Statement.MirrorCentral(Range range, Expr centerX, Expr centerY, Statement.Body body) -> {
                 compileExpression(centerX, instructions);
                 compileExpression(centerY, instructions);
+                instructions.add(new Bytecode.NewScope(range));
                 instructions.add(new Bytecode.MirrorCentral(range));
-                compileStatement(body, instructions);
+                compileStatement(body, instructions, offset);
+                instructions.add(new Bytecode.ExitScope(range));
             }
 
-            case Statement.MirrorAxial(Range range, Expr axisStartX, Expr axisStartY, Expr axisEndX, Expr axisEndY, Statement.Body body) -> {
+            case Statement.MirrorAxial(
+                    Range range, Expr axisStartX, Expr axisStartY, Expr axisEndX, Expr axisEndY, Statement.Body body
+            ) -> {
                 compileExpression(axisStartX, instructions);
                 compileExpression(axisStartY, instructions);
                 compileExpression(axisEndX, instructions);
                 compileExpression(axisEndY, instructions);
+                instructions.add(new Bytecode.NewScope(range));
                 instructions.add(new Bytecode.MirrorAxial(range));
-                compileStatement(body, instructions);
+                compileStatement(body, instructions, offset);
+                instructions.add(new Bytecode.ExitScope(range));
             }
 
             case Statement.DeclareVariable(Range range, Type type, String name, Optional<Expr> value) -> {
@@ -369,8 +393,17 @@ public class Compiler {
             case Statement.DeleteVariable(Range range, Expr ignored) -> {
                 instructions.add(new Bytecode.Delete(range, "")); //TODO fix
             }
-
-            default -> throw new RuntimeException("TODO remove");
         }
+    }
+
+    public static List<Bytecode> compileProgram(Program program) {
+        List<Bytecode> instructions = new LinkedList<>();
+
+        for (Statement statement : program.statements()) compileStatement(statement, instructions, 0);
+
+        Position endPosition = program.statements().isEmpty() ? new Position(0, 0) : program.statements().getLast().range().to();
+        instructions.add(new Bytecode.End(new Range(endPosition, endPosition)));
+
+        return instructions;
     }
 }
