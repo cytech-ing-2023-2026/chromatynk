@@ -87,7 +87,7 @@
 				<SplitPane dividerPositions="0.5" orientation="VERTICAL">
 					<items>
 						<!-- Canvas & step-by-step controls -->
-						<VBox HBox.hgrow="ALWAYS">
+						<VBox>
 							<padding><Insets topRightBottomLeft="10"/></padding>
 
 							<BorderPane VBox.vgrow="ALWAYS">
@@ -103,9 +103,11 @@
 						</VBox>
 
 						<!-- Output area -->
-						<TextArea fx:id="outputArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS">
-							<padding><Insets topRightBottomLeft="5"/></padding>
-						</TextArea>
+						<VBox spacing="5">
+							<padding><Insets topRightBottomLeft="10"/></padding>
+							<Label text="Sortie"/>
+							<TextArea fx:id="outputArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS"/>
+						</VBox>
 					</items>
 				</SplitPane>
 			</items>
