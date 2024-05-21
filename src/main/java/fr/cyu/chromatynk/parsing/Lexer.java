@@ -42,7 +42,7 @@ public class Lexer {
     /**
      * Parser for float literals (e.g 1, 1.5, 0.42...).
      */
-    public static final Parser<Character, LiteralFloat> LITERAL_FLOAT_PARSER = matching("[0-9]+(\\.[0-9]+)?")
+    public static final Parser<Character, LiteralFloat> LITERAL_FLOAT_PARSER = matching("[0-9]+\\.[0-9]+")
             .map(Double::parseDouble)
             .mapWithRange(LiteralFloat::new)
             .mapError(e -> new UnexpectedInputException(e.getRange(), "Actual float", ((UnexpectedInputException) e).getActual()));
@@ -158,8 +158,8 @@ public class Lexer {
     public static final Parser<Character, List<Token>> TOKENS_PARSER = firstSucceeding(
             LITERAL_BOOL_PARSER,
             LITERAL_STRING_PARSER,
-            LITERAL_INT_PARSER,
             LITERAL_FLOAT_PARSER,
+            LITERAL_INT_PARSER,
             LITERAL_COLOR_PARSER,
             OPERATOR_PARSER,
             SYMBOL_PARSER,
