@@ -46,15 +46,9 @@ git clone https://github.com/cytech-ing1-gi22/chromatynk
 
 Then simply run this command, which uses the bundled *maven* wrapper (or you can use your existing `mvn` installation instead) :
 
-(Linux)
-```bash
-./mvnw package
-```
-
-(Windows)
-```bat
-mvnw.cmd package
-```
+| Linux | Windows |
+| --- | --- | 
+| ```./mvnw package``` | ```mvnw.cmd package``` |
 
 This command will package the application into a `.jar` file, which you can easily run at any time.
 
@@ -66,17 +60,13 @@ This command will package the application into a `.jar` file, which you can easi
 
 Assuming you cloned the repo already, you can :
 - Following the build instructions and then run the packaged `.jar` file with your favorite Java 21-compatible JVM.
-- Use this command to run directly from source (you can replace `./mvwn`/`mvnw.cmd` with an existing *maven* installation) :
+- Use this command to run directly from the root folder :
 
-Linux :
-```bash
-./mvnw javafx:run
-```
+| Linux | Windows |
+| --- | --- |
+| ```./mvnw javafx:run``` | ```mvnw.cmd javafx:run``` |
 
-Windows :
-```bat
-mvnw.cmd javafx:run
-```
+*(You can replace `./mvwn` and `mvnw.cmd` with an existing *maven* installation.)*
 
 ## Architecture
 *(Note : This tree does not include external libraries.)*
