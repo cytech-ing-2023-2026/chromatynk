@@ -33,7 +33,7 @@ public class FileMenuController {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Ouvrir un fichier");
 
-		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers Chromatynk", "*.cty"));
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers Chromat'ynk", "*.cty"));
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Autres fichiers", "*"));
 
 		File selectedFile = fileChooser.showOpenDialog(primaryStage);
@@ -60,7 +60,7 @@ public class FileMenuController {
 		fileChooser.setTitle("Enregistrer sous...");
 
 		// Add a file extension filter for .cty files
-		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Fichiers Chromatynk (*.cty)", "*.cty");
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Fichiers Chromat'ynk (*.cty)", "*.cty");
 		fileChooser.getExtensionFilters().add(extFilter);
 
 		File selectedFile = fileChooser.showSaveDialog(primaryStage);

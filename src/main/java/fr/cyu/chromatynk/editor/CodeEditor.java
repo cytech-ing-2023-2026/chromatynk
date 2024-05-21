@@ -36,7 +36,7 @@ public class CodeEditor extends Application {
         root = fxmlLoader.load();
 
         // Set the stage
-        primaryStage.setTitle("Chromatynk");
+        primaryStage.setTitle("Chromat'ynk");
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();
     }

@@ -71,6 +71,10 @@ public class CodeEditorController implements Initializable {
     private int tabCounter = 1;
     private Map<Tab, String> tabContentMap = new HashMap<>(); // Map to store content of each tab
 
+	// Output area
+	@FXML
+	private TextArea outputArea;
+
     private final Stage primaryStage;
     private FileMenuController fileMenuController;
 
