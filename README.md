@@ -1,8 +1,8 @@
 <div align="center">
-  <h1>Chromatynk</h1>
+  <h1>Chromat'ynk</h1>
 </div>
 
-*Chromatynk* allows users to draw arbitrary shapes on a canvas using simple instructions, such as moving forward by a certain number of pixels or turning by a specific angle.
+*Chromat'ynk* allows users to draw arbitrary shapes on a canvas using simple instructions, such as moving forward by a certain number of pixels or turning by a specific angle.
 
 Users can customize the thickness and color of the lines drawn. The program includes a custom instruction language and an interpreter to process these instructions. Additionally, it features the ability to save and load creations, and renders the drawings in **real-time**.
 
@@ -34,19 +34,52 @@ Users can customize the thickness and color of the lines drawn. The program incl
 
 ## How to build
 
-### Compile-time dependencies
-
 ### Instructions
+
+Chromat'ynk requires Java 21 or later, due to the usage of pattern matching and `record`.
+
+First, clone the project with `git` :
+
+```bash
+git clone https://github.com/cytech-ing1-gi22/chromatynk
+```
+
+Then simply run this command, which uses the bundled *maven* wrapper (or you can use your existing `mvn` installation instead) :
+
+(Linux)
+```bash
+./mvnw package
+```
+
+(Windows)
+```bat
+mvnw.cmd package
+```
+
+This command will package the application into a `.jar` file, which you can easily run at any time.
 
 ## How to run
 
-### Runtime dependencies
+*(Note : running the application also requires Java 21 or later. The application has been successfully tested on GraalVM and OpenJDK.)*
 
 ### Instructions
 
-## Architecture (file dependency tree)
-*(Note : This tree does not include external dependencies.)*
+Assuming you cloned the repo already, you can :
+- Following the build instructions and then run the packaged `.jar` file with your favorite Java 21-compatible JVM.
+- Use this command to run directly from source (you can replace `./mvwn`/`mvnw.cmd` with an existing *maven* installation) :
 
+Linux :
+```bash
+./mvnw javafx:run
+```
+
+Windows :
+```bat
+mvnw.cmd javafx:run
+```
+
+## Architecture
+*(Note : This tree does not include external libraries.)*
 
 ```mermaid
 classDiagram
