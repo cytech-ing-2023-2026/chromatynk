@@ -1,13 +1,16 @@
 package fr.cyu.chromatynk.typing;
 
 import fr.cyu.chromatynk.ast.Expr;
+
 import static fr.cyu.chromatynk.ast.Expr.*;
 
 import fr.cyu.chromatynk.ast.Statement;
 import fr.cyu.chromatynk.ast.Type;
 import fr.cyu.chromatynk.util.Range;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -18,7 +21,7 @@ public class Typer {
     /**
      * A static function getType which throws an exception with different cases inside
      *
-     * @param expr the expression used
+     * @param expr    the expression used
      * @param context the context needed for the expression
      */
 
@@ -125,7 +128,8 @@ public class Typer {
 
             case Mul(Range ignored, Expr left, Expr right) -> switch (getType(left, context)) {
 
-                case BOOLEAN -> throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.INT, Type.FLOAT), Type.BOOLEAN);
+                case BOOLEAN ->
+                        throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.INT, Type.FLOAT), Type.BOOLEAN);
 
                 case STRING -> Type.STRING;
 
@@ -144,7 +148,8 @@ public class Typer {
                             throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
                 };
 
-                case COLOR -> throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.INT, Type.FLOAT), Type.COLOR);
+                case COLOR ->
+                        throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.INT, Type.FLOAT), Type.COLOR);
 
                 case PERCENT -> switch (getType(right, context)) {
                     case STRING -> Type.STRING;
@@ -156,7 +161,8 @@ public class Typer {
 
             case Div(Range ignored, Expr left, Expr right) -> switch (getType(left, context)) {
 
-                case BOOLEAN -> throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.INT, Type.FLOAT), Type.BOOLEAN);
+                case BOOLEAN ->
+                        throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.INT, Type.FLOAT), Type.BOOLEAN);
 
                 case STRING -> Type.STRING;
 
@@ -175,7 +181,8 @@ public class Typer {
                             throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT, Type.STRING), actual);
                 };
 
-                case COLOR -> throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.INT, Type.FLOAT), Type.COLOR);
+                case COLOR ->
+                        throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.INT, Type.FLOAT), Type.COLOR);
 
 
                 case PERCENT -> switch (getType(right, context)) {
@@ -214,7 +221,8 @@ public class Typer {
                         throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.STRING, Type.PERCENT, Type.COLOR), actual);
             };
 
-            /** reprendre l'égalité */case Equal(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
+            /** reprendre l'égalité */
+            case Equal(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
                 case INT -> switch (getType(right, context)) {
                     case INT, FLOAT -> Type.FLOAT;
                     case Type actual ->
@@ -233,13 +241,13 @@ public class Typer {
                             throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.PERCENT), actual);
                 };
 
-                case STRING -> switch(getType(right, context)) {
+                case STRING -> switch (getType(right, context)) {
                     case STRING -> Type.BOOLEAN;
                     case Type actual ->
-                    throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.PERCENT), actual);
+                            throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.PERCENT), actual);
                 };
 
-                case COLOR -> switch(getType(right, context)) {
+                case COLOR -> switch (getType(right, context)) {
                     case STRING -> Type.BOOLEAN;
                     case Type actual ->
                             throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.COLOR), actual);
@@ -339,17 +347,20 @@ public class Typer {
             case LessEqual(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
                 case INT -> switch (getType(right, context)) {
                     case INT, FLOAT -> Type.BOOLEAN;
-                    case Type actual -> throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT), actual);
+                    case Type actual ->
+                            throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT), actual);
                 };
 
                 case FLOAT -> switch (getType(right, context)) {
                     case INT, FLOAT -> Type.BOOLEAN;
-                    case Type actual -> throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT), actual);
+                    case Type actual ->
+                            throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT), actual);
                 };
 
                 case PERCENT -> switch (getType(right, context)) {
                     case PERCENT -> Type.BOOLEAN;
-                    case Type actual -> throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.PERCENT), actual);
+                    case Type actual ->
+                            throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.PERCENT), actual);
                 };
 
                 case Type actual ->
@@ -369,33 +380,76 @@ public class Typer {
         };
     }
 
+    public void assertTypeMatch(Range range, Set<Type> expected, Type actualType) {
+        if (!expected.contains(actualType)) throw new TypeMismatchException(range, expected, actualType)
+    }
+
 
     /**
      * A voic checkTypes which throws an exception with different cases inside
      *
      * @param statement the statement used
-     * @param context the context needed for the instruction
+     * @param context   the context needed for the instruction
      */
-    public void checkTypes(Statement statement, TypingContext context) throws TypingException, TypeCheckException {
+    public void checkTypes(Statement statement, TypingContext context) throws TypingException {
         switch (statement) {
-            case Statement.Body body -> checkBody(body, context);
-            case Statement.For forStmt -> checkFor(forStmt, context);
-            case Statement.While whileStmt -> checkWhile(whileStmt, context);
-            case Statement.If ifStmt -> checkIf(ifStmt, context);
-            case Statement.Forward forward -> checkForward(forward, context);
-            case Statement.Backward backward -> checkBackward(backward, context);
-            case Statement.Turn turn -> checkTurn(turn, context);
-            case Statement.Pos pos -> checkPos(pos, context);
-            case Statement.Move move -> checkMove(move, context);
-            case Statement.Press press -> checkPress(press, context);
-            case Statement.Color color -> checkColor(color, context);
-            case Statement.ColorRGB colorRGB -> checkColorRGB(colorRGB, context);
-            case Statement.Thick thick -> checkThick(thick, context);
-            case Statement.LookAtCursor lookAtCursor -> checkLookAtCursor(lookAtCursor, context);
-            case Statement.LookAtPos lookAtPos -> checkLookAtPos(lookAtPos, context);
-            case Statement.CreateCursor createCursor -> checkCreateCursor(createCursor, context);
-            case Statement.SelectCursor selectCursor -> checkSelectCursor(selectCursor, context);
-            case Statement.RemoveCursor removeCursor -> checkRemoveCursor(removeCursor, context);
+            case Statement.Body(Range ignored, List<Statement> statements) -> {
+                for (Statement stat : statements) {
+                    checkTypes(stat, context);
+                }
+            }
+            case Statement.For(
+                    Range range, String iterator, Expr from, Expr to, Optional<Expr> step, Statement.Body body
+            ) -> {
+                Type fromType = getType(from, context);
+                Type toType = getType(to, context);
+
+                assertTypeMatch(from.range(), Set.of(Type.INT, Type.FLOAT), fromType);
+                assertTypeMatch(to.range(), Set.of(Type.INT, Type.FLOAT), toType);
+
+                TypingContext forContext = new TypingContext(context, new HashMap<>());
+                forContext.declareVariable(iterator, fromType, range);
+
+                if (step.isPresent())
+                    assertTypeMatch(step.get().range(), Set.of(Type.INT, Type.FLOAT), getType(step.get(), forContext));
+
+                checkTypes(body, forContext);
+            }
+            case Statement.While(Range ignored, Expr condition, Statement.Body body) -> {
+                assertTypeMatch(condition.range(), Set.of(Type.BOOLEAN), getType(condition, context));
+                checkTypes(body, new TypingContext(context, new HashMap<>()));
+            }
+            case Statement.If(Range ignored, Expr condition, Statement.Body ifTrue, Optional<Statement.Body> ifFalse) -> {
+                assertTypeMatch(condition.range(), Set.of(Type.BOOLEAN), getType(condition, context));
+                checkTypes(ifTrue, new TypingContext(context, new HashMap<>()));
+                if(ifFalse.isPresent()) checkTypes(ifFalse.get(), new TypingContext(context, new HashMap<>()));
+            }
+            case Statement.Forward(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(expr, context));
+            case Statement.Backward(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(expr, context));
+            case Statement.Turn(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(expr, context));
+            case Statement.Pos(Range ignored, Expr x, Expr y) -> {
+                assertTypeMatch(x.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(x, context));
+                assertTypeMatch(y.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(y, context));
+            }
+            case Statement.Move(Range ignored, Expr x, Expr y) -> {
+                assertTypeMatch(x.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(x, context));
+                assertTypeMatch(y.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(y, context));
+            }
+            case Statement.Press(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(expr, context));
+            case Statement.Color(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.COLOR), getType(expr, context));
+            case Statement.ColorRGB(Range ignored, Expr expr) -> throw new RuntimeException("todo");
+            case Statement.Thick(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(expr, context));
+            case Statement.LookAtCursor(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.STRING), getType(expr, context));
+            case Statement.LookAtPos(Range ignored, Expr x, Expr y) -> {
+                assertTypeMatch(x.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(x, context));
+                assertTypeMatch(y.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(y, context));
+            }
+            case Statement.CreateCursor(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.STRING), getType(expr, context));
+            case Statement.SelectCursor(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.STRING), getType(expr, context));
+            case Statement.RemoveCursor(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.STRING), getType(expr, context));
+            case Statement.Mimic(Range ignored, Expr expr, Statement.Body body) -> {
+                assertTypeMatch(expr.range(), Set.of(Type.INT, Type.STRING), getType(expr, context));
+            }
             case Statement.Mimic mimic -> checkMimic(mimic, context);
             case Statement.MirrorCentral mirrorCentral -> checkMirrorCentral(mirrorCentral, context);
             case Statement.MirrorAxial mirrorAxial -> checkMirrorAxial(mirrorAxial, context);
@@ -404,109 +458,10 @@ public class Typer {
             case Statement.DeleteVariable deleteVariable -> checkDeleteVariable(deleteVariable, context);
             case Statement.Hide hide -> checkHide(hide, context);
             case Statement.Show show -> checkShow(show, context);
-            default -> throw new TypeCheckException("Unsupported statement type: " + statement.getClass().getSimpleName());
+            default ->
+                    throw new TypeCheckException("Unsupported statement type: " + statement.getClass().getSimpleName());
         }
     }
-
-    private void checkShow(Statement.Show show, TypingContext context) {
-    }
-
-    private void checkHide(Statement.Hide hide, TypingContext context) {
-    }
-
-    private void checkDeleteVariable(Statement.DeleteVariable deleteVariable, TypingContext context) {
-
-    }
-
-    private void checkAssignVariable(Statement.AssignVariable assignVariable, TypingContext context) {
-
-    }
-
-    private void checkDeclareVariable(Statement.DeclareVariable declareVariable, TypingContext context) {
-
-    }
-
-    private void checkMirrorAxial(Statement.MirrorAxial mirrorAxial, TypingContext context) {
-
-    }
-
-    private void checkMirrorCentral(Statement.MirrorCentral mirrorCentral, TypingContext context) {
-
-    }
-
-    private void checkMimic(Statement.Mimic mimic, TypingContext context) {
-
-    }
-
-    private void checkRemoveCursor(Statement.RemoveCursor removeCursor, TypingContext context) {
-
-    }
-
-    private void checkSelectCursor(Statement.SelectCursor selectCursor, TypingContext context) {
-
-    }
-
-    private void checkCreateCursor(Statement.CreateCursor createCursor, TypingContext context) {
-
-    }
-
-    private void checkLookAtPos(Statement.LookAtPos lookAtPos, TypingContext context) {
-
-    }
-
-    private void checkLookAtCursor(Statement.LookAtCursor lookAtCursor, TypingContext context) {
-
-    }
-
-    private void checkThick(Statement.Thick thick, TypingContext context) {
-
-    }
-
-    private void checkColorRGB(Statement.ColorRGB colorRGB, TypingContext context) {
-
-    }
-
-    private void checkColor(Statement.Color color, TypingContext context) {
-
-    }
-
-    private void checkPress(Statement.Press press, TypingContext context) {
-
-    }
-
-    private void checkMove(Statement.Move move, TypingContext context) {
-
-    }
-
-    private void checkPos(Statement.Pos pos, TypingContext context) {
-
-    }
-
-    private void checkTurn(Statement.Turn turn, TypingContext context) {
-
-    }
-
-    private void checkBackward(Statement.Backward backward, TypingContext context) {
-
-    }
-
-    private void checkForward(Statement.Forward forward, TypingContext context) {
-
-    }
-
-    private void checkIf(Statement.If ifStmt, TypingContext context) {
-
-    }
-
-    private void checkWhile(Statement.While whileStmt, TypingContext context) {
-
-    }
-
-    private void checkFor(Statement.For forStmt, TypingContext context) {
-
-    }
-
-    private void checkBody(Statement.Body body, TypingContext context) {
-        
-    }
 }
+
+
