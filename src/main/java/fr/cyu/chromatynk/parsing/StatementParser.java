@@ -39,8 +39,7 @@ public class StatementParser {
             Map.entry(Token.LookAt.class, Statement.LookAtCursor::new),
             Map.entry(Token.Cursor.class, Statement.CreateCursor::new),
             Map.entry(Token.Select.class, Statement.SelectCursor::new),
-            Map.entry(Token.Remove.class, Statement.RemoveCursor::new),
-            Map.entry(Token.Del.class, Statement.DeleteVariable::new)
+            Map.entry(Token.Remove.class, Statement.RemoveCursor::new)
     );
 
     private static final Map<Class<? extends Token>, TriFunction<Range, Expr, Expr, Statement>> TWO_ARG_STATEMENTS = Map.ofEntries(
@@ -124,6 +123,15 @@ public class StatementParser {
     }
 
     /**
+     * Variable deletion parser.
+     */
+    public static Parser<Token, Statement> deleteVariable() {
+        return tokenOf(Token.Del.class)
+                .zip(tokenOf(Token.Identifier.class))
+                .map(tpl -> new Statement.DeleteVariable(tpl.a().range().merge(tpl.b().range()), tpl.b().name()));
+    }
+
+    /**
      * Variable declaration (and optional assignment) parser.
      */
     public static Parser<Token, Statement> variableDeclaration() {
@@ -158,7 +166,7 @@ public class StatementParser {
      */
     public static Parser<Token, Statement> instruction() {
         return Parser
-                .firstSucceeding(variableDeclaration(), variableAssignment(), threeArgs(), twoArgs(), oneArg(), zeroArg())
+                .firstSucceeding(deleteVariable(), variableDeclaration(), variableAssignment(), threeArgs(), twoArgs(), oneArg(), zeroArg())
                 .mapError(e -> new ParsingException.NonFatal(e.getRange(), "Illegal instruction"));
     }
 

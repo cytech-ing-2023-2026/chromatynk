@@ -390,8 +390,8 @@ public class Compiler {
                 instructions.add(new Bytecode.Store(range, name));
             }
 
-            case Statement.DeleteVariable(Range range, Expr ignored) -> {
-                instructions.add(new Bytecode.Delete(range, "")); //TODO fix
+            case Statement.DeleteVariable(Range range, String name) -> {
+                instructions.add(new Bytecode.Delete(range, name));
             }
         }
     }

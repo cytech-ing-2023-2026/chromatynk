@@ -255,8 +255,8 @@ public sealed interface Statement {
      * Delete a variable.
      *
      * @param range the starting and ending {@link Position} of this statement
-     * @param variableName the name of the variable to delete
+     * @param name the name of the variable to delete
      */
-    record DeleteVariable(Range range, Expr variableName) implements Statement {}
+    record DeleteVariable(Range range, String name) implements Statement {}
 
 }
