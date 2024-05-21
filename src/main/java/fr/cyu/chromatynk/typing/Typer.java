@@ -437,7 +437,7 @@ public class Typer {
             }
             case Statement.Press(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(expr, context));
             case Statement.Color(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.COLOR), getType(expr, context));
-            case Statement.ColorRGB(Range ignored, Expr expr) -> throw new RuntimeException("todo");
+            case Statement.ColorRGB ignored -> throw new RuntimeException("todo"); //TODO
             case Statement.Thick(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(expr, context));
             case Statement.LookAtCursor(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.STRING), getType(expr, context));
             case Statement.LookAtPos(Range ignored, Expr x, Expr y) -> {
@@ -448,18 +448,32 @@ public class Typer {
             case Statement.SelectCursor(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.STRING), getType(expr, context));
             case Statement.RemoveCursor(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.STRING), getType(expr, context));
             case Statement.Mimic(Range ignored, Expr expr, Statement.Body body) -> {
-                assertTypeMatch(expr.range(), Set.of(Type.INT, Type.STRING), getType(expr, context));
+                assertTypeMatch(expr.range(), Set.of(Type.INT, Type.FLOAT), getType(expr, context));
+                checkTypes(body, new TypingContext(context, new HashMap<>()));
             }
-            case Statement.Mimic mimic -> checkMimic(mimic, context);
-            case Statement.MirrorCentral mirrorCentral -> checkMirrorCentral(mirrorCentral, context);
-            case Statement.MirrorAxial mirrorAxial -> checkMirrorAxial(mirrorAxial, context);
-            case Statement.DeclareVariable declareVariable -> checkDeclareVariable(declareVariable, context);
-            case Statement.AssignVariable assignVariable -> checkAssignVariable(assignVariable, context);
-            case Statement.DeleteVariable deleteVariable -> checkDeleteVariable(deleteVariable, context);
-            case Statement.Hide hide -> checkHide(hide, context);
-            case Statement.Show show -> checkShow(show, context);
-            default ->
-                    throw new TypeCheckException("Unsupported statement type: " + statement.getClass().getSimpleName());
+            case Statement.MirrorCentral(Range ignored, Expr centerX, Expr centerY, Statement.Body body) -> {
+                assertTypeMatch(centerX.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(centerX, context));
+                assertTypeMatch(centerY.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(centerY, context));
+                checkTypes(body, new TypingContext(context, new HashMap<>()));
+            }
+            case Statement.MirrorAxial(Range ignored, Expr axisStartX, Expr axisStartY, Expr axisEndX, Expr axisEndY, Statement.Body body) -> {
+                assertTypeMatch(axisStartX.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(axisStartX, context));
+                assertTypeMatch(axisStartY.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(axisStartY, context));
+                assertTypeMatch(axisEndX.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(axisEndX, context));
+                assertTypeMatch(axisEndY.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENT), getType(axisEndY, context));
+                checkTypes(body, new TypingContext(context, new HashMap<>()));
+            }
+            case Statement.DeclareVariable(Range range, Type type, String name, Optional<Expr> expr) -> {
+                if(expr.isPresent()) assertTypeMatch(expr.get().range(), type == Type.FLOAT ? Set.of(type, Type.INT) : Set.of(type), getType(expr.get(), context));
+                context.declareVariable(name, type, range);
+            }
+            case Statement.AssignVariable(Range range, String name, Expr expr) -> {
+                Type type = context.getType(name).orElseThrow(() -> new MissingVariableException(range, name));
+                assertTypeMatch(expr.range(), type == Type.FLOAT ? Set.of(type, Type.INT) : Set.of(type), getType(expr, context));
+            }
+            case Statement.DeleteVariable(Range ignored, Expr ignored2) -> {}
+            case Statement.Hide ignored -> {}
+            case Statement.Show ignored -> {}
         }
     }
 }
