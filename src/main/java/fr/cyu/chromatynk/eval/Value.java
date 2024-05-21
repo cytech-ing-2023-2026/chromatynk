@@ -26,7 +26,14 @@ public sealed interface Value {
      *
      * @param value the value of this floating number
      */
-    record Float(float value) implements Value {}
+    record Float(double value) implements Value {}
+
+    /**
+     * A percentage.
+     *
+     * @param value the value of this percentage
+     */
+    record Percentage(double value) implements Value {}
 
     /**
      * A string.
@@ -43,17 +50,24 @@ public sealed interface Value {
      * @param blue the blue component between 0 and 1
      * @param alpha the opacity between 0 and 1
      */
-    record Color(double red, double green, double blue, double alpha) implements Value {}
+    record Color(double red, double green, double blue, double alpha) implements Value {
+
+        @Override
+        public String toString() {
+            return "#" + Integer.toHexString((int) red * 255) + Integer.toHexString((int) green * 255) + Integer.toHexString((int) blue * 255) + Integer.toHexString((int) alpha * 255);
+        }
+    }
 
     /**
      * Get the type of this value.
      */
     default Type getType() {
         return switch (this) {
-            case Bool x  -> Type.BOOLEAN;
-            case Int x   -> Type.INT;
+            case Bool x -> Type.BOOLEAN;
+            case Int x -> Type.INT;
             case Float x -> Type.FLOAT;
-            case Str x   -> Type.STRING;
+            case Percentage x -> Type.PERCENTAGE;
+            case Str x -> Type.STRING;
             case Color x -> Type.COLOR;
         };
     }

@@ -24,7 +24,7 @@ public class App extends Application {
         graphics.setFill(javafx.scene.paint.Color.WHITE);
         graphics.fillRect(0, 0, 500, 500);
 
-        var cursor = new TangibleCursor(100, 100, 0, 0, new Color(1, 0, 0), 1, 5);
+        var cursor = new TangibleCursor(100, 100, 0, 0, true, new Color(1, 0, 0), 1, 5);
         var dupli = new AxialMirroredCursor(cursor, 100, 200, 300, 400);
         dupli.move(graphics, 100, 100);
         dupli.setColor(new Color(0, 1, 0));

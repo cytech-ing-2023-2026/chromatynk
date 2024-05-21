@@ -1,10 +1,7 @@
 package fr.cyu.chromatynk.ast;
 
-import fr.cyu.chromatynk.eval.Value;
 import fr.cyu.chromatynk.util.Position;
 import fr.cyu.chromatynk.util.Range;
-
-import java.util.Optional;
 
 /**
  * A Sealed interface Expr {}*
@@ -202,13 +199,4 @@ public sealed interface Expr {
      * @param name the name of variable
      */
     record VarCall(Range range, String name) implements Expr {}
-
-    /**
-     * Set the color of the current cursor.
-     *
-     * @param range the starting and ending {@link Position} of this expression
-     * @param color the new color the cursor will use while drawing
-     */
-    record Color(Range range, Expr color) implements Expr {}
 }
-

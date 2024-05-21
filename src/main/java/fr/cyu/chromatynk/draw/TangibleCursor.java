@@ -11,6 +11,7 @@ public class TangibleCursor implements Cursor {
     private double y;
     private double dirX;
     private double dirY;
+    private boolean visible;
     private Color color;
     private double opacity;
     private double thickness;
@@ -22,15 +23,17 @@ public class TangibleCursor implements Cursor {
      * @param y the Y coordinate of this cursor
      * @param dirX the X direction of this cursor
      * @param dirY the Y direction of this cursor
+     * @param visible the visibility of this cursor
      * @param color the color to use when drawing with this cursor
      * @param opacity the opacity to use when drawing with this cursor
      * @param thickness the thickness to use when drawing with this cursor
      */
-    public TangibleCursor(double x, double y, double dirX, double dirY, Color color, double opacity, double thickness) {
+    public TangibleCursor(double x, double y, double dirX, double dirY, boolean visible, Color color, double opacity, double thickness) {
         this.x = x;
         this.y = y;
         this.dirX = dirX;
         this.dirY = dirY;
+        this.visible = visible;
         this.color = color;
         this.opacity = opacity;
         this.thickness = thickness;
@@ -43,7 +46,7 @@ public class TangibleCursor implements Cursor {
      * @param y the Y coordinate of this cursor
      */
     public TangibleCursor(double x, double y) {
-        this(x, y, 0, 0, new Color(0, 0, 0), 1, 1);
+        this(x, y, 1, 0, true, new Color(0, 0, 0), 1, 1);
     }
 
     @Override
@@ -84,6 +87,16 @@ public class TangibleCursor implements Cursor {
     @Override
     public void setDirY(double dirY) {
         this.dirY = dirY;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return visible;
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
     @Override

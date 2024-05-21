@@ -56,6 +56,16 @@ public interface Cursor {
     void setDirY(double dirY);
 
     /**
+     * Check if this cursor is visible.
+     */
+    boolean isVisible();
+
+    /**
+     * Set the visibility of this cursor.
+     */
+    void setVisible(boolean visible);
+
+    /**
      * Get drawing color of this cursor.
      */
     Color getColor();
@@ -116,11 +126,34 @@ public interface Cursor {
     }
 
     /**
+     * Move this cursor on the given distance, following its current direction and tracing a line between the starting and ending positions.
+     *
+     * @param graphics the graphics context to draw on
+     * @param distance the distance to travel
+     */
+    default void move(GraphicsContext graphics, double distance) {
+        move(graphics, distance*getDirX(), distance*getDirY());
+    }
+
+    /**
+     * Rotate this cursor according to the given angle.
+     *
+     * @param degrees the rotation angle in degrees in clock direction
+     */
+    default void turn(double degrees) {
+        double currentAngleRad = Math.atan2(getDirY(), getDirX());
+        double finalAngle = currentAngleRad + Math.toRadians(degrees);
+
+        setDirX(Math.cos(finalAngle));
+        setDirY(Math.sin(finalAngle));
+    }
+
+    /**
      * Copy this cursor to a new tangible one.
      *
      * @return a new {@link TangibleCursor} with a snapshot of this cursor's data
      */
     default Cursor copyTangible() {
-        return new TangibleCursor(getX(), getY(), getDirX(), getDirY(), getColor(), getOpacity(), getThickness());
+        return new TangibleCursor(getX(), getY(), getDirX(), getDirY(), isVisible(), getColor(), getOpacity(), getThickness());
     }
 }
