@@ -42,12 +42,16 @@ public class LexerTestCase {
 
     @Test
     public void literalFloat() {
-        assertParseString(new LiteralFloat(Range.sameLine(0, 1), 1), Lexer.LITERAL_FLOAT_PARSER, "1");
-        assertParseString(new LiteralFloat(Range.sameLine(0, 2), 42), Lexer.LITERAL_FLOAT_PARSER, "42");
         assertParseString(new LiteralFloat(Range.sameLine(0, 4), 42.5), Lexer.LITERAL_FLOAT_PARSER, "42.5");
-        assertParseString(new LiteralFloat(Range.sameLine(0, 2), 42), Lexer.LITERAL_FLOAT_PARSER, "42.");
+        assertParseFailure(UnexpectedInputException.class, Lexer.LITERAL_FLOAT_PARSER, ParsingIterator.fromString("5"));
         assertParseFailure(UnexpectedInputException.class, Lexer.LITERAL_FLOAT_PARSER, ParsingIterator.fromString(".5"));
         assertParseFailure(UnexpectedInputException.class, Lexer.LITERAL_FLOAT_PARSER, ParsingIterator.fromString("abc"));
+    }
+
+    @Test
+    public void intFloatAmbiguity() {
+        assertParseString(List.of(new LiteralInt(Range.sameLine(0, 1), 5), new EndOfFile(new Position(1, 0))), Lexer.TOKENS_PARSER, "5");
+        assertParseString(List.of(new LiteralFloat(Range.sameLine(0, 3), 5), new EndOfFile(new Position(3, 0))), Lexer.TOKENS_PARSER, "5.0");
     }
 
     @Test
