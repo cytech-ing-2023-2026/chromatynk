@@ -29,6 +29,10 @@ public enum Type {
         return defaultValue;
     }
 
+    public boolean isNumeric() {
+        return this == INT || this == FLOAT;
+    }
+
     /**
      * Get a type from its name.
      *
