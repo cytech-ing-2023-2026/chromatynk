@@ -38,7 +38,7 @@ public class TypingContext {
         else directVariables.put(name, type);
     }
 
-    private void deleteVariable(String name, Range range) throws MissingVariableException {
+    public void deleteVariable(String name, Range range) throws MissingVariableException {
         if (directVariables.containsKey(name)) directVariables.remove(name);
         else if (parent == null) throw new MissingVariableException(range, name);
         else parent.deleteVariable(name, range);

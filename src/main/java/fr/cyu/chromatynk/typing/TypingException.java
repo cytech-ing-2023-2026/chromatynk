@@ -1,17 +1,11 @@
 package fr.cyu.chromatynk.typing;
 
+import fr.cyu.chromatynk.ChromatynkException;
 import fr.cyu.chromatynk.util.Range;
 
-public class TypingException extends Exception {
-
-    private final Range range;
+public class TypingException extends ChromatynkException {
 
     public TypingException(Range range, String message) {
-        super(message);
-        this.range = range;
-    }
-
-    public Range getRange() {
-        return range;
+        super(range, message);
     }
 }
