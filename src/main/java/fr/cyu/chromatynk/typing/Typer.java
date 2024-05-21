@@ -381,7 +381,7 @@ public class Typer {
     }
 
     public void assertTypeMatch(Range range, Set<Type> expected, Type actualType) {
-        if (!expected.contains(actualType)) throw new TypeMismatchException(range, expected, actualType)
+        if (!expected.contains(actualType)) throw new TypeMismatchException(range, expected, actualType);
     }
 
 
