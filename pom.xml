@@ -22,6 +22,12 @@
 			<version>21.0.3</version>
 			<scope>compile</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.fxmisc.richtext</groupId>
+            <artifactId>richtextfx</artifactId>
+            <version>0.11.2</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- JUnit/Test dependency -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

@@ -172,9 +172,7 @@ public class ParsingIterator<T> implements Iterator<T> {
      * @return a new {@link ParsingIterator} reading the characters of the passed input, using LF/CLRF as line breaks and {@link Character#isWhitespace(char)} for whitespaces
      */
     public static ParsingIterator<Character> fromString(String input) {
-        String standardizedInput = input.trim().replaceAll("(\r\n|\r)", "\n");
-
-        List<Character> chars = standardizedInput
+        List<Character> chars = input
                 .chars()
                 .mapToObj(c -> (char) c)
                 .collect(Collectors.toList());

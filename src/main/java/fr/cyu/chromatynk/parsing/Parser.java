@@ -419,6 +419,7 @@ public interface Parser<I, O> {
     static Parser<Character, String> keyword(String word) {
         return iterator -> {
             Position from = iterator.getPosition();
+            iterator.handleWhitespaces();
             if(!iterator.hasNext()) throw new UnexpectedInputException(new Range(from, from.nextColumn()), word, ParsingIterator.EOF);
             int matching = 0;
 
@@ -456,6 +457,7 @@ public interface Parser<I, O> {
     static Parser<Character, String> symbol(String symbol) {
         return iterator -> {
             Position from = iterator.getPosition();
+            iterator.handleWhitespaces();
             if(!iterator.hasNext()) throw new UnexpectedInputException(new Range(from, from.nextColumn()), symbol, ParsingIterator.EOF);
             int matching = 0;
 

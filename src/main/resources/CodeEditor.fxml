@@ -7,8 +7,9 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.effect.*?>
 
+<?import org.fxmisc.richtext.CodeArea?>
 <BorderPane xmlns="http://javafx.com/javafx"
-			xmlns:fx="http://javafx.com/fxml">
+			xmlns:fx="http://javafx.com/fxml" stylesheets="editor.css">
 	<top>
 		<VBox>
 			<!-- Menu -->
@@ -72,7 +73,7 @@
 
 			<items>
 				<VBox>
-					<TextArea fx:id="codeArea" prefWidth="400" prefHeight="300" wrapText="true" VBox.vgrow="ALWAYS"/>
+					<CodeArea fx:id="codeArea" prefWidth="400" prefHeight="300" wrapText="true" VBox.vgrow="ALWAYS"/>
 					<HBox spacing="10">
 						<padding>
 							<Insets top="10" />
