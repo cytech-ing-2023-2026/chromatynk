@@ -22,7 +22,7 @@ public class Chromatynk {
      * @return the parsed token sequence
      * @throws ParsingException
      */
-    public static List<Token> lexProgram(String source) throws ParsingException {
+    public static List<Token> lexSource(String source) throws ParsingException {
         return Lexer.TOKENS_PARSER.parse(ParsingIterator.fromString(source)).value();
     }
 
@@ -33,15 +33,19 @@ public class Chromatynk {
      * @return the parsed program
      * @throws ParsingException
      */
-    public static Program parseProgram(String source) throws ParsingException {
+    public static Program parseSource(String source) throws ParsingException {
         return StatementParser
                 .program()
-                .parse(new ParsingIterator<>(Lexer.TOKENS_PARSER.parse(ParsingIterator.fromString(source)).value()))
+                .parse(new ParsingIterator<>(lexSource(source)))
                 .value();
     }
 
-    public static EvalContext executeProgram(Program program, GraphicsContext graphics, Clock clock) throws EvalException {
-        List<Bytecode> instructions = Compiler.compileProgram(program);
-        return Interpreter.evaluateAll(EvalContext.create(instructions, graphics), clock);
+    public static EvalContext compileSource(String source, GraphicsContext graphics) throws ParsingException {
+        List<Bytecode> instructions = Compiler.compileProgram(parseSource(source));
+        return EvalContext.create(instructions, graphics);
+    }
+
+    public static EvalContext execute(EvalContext context, Clock clock) throws EvalException {
+        return Interpreter.evaluateAll(context, clock);
     }
 }

@@ -44,7 +44,7 @@
 								</items>
 							</Menu>
 							<SeparatorMenuItem/>
-							<CheckMenuItem text="Mode étape par étape" fx:id="stepByStepCheckbox"/> <!-- fx:id="" -->
+							<CheckMenuItem text="Mode étape par étape" fx:id="stepByStepCheckbox" onAction="#toggleStepByStep"/> <!-- fx:id="" -->
 						</items>
 					</Menu>
 					<Menu text="Aide">
@@ -97,8 +97,8 @@
 							</BorderPane>
 							
 							<HBox fx:id="stepByStepControls" spacing="10" alignment="CENTER">
-								<Label text="Étape 1"/>
-								<Button fx:id="stepByStepForwardButton" text="Avancer"/>
+								<Label fx:id="stepLabel" text="Instruction 1"/>
+								<Button fx:id="stepByStepForwardButton" text="Avancer" onAction="#nextInstruction"/>
 							</HBox>
 						</VBox>
 

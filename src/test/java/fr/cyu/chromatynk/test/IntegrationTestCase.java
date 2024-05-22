@@ -60,6 +60,6 @@ public class IntegrationTestCase {
                 )
         ));
 
-        assertEquals(expected, Chromatynk.parseProgram(source));
+        assertEquals(expected, Chromatynk.parseSource(source));
     }
 }

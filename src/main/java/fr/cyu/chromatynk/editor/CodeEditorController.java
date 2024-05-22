@@ -1,7 +1,11 @@
 package fr.cyu.chromatynk.editor;
 
 import fr.cyu.chromatynk.Chromatynk;
+import fr.cyu.chromatynk.ChromatynkException;
+import fr.cyu.chromatynk.eval.Clock;
+import fr.cyu.chromatynk.eval.EvalContext;
 import fr.cyu.chromatynk.eval.ForeverClock;
+import fr.cyu.chromatynk.eval.StepByStepClock;
 import fr.cyu.chromatynk.parsing.ParsingException;
 import fr.cyu.chromatynk.parsing.Token;
 import fr.cyu.chromatynk.util.Tuple2;
@@ -23,6 +27,8 @@ import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.reactfx.Subscription;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.time.Duration;
 import java.util.*;
@@ -65,6 +71,8 @@ public class CodeEditorController implements Initializable {
     private CheckMenuItem stepByStepCheckbox;
     @FXML
     private HBox stepByStepControls;
+    @FXML
+    private Label stepLabel;
 	// Speed
 	@FXML
 	private ToggleGroup radioSpeedGroup;
@@ -85,6 +93,8 @@ public class CodeEditorController implements Initializable {
     private final Stage primaryStage;
     private FileMenuController fileMenuController;
 	private ImageMenuController imageMenuController;
+    private Clock clock;
+    private ExecutionTimer currentExecution;
 
     @SuppressWarnings("exports")
     public CodeEditorController(Stage primaryStage) {this.primaryStage = primaryStage;}
@@ -95,6 +105,8 @@ public class CodeEditorController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        clock = new ForeverClock(); //TODO change
+
         Executor executor = Executors.newSingleThreadExecutor();
 
         //Line numbers
@@ -175,7 +187,7 @@ public class CodeEditorController implements Initializable {
         Task<StyleSpans<Collection<String>>> task = new Task<>() {
             @Override
             protected StyleSpans<Collection<String>> call() throws ParsingException {
-                List<Token> tokens = Chromatynk.lexProgram(text);
+                List<Token> tokens = Chromatynk.lexSource(text);
                 StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
 
                 int lastKeywordEnd = 0;
@@ -228,6 +240,39 @@ public class CodeEditorController implements Initializable {
         primaryStage.close();
     }
 
+    private void postExecution() {
+        tabPane.setDisable(false);
+        codeArea.setDisable(false);
+        runButton.setDisable(false);
+        clearTextAreaButton.setDisable(false);
+        executionMenu.setDisable(false);
+    }
+
+    private void onError(String source, Throwable throwable) {
+        if(throwable instanceof ChromatynkException e) {
+            outputArea.setText(e.getFullMessage(source));
+        } else {
+            StringWriter sw = new StringWriter();
+            throwable.printStackTrace(new PrintWriter(sw));
+            outputArea.setText(sw.toString());
+        }
+
+        infoLabel.setText("ERREUR - Dessin échoué");
+        statusLabel.setText("L'exécution a été arrêtée par une erreur.");
+
+        postExecution();
+    }
+
+    private void onSuccess() {
+        infoLabel.setText("INFO - Dessin complété");
+        statusLabel.setText("Les instructions de dessin ont pu être complétées.");
+        postExecution();
+    }
+
+    private void onProgress(EvalContext context) {
+        stepLabel.setText("Instruction " + context.getNextAddress()+1);
+    }
+
     public void runScript() {
         // Disable tab system, code area, execution menu and buttons
         tabPane.setDisable(true);
@@ -241,25 +286,24 @@ public class CodeEditorController implements Initializable {
 		graphicsContext.setFill(Color.WHITE);
 		graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-		try {
-			infoLabel.setText("INFO - Dessin en cours...");
-			statusLabel.setText("Les instructions de dessin sont en cours d'exécution...");
+        try {
+            EvalContext context = Chromatynk.compileSource(codeArea.getText(), graphicsContext);
+            currentExecution = new ExecutionTimer(codeArea.getText(), context, clock, this::onSuccess, e -> onError(codeArea.getText(), e), this::onProgress);
+            currentExecution.start();
+        } catch (Throwable t) {
+            onError(codeArea.getText(), t);
+        }
+    }
 
-			Chromatynk.executeProgram(Chromatynk.parseProgram(codeArea.getText()), graphicsContext, new ForeverClock());
+    private Clock getNormalClock() {
+        return new ForeverClock();
+    }
 
-			infoLabel.setText("INFO - Dessin complété");
-			statusLabel.setText("Les instructions de dessin ont pu être complétées.");
-		} catch (Exception exception) {
-			outputArea.setText(exception.getMessage());
+    public void toggleStepByStep() {
+        clock = stepByStepCheckbox.isSelected() ? new StepByStepClock(true) : getNormalClock();
+    }
 
-			infoLabel.setText("ERREUR - Dessin échoué");
-			statusLabel.setText("L'exécution a été arrêtée par une erreur.");
-		} finally {
-			tabPane.setDisable(false);
-			codeArea.setDisable(false);
-			runButton.setDisable(false);
-			clearTextAreaButton.setDisable(false);
-			executionMenu.setDisable(false);
-		}
+    public void nextInstruction() {
+        if(clock instanceof StepByStepClock c) c.resume();
     }
 }
