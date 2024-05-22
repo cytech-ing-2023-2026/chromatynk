@@ -30,21 +30,21 @@
 					</Menu>
 					<Menu text="Exécution" fx:id="executionMenu">
 						<items>
-							<Menu text="Vitesse">
+							<Menu text="Vitesse" onAction="#refreshSecondaryClock">
 								<items>
 									<fx:define>
 										<ToggleGroup fx:id="radioSpeedGroup"/>
 									</fx:define>
-									<RadioMenuItem text="Pleine puissance" toggleGroup="$radioSpeedGroup"/>
-									<RadioMenuItem text="16 instructions/s" toggleGroup="$radioSpeedGroup"/>
-									<RadioMenuItem text="8 instructions/s" toggleGroup="$radioSpeedGroup"/>
-									<RadioMenuItem text="4 instructions/s" toggleGroup="$radioSpeedGroup"/>
-									<RadioMenuItem text="2 instructions/s" toggleGroup="$radioSpeedGroup"/>
-									<RadioMenuItem text="1 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speedFull" text="Pleine puissance" toggleGroup="$radioSpeedGroup" selected="true"/>
+									<RadioMenuItem fx:id="speed16" text="16 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speed8" text="8 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speed4" text="4 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speed2" text="2 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speed1" text="1 instructions/s" toggleGroup="$radioSpeedGroup"/>
 								</items>
 							</Menu>
 							<SeparatorMenuItem/>
-							<CheckMenuItem text="Mode étape par étape" fx:id="stepByStepCheckbox" onAction="#toggleStepByStep"/> <!-- fx:id="" -->
+							<CheckMenuItem text="Mode étape par étape" fx:id="stepByStepCheckbox" onAction="#refreshSecondaryClock"/> <!-- fx:id="" -->
 						</items>
 					</Menu>
 					<Menu text="Aide">

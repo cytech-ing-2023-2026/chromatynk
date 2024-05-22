@@ -2,10 +2,7 @@ package fr.cyu.chromatynk.editor;
 
 import fr.cyu.chromatynk.Chromatynk;
 import fr.cyu.chromatynk.ChromatynkException;
-import fr.cyu.chromatynk.eval.Clock;
-import fr.cyu.chromatynk.eval.EvalContext;
-import fr.cyu.chromatynk.eval.ForeverClock;
-import fr.cyu.chromatynk.eval.StepByStepClock;
+import fr.cyu.chromatynk.eval.*;
 import fr.cyu.chromatynk.parsing.ParsingException;
 import fr.cyu.chromatynk.parsing.Token;
 import fr.cyu.chromatynk.util.Tuple2;
@@ -93,11 +90,29 @@ public class CodeEditorController implements Initializable {
     private final Stage primaryStage;
     private FileMenuController fileMenuController;
 	private ImageMenuController imageMenuController;
-    private Clock clock;
+    private Clock timeoutClock;
+    private Clock secondaryClock;
     private ExecutionTimer currentExecution;
 
     @SuppressWarnings("exports")
     public CodeEditorController(Stage primaryStage) {this.primaryStage = primaryStage;}
+
+    private Clock getPeriodClock() {
+        long period = switch (((RadioMenuItem)radioSpeedGroup.getSelectedToggle()).getId()) {
+            case "speed16" -> 1000/16;
+            case "speed8" -> 1000/8;
+            case "speed4" -> 1000/4;
+            case "speed2" -> 1000/2;
+            case "speed1" -> 1000;
+            default -> 0;
+        };
+
+        return new PeriodClock(period);
+    }
+
+    private Clock getClock() {
+        return new AndClock(timeoutClock, secondaryClock);
+    }
 
     /**
      * This function is used to setup the UI elements of the code editor Java-side.
@@ -105,7 +120,8 @@ public class CodeEditorController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        clock = new ForeverClock(); //TODO change
+        timeoutClock = TimeoutClock.fps(30); //TODO change
+        secondaryClock = getPeriodClock();
 
         Executor executor = Executors.newSingleThreadExecutor();
 
@@ -288,22 +304,18 @@ public class CodeEditorController implements Initializable {
 
         try {
             EvalContext context = Chromatynk.compileSource(codeArea.getText(), graphicsContext);
-            currentExecution = new ExecutionTimer(codeArea.getText(), context, clock, this::onSuccess, e -> onError(codeArea.getText(), e), this::onProgress);
+            currentExecution = new ExecutionTimer(codeArea.getText(), context, getClock(), this::onSuccess, e -> onError(codeArea.getText(), e), this::onProgress);
             currentExecution.start();
         } catch (Throwable t) {
             onError(codeArea.getText(), t);
         }
     }
 
-    private Clock getNormalClock() {
-        return new ForeverClock();
-    }
-
-    public void toggleStepByStep() {
-        clock = stepByStepCheckbox.isSelected() ? new StepByStepClock(true) : getNormalClock();
+    public void refreshSecondaryClock() {
+        secondaryClock = stepByStepCheckbox.isSelected() ? new StepByStepClock(false) : getPeriodClock();
     }
 
     public void nextInstruction() {
-        if(clock instanceof StepByStepClock c) c.resume();
+        if(secondaryClock instanceof StepByStepClock c) c.resume();
     }
 }
