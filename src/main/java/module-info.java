@@ -3,6 +3,8 @@ module fr.cyu {
     requires javafx.fxml;
     requires org.fxmisc.richtext;
     requires reactfx;
+    requires java.desktop;
+    requires javafx.swing;
 
     exports fr.cyu.chromatynk;
     exports fr.cyu.chromatynk.ast;

@@ -25,7 +25,7 @@
 					</Menu>
 					<Menu text="Image">
 						<items>
-							<MenuItem text="Enregistrer sous"/>
+							<MenuItem text="Enregistrer sous" onAction="#saveCanvas"/>
 						</items>
 					</Menu>
 					<Menu text="Exécution">

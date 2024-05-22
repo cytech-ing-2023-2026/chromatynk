@@ -6,11 +6,13 @@ import fr.cyu.chromatynk.parsing.Token;
 import fr.cyu.chromatynk.util.Tuple2;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -22,6 +24,7 @@ import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.reactfx.Subscription;
 
+import java.awt.image.RenderedImage;
 import java.net.URL;
 import java.time.Duration;
 import java.util.*;
@@ -209,6 +212,12 @@ public class CodeEditorController implements Initializable {
 
     public void saveFile() {
         fileMenuController.saveFile();
+    }
+
+    public void saveCanvas() {
+        WritableImage writableImage = canvas.snapshot(null, null);
+        RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
+        fileMenuController.saveImage(renderedImage);
     }
 
     public void clearTextArea() {

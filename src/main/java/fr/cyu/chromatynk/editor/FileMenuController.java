@@ -1,13 +1,18 @@
 package fr.cyu.chromatynk.editor;
 
 import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.fxmisc.richtext.CodeArea;
 
+import javax.imageio.ImageIO;
+import java.awt.image.RenderedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The controller for the file menu
@@ -71,6 +76,28 @@ public class FileMenuController {
 					filePath += ".cty"; // Append .cty extension if not provided
 				}
 				Files.write(Paths.get(filePath), codeArea.getText().getBytes());
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	public void saveImage(RenderedImage image) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Enregistrer sous...");
+
+		// Add a file extension filter for image files
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", ".jpeg");
+		fileChooser.getExtensionFilters().add(extFilter);
+
+		File selectedFile = fileChooser.showSaveDialog(primaryStage);
+		if (selectedFile != null) {
+			try {
+				String filePath = selectedFile.getAbsolutePath();
+				if (!filePath.endsWith(".png")) {
+					filePath += ".png"; // Append .png extension if not provided
+				}
+				ImageIO.write(image, "png", new File(filePath));
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
