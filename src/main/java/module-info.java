@@ -1,6 +1,7 @@
 module fr.cyu {
     requires javafx.controls;
     requires javafx.fxml;
+	requires javafx.swing;
     requires org.fxmisc.richtext;
     requires reactfx;
 

@@ -37,7 +37,7 @@ public class CodeEditor extends Application {
 
         // Set the stage
         primaryStage.setTitle("Chromat'ynk");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setScene(new Scene(root, 800, 700));
         primaryStage.show();
     }
 

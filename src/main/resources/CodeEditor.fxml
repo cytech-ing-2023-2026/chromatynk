@@ -25,10 +25,10 @@
 					</Menu>
 					<Menu text="Image">
 						<items>
-							<MenuItem text="Enregistrer sous"/>
+							<MenuItem text="Enregistrer sous" onAction="#saveImage"/>
 						</items>
 					</Menu>
-					<Menu text="Exécution">
+					<Menu text="Exécution" fx:id="executionMenu">
 						<items>
 							<Menu text="Vitesse">
 								<items>
@@ -119,9 +119,9 @@
 			<padding>
 				<Insets topRightBottomLeft="10" />
 			</padding>
-			<Label fx:id="infoLabel" text="INFO - Message d'information utile..."/>
+			<Label fx:id="infoLabel" text="INFO - Aucun dessin n'a été exécuté."/>
 			<Region HBox.hgrow="ALWAYS"/>
-			<Label fx:id="statusLabel" text="Dessin en cours..."/>
+			<Label fx:id="statusLabel" text="En attente..."/>
 		</HBox>
 	</bottom>
 </BorderPane>

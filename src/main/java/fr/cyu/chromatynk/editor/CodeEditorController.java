@@ -1,6 +1,7 @@
 package fr.cyu.chromatynk.editor;
 
 import fr.cyu.chromatynk.Chromatynk;
+import fr.cyu.chromatynk.eval.ForeverClock;
 import fr.cyu.chromatynk.parsing.ParsingException;
 import fr.cyu.chromatynk.parsing.Token;
 import fr.cyu.chromatynk.util.Tuple2;
@@ -50,17 +51,23 @@ public class CodeEditorController implements Initializable {
 
     // Bottom bar
     @FXML
+    private HBox bottomBar;
+    @FXML
     private Label infoLabel;
     @FXML
     private Label statusLabel;
-    @FXML
-    private HBox bottomBar;
 
+	// Execution menu
+	@FXML
+	private Menu executionMenu;
     // Step-by-step mode
     @FXML
     private CheckMenuItem stepByStepCheckbox;
     @FXML
     private HBox stepByStepControls;
+	// Speed
+	@FXML
+	private ToggleGroup radioSpeedGroup;
 
     // Tabs
     @FXML
@@ -77,11 +84,10 @@ public class CodeEditorController implements Initializable {
 
     private final Stage primaryStage;
     private FileMenuController fileMenuController;
+	private ImageMenuController imageMenuController;
 
     @SuppressWarnings("exports")
-    public CodeEditorController(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-    }
+    public CodeEditorController(Stage primaryStage) {this.primaryStage = primaryStage;}
 
     /**
      * This function is used to setup the UI elements of the code editor Java-side.
@@ -117,8 +123,6 @@ public class CodeEditorController implements Initializable {
             }
         });
 
-        this.fileMenuController = new FileMenuController(primaryStage, codeArea);
-
         // Set background color of the canvas
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
         graphicsContext.setFill(Color.WHITE);
@@ -129,9 +133,7 @@ public class CodeEditorController implements Initializable {
 
         // Only show relevant UI when in step-by-step mode
         stepByStepControls.setVisible(stepByStepCheckbox.isSelected());
-        stepByStepCheckbox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            stepByStepControls.setVisible(newValue);
-        });
+        stepByStepCheckbox.selectedProperty().addListener((observable, oldValue, newValue) -> {stepByStepControls.setVisible(newValue);});
 
         // Handle tab changes
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
@@ -163,6 +165,9 @@ public class CodeEditorController implements Initializable {
                 tabPane.getSelectionModel().select(newTabInstance);
             }
         });
+
+        this.fileMenuController = new FileMenuController(primaryStage, codeArea);
+		this.imageMenuController = new ImageMenuController(primaryStage, canvas);
     }
 
     public Task<StyleSpans<Collection<String>>> computeHighlighting(Executor executor) {
@@ -211,6 +216,10 @@ public class CodeEditorController implements Initializable {
         fileMenuController.saveFile();
     }
 
+	public void saveImage() {
+		imageMenuController.saveImage();
+	}
+
     public void clearTextArea() {
         codeArea.clear();
     }
@@ -220,14 +229,37 @@ public class CodeEditorController implements Initializable {
     }
 
     public void runScript() {
-        // Disable tab system, code area, and buttons
+        // Disable tab system, code area, execution menu and buttons
         tabPane.setDisable(true);
         codeArea.setDisable(true);
         runButton.setDisable(true);
         clearTextAreaButton.setDisable(true);
+		executionMenu.setDisable(true);
+		// Empty output and canvas
+		outputArea.setText("");
+		GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+		graphicsContext.setFill(Color.WHITE);
+		graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Wait for drawing to be finished
+		try {
+			infoLabel.setText("INFO - Dessin en cours...");
+			statusLabel.setText("Les instructions de dessin sont en cours d'exécution...");
 
-        // The features would be re-enabled here.
+			Chromatynk.executeProgram(Chromatynk.parseProgram(codeArea.getText()), graphicsContext, new ForeverClock());
+
+			infoLabel.setText("INFO - Dessin complété");
+			statusLabel.setText("Les instructions de dessin ont pu être complétées.");
+		} catch (Exception exception) {
+			outputArea.setText(exception.getMessage());
+
+			infoLabel.setText("ERREUR - Dessin échoué");
+			statusLabel.setText("L'exécution a été arrêtée par une erreur.");
+		} finally {
+			tabPane.setDisable(false);
+			codeArea.setDisable(false);
+			runButton.setDisable(false);
+			clearTextAreaButton.setDisable(false);
+			executionMenu.setDisable(false);
+		}
     }
 }
