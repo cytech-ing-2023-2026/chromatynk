@@ -51,10 +51,10 @@ public class ChromatynkException extends Exception {
         }
 
         if (range.from().equals(range.to())) {
-            result.append("At line ").append(range.from().row()).append(", column ").append(range.from().column());
+            result.append("At line ").append(range.from().row()+1).append(", column ").append(range.from().column());
         } else {
-            result.append("From line ").append(range.from().row()).append(", column ").append(range.from().column()).append('\n');
-            result.append("To line ").append(range.to().row()).append(", column ").append(range.to().column());
+            result.append("From line ").append(range.from().row()+1).append(", column ").append(range.from().column()).append('\n');
+            result.append("To line ").append(range.to().row()+1).append(", column ").append(range.to().column());
         }
 
         return result.toString();
