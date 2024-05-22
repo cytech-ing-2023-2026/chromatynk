@@ -146,7 +146,6 @@ public class StatementParser {
                         Range endingRange = initialExpr.map(Expr::range).orElse(identifier.range());
                         yield new Statement.DeclareVariable(typeRange.merge(endingRange), type, identifier.name(), initialExpr);
                     }
-					default -> throw new AssertionError("Code should be unreachable, this line is only present to stop errors on one setup.");
                 });
     }
 
@@ -159,7 +158,6 @@ public class StatementParser {
                 .map(tpl -> switch (tpl) {
                     case Tuple2(Token.Identifier id, Expr value) ->
                             new Statement.AssignVariable(id.range().merge(value.range()), id.name(), value);
-					default -> throw new AssertionError("Code should be unreachable, this line is only present to stop errors on one setup.");
                 });
     }
 
@@ -186,7 +184,6 @@ public class StatementParser {
                 .map(tpl -> switch (tpl) {
                     case Tuple2(Tuple2(Token.BraceOpen open, List<Statement> statements), Token.BraceClosed closed) ->
                             new Statement.Body(open.range().merge(closed.range()), statements);
-					default -> throw new AssertionError("Code should be unreachable, this line is only present to stop errors on one setup.");
                 });
     }
 
@@ -200,7 +197,6 @@ public class StatementParser {
                 .map(tpl -> switch (tpl) {
                     case Tuple2(Tuple2(Token.While whileToken, Expr condition), Statement.Body body) ->
                             new Statement.While(whileToken.range().merge(body.range()), condition, body);
-					default -> throw new AssertionError("Code should be unreachable, this line is only present to stop errors on one setup.");
                 });
     }
 
@@ -224,7 +220,6 @@ public class StatementParser {
                             ), Statement.Body body
                     ) ->
                             new Statement.For(forToken.range().merge(body.range()), iterator.name(), start, to, step, body);
-					default -> throw new AssertionError("Code should be unreachable, this line is only present to stop errors on one setup.");
                 });
     }
 
@@ -244,7 +239,6 @@ public class StatementParser {
                         Optional<Statement.Body> ifFalse = elseBody.map(Tuple2::b);
                         yield new Statement.If(ifToken.range().merge(ifFalse.orElse(ifTrue).range()), condition, ifTrue, ifFalse);
                     }
-					default -> throw new AssertionError("Code should be unreachable, this line is only present to stop errors on one setup.");
                 });
     }
 
@@ -258,7 +252,6 @@ public class StatementParser {
                 .map(tpl -> switch (tpl) {
                     case Tuple2(Tuple2(Token mimicToken, Expr mimicked), Statement.Body body) ->
                             new Statement.Mimic(mimicToken.range().merge(body.range()), mimicked, body);
-					default -> throw new AssertionError("Code should be unreachable, this line is only present to stop errors on one setup.");
                 });
     }
 
@@ -273,7 +266,6 @@ public class StatementParser {
                 .map(tpl -> switch (tpl) {
                     case Tuple2(Tuple2(Tuple2(Token mirrorToken, Expr centerX), Expr centerY), Statement.Body body) ->
                             new Statement.MirrorCentral(mirrorToken.range().merge(body.range()), centerX, centerY, body);
-					default -> throw new AssertionError("Code should be unreachable, this line is only present to stop errors on one setup.");
                 });
     }
 
@@ -297,7 +289,6 @@ public class StatementParser {
                             ), Statement.Body body
                     ) ->
                             new Statement.MirrorAxial(mirrorToken.range().merge(body.range()), axisStartX, axisStartY, axisEndX, axisEndY, body);
-					default -> throw new AssertionError("Code should be unreachable, this line is only present to stop errors on one setup.");
                 });
     }
 
