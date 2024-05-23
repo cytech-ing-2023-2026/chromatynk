@@ -391,19 +391,17 @@ public class Typer {
                 }
             }
             case Statement.For(
-                    Range range, String iterator, Expr from, Expr to, Optional<Expr> step, Statement.Body body
+                    Range range, String iterator, Optional<Expr> from, Expr to, Optional<Expr> step, Statement.Body body
             ) -> {
-                Type fromType = getType(from, context);
-                Type toType = getType(to, context);
 
-                assertTypeMatch(from.range(), Set.of(Type.INT, Type.FLOAT), fromType);
-                assertTypeMatch(to.range(), Set.of(Type.INT, Type.FLOAT), toType);
+                if(from.isPresent()) assertTypeMatch(from.get().range(), Set.of(Type.INT), getType(from.get(), context));
+                assertTypeMatch(to.range(), Set.of(Type.INT), getType(to, context));
 
                 TypingContext forContext = new TypingContext(context, new HashMap<>());
-                forContext.declareVariable(iterator, fromType, range);
+                forContext.declareVariable(iterator, Type.INT, range);
 
                 if (step.isPresent())
-                    assertTypeMatch(step.get().range(), Set.of(Type.INT, Type.FLOAT), getType(step.get(), forContext));
+                    assertTypeMatch(step.get().range(), Set.of(Type.INT), getType(step.get(), forContext));
 
                 checkTypes(body, forContext);
             }

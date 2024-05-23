@@ -125,7 +125,7 @@ public class Compiler {
 
     public static void compileStatement(Statement statement, List<Bytecode> instructions, int offset) {
         switch (statement) {
-            case Statement.Body(Range range, List<Statement> statements) -> {
+            case Statement.Body(Range ignored, List<Statement> statements) -> {
                 for (Statement stat : statements) compileStatement(stat, instructions, offset);
             }
 
@@ -166,7 +166,7 @@ public class Compiler {
             ... //14
              */
             case Statement.For(
-                    Range range, String iterator, Expr from, Expr to, Optional<Expr> step, Statement.Body body
+                    Range range, String iterator, Optional<Expr> from, Expr to, Optional<Expr> step, Statement.Body body
             ) -> {
                 instructions.add(new Bytecode.NewScope(range));
 
@@ -174,7 +174,7 @@ public class Compiler {
                         range,
                         Type.INT,
                         iterator,
-                        Optional.of(from)
+                        from
                 ), instructions, offset);
 
                 int conditionAddr = instructions.size() + offset;
@@ -396,9 +396,7 @@ public class Compiler {
                 instructions.add(new Bytecode.Store(range, name));
             }
 
-            case Statement.DeleteVariable(Range range, String name) -> {
-                instructions.add(new Bytecode.Delete(range, name));
-            }
+            case Statement.DeleteVariable(Range range, String name) -> instructions.add(new Bytecode.Delete(range, name));
         }
     }
 

@@ -55,10 +55,10 @@ public sealed interface Statement {
      * @param iterator the name of the iterator
      * @param from     the initial thickness of the iterator
      * @param to       the upper bound of the iterator
-     * @param step     the optional step to increment the iterator
+     * @param step     the step to increment the iterator
      * @param body     the statements to execute
      */
-    record For(Range range, String iterator, Expr from, Expr to, Optional<Expr> step, Body body) implements Statement {}
+    record For(Range range, String iterator, Optional<Expr> from, Expr to, Optional<Expr> step, Body body) implements Statement {}
 
     /**
      * A Turn {@code angle}.
