@@ -305,6 +305,7 @@ public class CodeEditorController implements Initializable {
     private void onSuccess() {
         infoLabel.setText("INFO - Dessin complété");
         statusLabel.setText("Les instructions de dessin ont pu être complétées.");
+		
         postExecution();
     }
 
@@ -340,6 +341,10 @@ public class CodeEditorController implements Initializable {
             currentExecution.stop();
             currentExecution = null;
         }
+
+		// Mark execution as stopped early
+		infoLabel.setText("WARN - Dessin arrêté.");
+		statusLabel.setText("Le dessin a été manuellement interrompu lors de son exécution.");
         postExecution();
     }
 
