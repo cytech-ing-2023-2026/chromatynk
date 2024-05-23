@@ -12,7 +12,7 @@ MIRROR 50%, 50%{
 		SELECT 0
 		FOR i FROM 0 TO 4{
 			FWD 50%
-			TURN 15.5%
+			TURN 90
 		}
 	}
 }
