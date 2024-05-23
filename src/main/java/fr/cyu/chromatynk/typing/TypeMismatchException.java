@@ -10,6 +10,6 @@ public class TypeMismatchException extends TypingException{
 
 
     public TypeMismatchException(Range range, Set<Type> expected, Type actual) {
-        super(range, "Type mismatch\nExpected: " + expected.stream().map(Type::getName).collect(Collectors.joining()) + "\nGot: " + actual.getName());
+        super(range, "Type mismatch\nExpected: " + expected.stream().map(Type::getName).collect(Collectors.joining(", ")) + "\nGot: " + actual.getName());
     }
 }
