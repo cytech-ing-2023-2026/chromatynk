@@ -219,7 +219,7 @@ public class StatementParser {
     public static Parser<Token, Statement> forLoop() {
         return tokenOf(Token.For.class)
                 .zip(tokenOf(Token.Identifier.class).fatal())
-                .zip(ExprParser.anyExpr().prefixed(tokenOf(Token.From.class)).fatal())
+                .zip(ExprParser.anyExpr().fatal().prefixed(tokenOf(Token.From.class)).optional())
                 .zip(ExprParser.anyExpr().prefixed(tokenOf(Token.To.class)).fatal())
                 .zip(ExprParser.anyExpr().fatal().prefixed(tokenOf(Token.Step.class)).optional())
                 .zip(body().fatal())
@@ -227,7 +227,7 @@ public class StatementParser {
                     case Tuple2(
                             Tuple2(
                                     Tuple2(
-                                            Tuple2(Tuple2(Token forToken, Token.Identifier iterator), Expr start),
+                                            Tuple2(Tuple2(Token forToken, Token.Identifier iterator), Optional<Expr> start),
                                             Expr to
                                     ), Optional<Expr> step
                             ), Statement.Body body

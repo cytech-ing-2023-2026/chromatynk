@@ -42,7 +42,7 @@ public class IntegrationTestCase {
                 new Statement.For(
                         new Range(new Position(0, 2), new Position(1, 4)),
                         "i",
-                        new Expr.LiteralInt(Range.sameLine(11, 12, 2), 2),
+                        Optional.of(new Expr.LiteralInt(Range.sameLine(11, 12, 2), 2)),
                         new Expr.VarCall(Range.sameLine(16, 17, 2), "n"),
                         Optional.empty(),
                         new Statement.Body(

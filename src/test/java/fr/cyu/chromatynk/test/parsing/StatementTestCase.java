@@ -244,7 +244,7 @@ public class StatementTestCase {
                 new Statement.For(
                         new Range(new Position(0, 0), new Position(1, 2)),
                         "i",
-                        new Expr.LiteralInt(Range.sameLine(11, 12), 0),
+                        Optional.of(new Expr.LiteralInt(Range.sameLine(11, 12), 0)),
                         new Expr.LiteralInt(Range.sameLine(16, 18), 10),
                         Optional.empty(),
                         new Statement.Body(
@@ -275,7 +275,7 @@ public class StatementTestCase {
                 new Statement.For(
                         new Range(new Position(0, 0), new Position(1, 2)),
                         "i",
-                        new Expr.LiteralInt(Range.sameLine(11, 12), 0),
+                        Optional.of(new Expr.LiteralInt(Range.sameLine(11, 12), 0)),
                         new Expr.LiteralInt(Range.sameLine(16, 18), 10),
                         Optional.of(new Expr.LiteralInt(Range.sameLine(24, 25), 2)),
                         new Statement.Body(
@@ -500,7 +500,7 @@ public class StatementTestCase {
                         new Statement.For(
                                 new Range(new Position(0, 2), new Position(1, 4)),
                                 "i",
-                                new Expr.LiteralInt(Range.sameLine(11, 12, 2), 2),
+                                Optional.of(new Expr.LiteralInt(Range.sameLine(11, 12, 2), 2)),
                                 new Expr.VarCall(Range.sameLine(16, 17, 2), "n"),
                                 Optional.empty(),
                                 new Statement.Body(
