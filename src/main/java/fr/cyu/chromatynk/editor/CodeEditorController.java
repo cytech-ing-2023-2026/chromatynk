@@ -2,8 +2,11 @@ package fr.cyu.chromatynk.editor;
 
 import fr.cyu.chromatynk.Chromatynk;
 import fr.cyu.chromatynk.ChromatynkException;
+import fr.cyu.chromatynk.ast.Program;
 import fr.cyu.chromatynk.eval.*;
 import fr.cyu.chromatynk.parsing.ParsingException;
+import fr.cyu.chromatynk.parsing.ParsingIterator;
+import fr.cyu.chromatynk.parsing.StatementParser;
 import fr.cyu.chromatynk.parsing.Token;
 import fr.cyu.chromatynk.util.Tuple2;
 import javafx.application.Platform;
@@ -207,7 +210,7 @@ public class CodeEditorController implements Initializable {
             @Override
             protected StyleSpans<Collection<String>> call() throws ParsingException {
                 List<Token> tokens = Chromatynk.lexSource(text);
-                StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+                StyleSpansBuilder<Collection<String>> lexSpansBuilder = new StyleSpansBuilder<>();
 
                 int lastKeywordEnd = 0;
 
@@ -225,13 +228,34 @@ public class CodeEditorController implements Initializable {
 
                     Tuple2<Integer, Integer> range1d = token.range().toCursorRange(text);
 
-                    spansBuilder.add(Collections.singleton("default"), Math.max(0, range1d.a() - lastKeywordEnd));
-                    spansBuilder.add(Collections.singleton(cssClass), range1d.b() - range1d.a());
+                    lexSpansBuilder.add(Collections.singleton("default"), Math.max(0, range1d.a() - lastKeywordEnd));
+                    lexSpansBuilder.add(Collections.singleton(cssClass), range1d.b() - range1d.a());
                     lastKeywordEnd = range1d.b();
                 }
 
-                var res = spansBuilder.create();
-                return res;
+                StyleSpans<Collection<String>> lexSpans = lexSpansBuilder.create();
+
+                StyleSpansBuilder<Collection<String>> errorSpansBuilder = new StyleSpansBuilder<>();
+
+                try {
+                    Program program = StatementParser.program().parse(new ParsingIterator<>(tokens)).value();
+                    Chromatynk.typecheckProgram(program);
+                } catch (ChromatynkException e) {
+                    Tuple2<Integer, Integer> range1d = e.getRange().toCursorRange(text);
+                    errorSpansBuilder.add(Collections.singleton("default"), Math.max(0, range1d.a()));
+                    errorSpansBuilder.add(Collections.singleton("error"), range1d.b() - range1d.a());
+
+                    StyleSpans<Collection<String>> errorSpans = errorSpansBuilder.create();
+
+                    return lexSpans.overlay(errorSpans, (a, b) -> {
+                        List<String> classes = new ArrayList<>(a.size()+b.size());
+                        classes.addAll(a);
+                        classes.addAll(b);
+                        return classes;
+                    });
+                }
+
+                return lexSpans;
             }
         };
 

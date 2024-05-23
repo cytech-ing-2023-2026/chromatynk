@@ -44,16 +44,14 @@ public class Chromatynk {
                 .value();
     }
 
-    public static Program typecheckSource(String source) throws ParsingException, TypingException {
-        Program result = parseSource(source);
+    public static void typecheckProgram(Program program) throws TypingException {
         TypingContext typingContext = new TypingContext();
-        for(Statement statement : result.statements()) Typer.checkTypes(statement, typingContext);
-
-        return result;
+        for(Statement statement : program.statements()) Typer.checkTypes(statement, typingContext);
     }
 
     public static EvalContext compileSource(String source, GraphicsContext graphics) throws ParsingException, TypingException {
-        Program program = typecheckSource(source);
+        Program program = parseSource(source);
+        typecheckProgram(program);
 
         List<Bytecode> instructions = Compiler.compileProgram(program);
         return EvalContext.create(instructions, graphics);
