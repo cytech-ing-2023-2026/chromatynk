@@ -7,6 +7,7 @@ module fr.cyu {
 
     exports fr.cyu.chromatynk;
     exports fr.cyu.chromatynk.ast;
+    exports fr.cyu.chromatynk.bytecode;
     exports fr.cyu.chromatynk.editor;
     exports fr.cyu.chromatynk.eval;
     exports fr.cyu.chromatynk.parsing;
