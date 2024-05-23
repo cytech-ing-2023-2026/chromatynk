@@ -69,7 +69,7 @@ public class EvalContext {
         return nextAddress < instructions.size();
     }
 
-    public Bytecode next() throws EvalException {
+    public Bytecode next() {
         Bytecode bytecode = peek();
         nextAddress++;
         return bytecode;
@@ -107,8 +107,9 @@ public class EvalContext {
         return getCursor(getCurrentCursorId()).get();
     }
 
-    private void removeDeletedCursorsFromHistory() {
+    private void removeDeletedCursorsFromHistory() throws EvalException {
         this.selectionHistory.removeIf(c -> !containsCursor(c));
+        if(selectionHistory.isEmpty()) throw new EvalException(getCurrentRange(), "No selected cursor left");
     }
 
     /**
@@ -184,11 +185,10 @@ public class EvalContext {
 
     /**
      * Exit the current scope.
-     *
-     * @return the popped scope
      */
-    public Scope exitScope() {
-        return scopes.pop();
+    public void exitScope() throws EvalException {
+        scopes.pop();
+        removeDeletedCursorsFromHistory();
     }
 
     /**
@@ -330,11 +330,12 @@ public class EvalContext {
      *
      * @param id the id of the cursor
      */
-    public void deleteCursor(CursorId id) throws MissingCursorException {
+    public void deleteCursor(CursorId id) throws EvalException {
         for (Scope scope : scopes) {
             if(scope.containsCursor(id)) {
                 scope.deleteCursor(id);
                 selectionHistory.removeFirstOccurrence(id);
+                if(selectionHistory.isEmpty()) throw new EvalException(getCurrentRange(), "No selected cursor left");
                 return;
             }
         }
