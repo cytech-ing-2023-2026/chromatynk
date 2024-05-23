@@ -10,9 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
- * The controller for the file menu
+ * The controller for handling file-related actions in the application.
+ * It provides functionality to open and save files with content from/to a CodeArea.
+ * 
  * @author JordanViknar
- * @see CodeEditor
  * @see CodeEditorController
  */
 public class FileMenuController {
@@ -20,6 +21,12 @@ public class FileMenuController {
 	private final Stage primaryStage;
 	private final CodeArea codeArea;
 
+	/**
+     * Constructs a {@link FileMenuController} with the given primary stage and code area.
+     * 
+     * @param primaryStage the primary stage of the application
+     * @param codeArea the code area whose content needs to be loaded from or saved to a file
+     */
 	@SuppressWarnings("exports")
 	public FileMenuController(Stage primaryStage, CodeArea codeArea) {
 		this.primaryStage = primaryStage;
@@ -27,7 +34,7 @@ public class FileMenuController {
 	}
 
 	/**
-	 * Opens a file dialog and loads the content of the selected file into the text area
+	 * Opens a file dialog and loads the content of the selected file into the text area.
 	 */
 	public void openFile() {
 		FileChooser fileChooser = new FileChooser();
@@ -53,7 +60,7 @@ public class FileMenuController {
 	}
 
 	/**
-	 * Opens a file dialog and saves the content of the text area into the selected file
+	 * Opens a file dialog and saves the content of the text area into the selected file.
 	 */
 	public void saveFile() {
 		FileChooser fileChooser = new FileChooser();

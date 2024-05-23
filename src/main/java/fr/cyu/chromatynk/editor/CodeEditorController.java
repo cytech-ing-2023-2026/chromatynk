@@ -25,7 +25,6 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
-import org.reactfx.Subscription;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -38,9 +37,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The controller for the code editor
- *
- * @author JordanViknar
+ * The controller for the code editor.
+ * This class is responsible for handling the interactions and functionality of the code editor UI.
+ * It includes methods for syntax highlighting, auto-indentation, script execution, and file handling.
  */
 public class CodeEditorController implements Initializable {
     // The main elements
@@ -100,9 +99,21 @@ public class CodeEditorController implements Initializable {
     private StepByStepClock stepByStepClock = new StepByStepClock(false);
     private ExecutionTimer currentExecution;
 
+	/**
+     * Constructor for the CodeEditorController.
+     *
+     * @param primaryStage the primary stage of the application
+     */
     @SuppressWarnings("exports")
-    public CodeEditorController(Stage primaryStage) {this.primaryStage = primaryStage;}
-
+    public CodeEditorController(Stage primaryStage) {
+		this.primaryStage = primaryStage;
+	}
+	
+	/**
+     * Creates and returns a Clock instance based on the selected speed from the UI.
+     *
+     * @return a Clock instance with the period set based on the selected speed
+     */
     private Clock getPeriodClock() {
         long period = switch (((RadioMenuItem)radioSpeedGroup.getSelectedToggle()).getId()) {
             case "speed16" -> 1000/16;
@@ -115,15 +126,16 @@ public class CodeEditorController implements Initializable {
 
         return new PeriodClock(period);
     }
-
+	
+	/**
+     * Creates and returns a Clock instance that combines timeoutClock and secondaryClock.
+     *
+     * @return a combined Clock instance
+     */
     private Clock getClock() {
         return new AndClock(timeoutClock, secondaryClock);
     }
 
-    /**
-     * This function is used to setup the UI elements of the code editor Java-side.
-     * Basically : it's for things we cannot do in FXML.
-     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         timeoutClock = TimeoutClock.fps(30); //TODO change
@@ -135,7 +147,7 @@ public class CodeEditorController implements Initializable {
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
         //Lexical highlighting
-        Subscription subscription = this.codeArea
+        this.codeArea
                 .multiPlainChanges()
                 .successionEnds(Duration.ofMillis(125))
                 .retainLatestUntilLater(executor)
@@ -204,6 +216,12 @@ public class CodeEditorController implements Initializable {
 		this.imageMenuController = new ImageMenuController(primaryStage, canvas);
     }
 
+	/**
+     * Computes syntax highlighting for the code area.
+     *
+     * @param executor the executor to run the task on
+     * @return a task that computes the style spans for syntax highlighting
+     */
     public Task<StyleSpans<Collection<String>>> computeHighlighting(Executor executor) {
         String text = codeArea.getText();
         Task<StyleSpans<Collection<String>>> task = new Task<>() {
@@ -263,30 +281,54 @@ public class CodeEditorController implements Initializable {
         return task;
     }
 
+	/**
+     * Opens a code file using the FileMenuController.
+     */
     public void openFile() {
         fileMenuController.openFile();
     }
 
+	/**
+     * Saves the current file using the FileMenuController.
+     */
     public void saveFile() {
         fileMenuController.saveFile();
     }
 
+	/**
+     * Saves the current canvas image using the ImageMenuController.
+     */
 	public void saveImage() {
 		imageMenuController.saveImage();
 	}
 
+	/**
+     * Clears the code area.
+     */
     public void clearTextArea() {
         codeArea.clear();
     }
 
+	/**
+     * Closes the application.
+     */
     public void quit() {
         primaryStage.close();
     }
 
+	/**
+     * Handles post-execution UI updates.
+     */
     private void postExecution() {
         stopButton.setDisable(true);
     }
 
+	/**
+     * Handles errors that occur during script execution.
+     *
+     * @param source the source code being executed
+     * @param throwable the exception that was thrown
+     */
     private void onError(String source, Throwable throwable) {
         if(throwable instanceof ChromatynkException e) {
             outputArea.setText(e.getFullMessage(source));
@@ -302,6 +344,9 @@ public class CodeEditorController implements Initializable {
         postExecution();
     }
 
+	/**
+     * Handles successful script execution.
+     */
     private void onSuccess() {
         infoLabel.setText("INFO - Dessin complété");
         statusLabel.setText("Les instructions de dessin ont pu être complétées.");
@@ -309,10 +354,18 @@ public class CodeEditorController implements Initializable {
         postExecution();
     }
 
+	/**
+     * Handles progress updates during script execution.
+     *
+     * @param context the evaluation context
+     */
     private void onProgress(EvalContext context) {
         stepLabel.setText("Instruction " + context.getNextAddress()+1);
     }
 
+	/**
+     * Runs the script currently in the code area.
+     */
     public void runScript() {
         stopScript();
 
@@ -336,6 +389,9 @@ public class CodeEditorController implements Initializable {
         }
     }
 
+	/**
+     * Stops the currently running script early.
+     */
     public void stopScript() {
         if(currentExecution != null) {
             currentExecution.stop();
@@ -345,14 +401,21 @@ public class CodeEditorController implements Initializable {
 		// Mark execution as stopped early
 		infoLabel.setText("WARN - Dessin arrêté.");
 		statusLabel.setText("Le dessin a été manuellement interrompu lors de son exécution.");
+
         postExecution();
     }
 
+	/**
+     * Refreshes the secondary clock based on the step-by-step mode.
+     */
     public void refreshSecondaryClock() {
         secondaryClock = stepByStepCheckbox.isSelected() ? stepByStepClock : getPeriodClock();
         if(currentExecution != null) currentExecution.setClock(secondaryClock);
     }
 
+	/**
+     * Executes the next instruction in step-by-step mode.
+     */
     public void nextInstruction() {
         stepByStepClock.resume();
     }
