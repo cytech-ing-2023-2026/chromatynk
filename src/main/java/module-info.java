@@ -12,6 +12,7 @@ module fr.cyu {
     exports fr.cyu.chromatynk.parsing;
     exports fr.cyu.chromatynk.typing;
     exports fr.cyu.chromatynk.util;
+	exports fr.cyu.chromatynk.draw;
 
     opens fr.cyu.chromatynk.editor to javafx.fxml;
 }

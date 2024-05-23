@@ -2,8 +2,6 @@ package fr.cyu.chromatynk.eval;
 
 import fr.cyu.chromatynk.ast.Type;
 
-import java.util.Optional;
-
 /**
  * A typed variable.
  */

@@ -382,7 +382,7 @@ public class CodeEditorController implements Initializable {
 
         try {
             EvalContext context = Chromatynk.compileSource(codeArea.getText(), graphicsContext);
-            currentExecution = new ExecutionTimer(codeArea.getText(), context, getClock(), this::onSuccess, e -> onError(codeArea.getText(), e), this::onProgress);
+            currentExecution = new ExecutionTimer(context, getClock(), this::onSuccess, e -> onError(codeArea.getText(), e), this::onProgress);
             currentExecution.start();
         } catch (Throwable t) {
             onError(codeArea.getText(), t);

@@ -17,7 +17,6 @@ import java.util.function.Consumer;
  */
 public class ExecutionTimer extends AnimationTimer {
 
-    private String source;
     private EvalContext context;
     private Clock clock;
     private Runnable onSuccess;
@@ -27,15 +26,13 @@ public class ExecutionTimer extends AnimationTimer {
 	/**
      * Constructs an {@link ExecutionTimer} with the specified parameters.
      * 
-     * @param source the source code to be executed
      * @param context the evaluation context in which the source code is executed
      * @param clock the clock used for timing the execution
      * @param onSuccess the callback to be executed upon successful completion of the script
      * @param onError the callback to be executed if an error occurs during script execution
      * @param onProgress the callback to be executed on each progress step of the script execution
      */
-    public ExecutionTimer(String source, EvalContext context, Clock clock, Runnable onSuccess, Consumer<Throwable> onError, Consumer<EvalContext> onProgress) {
-        this.source = source;
+    public ExecutionTimer(EvalContext context, Clock clock, Runnable onSuccess, Consumer<Throwable> onError, Consumer<EvalContext> onProgress) {
         this.context = context;
         this.clock = clock;
         this.onSuccess = onSuccess;

@@ -8,7 +8,6 @@ import fr.cyu.chromatynk.eval.Value;
 import fr.cyu.chromatynk.util.Position;
 import fr.cyu.chromatynk.util.Range;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;

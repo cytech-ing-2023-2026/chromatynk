@@ -6,9 +6,7 @@ import static fr.cyu.chromatynk.ast.Expr.*;
 
 import fr.cyu.chromatynk.ast.Statement;
 import fr.cyu.chromatynk.ast.Type;
-import fr.cyu.chromatynk.eval.EvalException;
 import fr.cyu.chromatynk.util.Range;
-import fr.cyu.chromatynk.util.Tuple3;
 
 import java.util.HashMap;
 import java.util.List;
