@@ -381,7 +381,7 @@ public class Typer {
 
 
     /**
-     * A voic checkTypes which throws an exception with different cases inside
+     * A void checkTypes which throws an exception with different cases inside
      *
      * @param statement the statement used
      * @param context   the context needed for the instruction
@@ -454,7 +454,7 @@ public class Typer {
 
             }
             case Statement.Thick(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENTAGE), getType(expr, context));
-            case Statement.LookAtCursor(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.STRING), getType(expr, context));
+            case Statement.LookAtCursor(Range ignored, Expr expr) -> assertTypeMatch(expr.range(), Set.of(Type.STRING, Type.INT), getType(expr, context));
             case Statement.LookAtPos(Range ignored, Expr x, Expr y) -> {
                 assertTypeMatch(x.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENTAGE), getType(x, context));
                 assertTypeMatch(y.range(), Set.of(Type.INT, Type.FLOAT, Type.PERCENTAGE), getType(y, context));
