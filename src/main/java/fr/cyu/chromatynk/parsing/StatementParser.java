@@ -171,9 +171,18 @@ public class StatementParser {
     }
 
     /**
+     * Body `-> ...` parser.
+     */
+    public static Parser<Token, Statement.Body> oneLineBody() {
+        return tokenOf(Token.Arrow.class)
+                .zip(Parser.lazy(StatementParser::anyStatement).fatal())
+                .map(tpl->new Statement.Body(tpl.a().range().merge(tpl.b().range()), List.of(tpl.b())));
+    }
+
+    /**
      * Body `{...}` parser.
      */
-    public static Parser<Token, Statement.Body> body() {
+    public static Parser<Token, Statement.Body> multiLineBody() {
         return tokenOf(Token.BraceOpen.class, "{")
                 .zip(Parser.lazy(
                         () -> anyStatement()
@@ -185,6 +194,10 @@ public class StatementParser {
                     case Tuple2(Tuple2(Token.BraceOpen open, List<Statement> statements), Token.BraceClosed closed) ->
                             new Statement.Body(open.range().merge(closed.range()), statements);
                 });
+    }
+
+    public static Parser<Token, Statement.Body> body(){
+        return Parser.firstSucceeding(oneLineBody(), multiLineBody());
     }
 
     /**
