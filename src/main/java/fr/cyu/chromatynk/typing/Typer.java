@@ -221,10 +221,9 @@ public class Typer {
                         throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.STRING, Type.PERCENTAGE, Type.COLOR), actual);
             };
 
-            /** reprendre l'égalité */
             case Equal(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
                 case INT -> switch (getType(right, context)) {
-                    case INT, FLOAT -> Type.FLOAT;
+                    case INT, FLOAT -> Type.BOOLEAN;
                     case Type actual ->
                             throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT), actual);
                 };
@@ -237,20 +236,23 @@ public class Typer {
 
                 case PERCENTAGE -> switch (getType(right, context)) {
                     case PERCENTAGE -> Type.BOOLEAN;
+                    case INT,FLOAT -> Type.BOOLEAN;
                     case Type actual ->
-                            throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.PERCENTAGE), actual);
+                            throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.PERCENTAGE, Type.INT, Type.FLOAT), actual);
                 };
 
                 case STRING -> switch (getType(right, context)) {
                     case STRING -> Type.BOOLEAN;
+                    case INT,FLOAT -> Type.BOOLEAN;
                     case Type actual ->
-                            throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.PERCENTAGE), actual);
+                            throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.PERCENTAGE, Type.INT, Type.FLOAT), actual);
                 };
 
                 case COLOR -> switch (getType(right, context)) {
                     case STRING -> Type.BOOLEAN;
+                    case INT,FLOAT -> Type.BOOLEAN;
                     case Type actual ->
-                            throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.COLOR), actual);
+                            throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.COLOR, Type.INT, Type.FLOAT), actual);
                 };
                 case Type actual ->
                         throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.STRING, Type.PERCENTAGE, Type.COLOR), actual);
