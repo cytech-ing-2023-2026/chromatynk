@@ -1,0 +1,8 @@
+COLOR #FF25BB
+THICK 5
+POS 25%, 25%
+
+FOR i FROM 0 TO 4 {
+  FWD 50%
+  TURN 90
+}
