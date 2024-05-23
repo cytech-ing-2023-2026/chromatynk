@@ -25,6 +25,10 @@ public class ExecutionTimer extends AnimationTimer {
         this.onProgress = onProgress;
     }
 
+    public void setClock(Clock clock) {
+        this.clock = clock;
+    }
+
     @Override
     public void handle(long l) {
         try {

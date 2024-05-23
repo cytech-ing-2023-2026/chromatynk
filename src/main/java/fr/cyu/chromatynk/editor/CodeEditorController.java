@@ -50,6 +50,8 @@ public class CodeEditorController implements Initializable {
     @FXML
     private Button runButton;
     @FXML
+    private Button stopButton;
+    @FXML
     private Button clearTextAreaButton;
 
     // Bottom bar
@@ -92,6 +94,7 @@ public class CodeEditorController implements Initializable {
 	private ImageMenuController imageMenuController;
     private Clock timeoutClock;
     private Clock secondaryClock;
+    private StepByStepClock stepByStepClock = new StepByStepClock(false);
     private ExecutionTimer currentExecution;
 
     @SuppressWarnings("exports")
@@ -257,11 +260,7 @@ public class CodeEditorController implements Initializable {
     }
 
     private void postExecution() {
-        tabPane.setDisable(false);
-        codeArea.setDisable(false);
-        runButton.setDisable(false);
-        clearTextAreaButton.setDisable(false);
-        executionMenu.setDisable(false);
+        stopButton.setDisable(true);
     }
 
     private void onError(String source, Throwable throwable) {
@@ -290,12 +289,10 @@ public class CodeEditorController implements Initializable {
     }
 
     public void runScript() {
-        // Disable tab system, code area, execution menu and buttons
-        tabPane.setDisable(true);
-        codeArea.setDisable(true);
-        runButton.setDisable(true);
-        clearTextAreaButton.setDisable(true);
-		executionMenu.setDisable(true);
+        stopScript();
+
+        stopButton.setDisable(false);
+
 		// Empty output and canvas
 		outputArea.setText("");
 		GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
@@ -311,11 +308,20 @@ public class CodeEditorController implements Initializable {
         }
     }
 
+    public void stopScript() {
+        if(currentExecution != null) {
+            currentExecution.stop();
+            currentExecution = null;
+        }
+        postExecution();
+    }
+
     public void refreshSecondaryClock() {
-        secondaryClock = stepByStepCheckbox.isSelected() ? new StepByStepClock(false) : getPeriodClock();
+        secondaryClock = stepByStepCheckbox.isSelected() ? stepByStepClock : getPeriodClock();
+        if(currentExecution != null) currentExecution.setClock(secondaryClock);
     }
 
     public void nextInstruction() {
-        if(secondaryClock instanceof StepByStepClock c) c.resume();
+        stepByStepClock.resume();
     }
 }
