@@ -1,7 +1,12 @@
 package fr.cyu.chromatynk.editor;
 
 import fr.cyu.chromatynk.Chromatynk;
+import fr.cyu.chromatynk.ChromatynkException;
+import fr.cyu.chromatynk.ast.Program;
+import fr.cyu.chromatynk.eval.*;
 import fr.cyu.chromatynk.parsing.ParsingException;
+import fr.cyu.chromatynk.parsing.ParsingIterator;
+import fr.cyu.chromatynk.parsing.StatementParser;
 import fr.cyu.chromatynk.parsing.Token;
 import fr.cyu.chromatynk.util.Tuple2;
 import javafx.application.Platform;
@@ -20,8 +25,9 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
-import org.reactfx.Subscription;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.time.Duration;
 import java.util.*;
@@ -31,9 +37,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The controller for the code editor
- *
- * @author JordanViknar
+ * The controller for the code editor.
+ * This class is responsible for handling the interactions and functionality of the code editor UI.
+ * It includes methods for syntax highlighting, auto-indentation, script execution, and file handling.
  */
 public class CodeEditorController implements Initializable {
     // The main elements
@@ -46,21 +52,31 @@ public class CodeEditorController implements Initializable {
     @FXML
     private Button runButton;
     @FXML
+    private Button stopButton;
+    @FXML
     private Button clearTextAreaButton;
 
     // Bottom bar
     @FXML
+    private HBox bottomBar;
+    @FXML
     private Label infoLabel;
     @FXML
     private Label statusLabel;
-    @FXML
-    private HBox bottomBar;
 
+	// Execution menu
+	@FXML
+	private Menu executionMenu;
     // Step-by-step mode
     @FXML
     private CheckMenuItem stepByStepCheckbox;
     @FXML
     private HBox stepByStepControls;
+    @FXML
+    private Label stepLabel;
+	// Speed
+	@FXML
+	private ToggleGroup radioSpeedGroup;
 
     // Tabs
     @FXML
@@ -77,25 +93,61 @@ public class CodeEditorController implements Initializable {
 
     private final Stage primaryStage;
     private FileMenuController fileMenuController;
+	private ImageMenuController imageMenuController;
+    private Clock timeoutClock;
+    private Clock secondaryClock;
+    private StepByStepClock stepByStepClock = new StepByStepClock(false);
+    private ExecutionTimer currentExecution;
 
+	/**
+     * Constructor for the CodeEditorController.
+     *
+     * @param primaryStage the primary stage of the application
+     */
     @SuppressWarnings("exports")
     public CodeEditorController(Stage primaryStage) {
-        this.primaryStage = primaryStage;
+		this.primaryStage = primaryStage;
+	}
+	
+	/**
+     * Creates and returns a Clock instance based on the selected speed from the UI.
+     *
+     * @return a Clock instance with the period set based on the selected speed
+     */
+    private Clock getPeriodClock() {
+        long period = switch (((RadioMenuItem)radioSpeedGroup.getSelectedToggle()).getId()) {
+            case "speed16" -> 1000/16;
+            case "speed8" -> 1000/8;
+            case "speed4" -> 1000/4;
+            case "speed2" -> 1000/2;
+            case "speed1" -> 1000;
+            default -> 0;
+        };
+
+        return new PeriodClock(period);
+    }
+	
+	/**
+     * Creates and returns a Clock instance that combines timeoutClock and secondaryClock.
+     *
+     * @return a combined Clock instance
+     */
+    private Clock getClock() {
+        return new AndClock(timeoutClock, secondaryClock);
     }
 
-    /**
-     * This function is used to setup the UI elements of the code editor Java-side.
-     * Basically : it's for things we cannot do in FXML.
-     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        timeoutClock = TimeoutClock.fps(30); //TODO change
+        secondaryClock = getPeriodClock();
+
         Executor executor = Executors.newSingleThreadExecutor();
 
         //Line numbers
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
         //Lexical highlighting
-        Subscription subscription = this.codeArea
+        this.codeArea
                 .multiPlainChanges()
                 .successionEnds(Duration.ofMillis(125))
                 .retainLatestUntilLater(executor)
@@ -117,8 +169,6 @@ public class CodeEditorController implements Initializable {
             }
         });
 
-        this.fileMenuController = new FileMenuController(primaryStage, codeArea);
-
         // Set background color of the canvas
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
         graphicsContext.setFill(Color.WHITE);
@@ -129,9 +179,7 @@ public class CodeEditorController implements Initializable {
 
         // Only show relevant UI when in step-by-step mode
         stepByStepControls.setVisible(stepByStepCheckbox.isSelected());
-        stepByStepCheckbox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            stepByStepControls.setVisible(newValue);
-        });
+        stepByStepCheckbox.selectedProperty().addListener((observable, oldValue, newValue) -> {stepByStepControls.setVisible(newValue);});
 
         // Handle tab changes
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
@@ -163,15 +211,24 @@ public class CodeEditorController implements Initializable {
                 tabPane.getSelectionModel().select(newTabInstance);
             }
         });
+
+        this.fileMenuController = new FileMenuController(primaryStage, codeArea);
+		this.imageMenuController = new ImageMenuController(primaryStage, canvas);
     }
 
+	/**
+     * Computes syntax highlighting for the code area.
+     *
+     * @param executor the executor to run the task on
+     * @return a task that computes the style spans for syntax highlighting
+     */
     public Task<StyleSpans<Collection<String>>> computeHighlighting(Executor executor) {
         String text = codeArea.getText();
         Task<StyleSpans<Collection<String>>> task = new Task<>() {
             @Override
             protected StyleSpans<Collection<String>> call() throws ParsingException {
-                List<Token> tokens = Chromatynk.lexProgram(text);
-                StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+                List<Token> tokens = Chromatynk.lexSource(text);
+                StyleSpansBuilder<Collection<String>> lexSpansBuilder = new StyleSpansBuilder<>();
 
                 int lastKeywordEnd = 0;
 
@@ -189,13 +246,34 @@ public class CodeEditorController implements Initializable {
 
                     Tuple2<Integer, Integer> range1d = token.range().toCursorRange(text);
 
-                    spansBuilder.add(Collections.singleton("default"), Math.max(0, range1d.a() - lastKeywordEnd));
-                    spansBuilder.add(Collections.singleton(cssClass), range1d.b() - range1d.a());
+                    lexSpansBuilder.add(Collections.singleton("default"), Math.max(0, range1d.a() - lastKeywordEnd));
+                    lexSpansBuilder.add(Collections.singleton(cssClass), range1d.b() - range1d.a());
                     lastKeywordEnd = range1d.b();
                 }
 
-                var res = spansBuilder.create();
-                return res;
+                StyleSpans<Collection<String>> lexSpans = lexSpansBuilder.create();
+
+                StyleSpansBuilder<Collection<String>> errorSpansBuilder = new StyleSpansBuilder<>();
+
+                try {
+                    Program program = StatementParser.program().parse(new ParsingIterator<>(tokens)).value();
+                    Chromatynk.typecheckProgram(program);
+                } catch (ChromatynkException e) {
+                    Tuple2<Integer, Integer> range1d = e.getRange().toCursorRange(text);
+                    errorSpansBuilder.add(Collections.singleton("default"), Math.max(0, range1d.a()));
+                    errorSpansBuilder.add(Collections.singleton("error"), range1d.b() - range1d.a());
+
+                    StyleSpans<Collection<String>> errorSpans = errorSpansBuilder.create();
+
+                    return lexSpans.overlay(errorSpans, (a, b) -> {
+                        List<String> classes = new ArrayList<>(a.size()+b.size());
+                        classes.addAll(a);
+                        classes.addAll(b);
+                        return classes;
+                    });
+                }
+
+                return lexSpans;
             }
         };
 
@@ -203,31 +281,142 @@ public class CodeEditorController implements Initializable {
         return task;
     }
 
+	/**
+     * Opens a code file using the FileMenuController.
+     */
     public void openFile() {
         fileMenuController.openFile();
     }
 
+	/**
+     * Saves the current file using the FileMenuController.
+     */
     public void saveFile() {
         fileMenuController.saveFile();
     }
 
+	/**
+     * Saves the current canvas image using the ImageMenuController.
+     */
+	public void saveImage() {
+		imageMenuController.saveImage();
+	}
+
+	/**
+     * Clears the code area.
+     */
     public void clearTextArea() {
         codeArea.clear();
     }
 
+	/**
+     * Closes the application.
+     */
     public void quit() {
         primaryStage.close();
     }
 
+	/**
+     * Handles post-execution UI updates.
+     */
+    private void postExecution() {
+        stopButton.setDisable(true);
+    }
+
+	/**
+     * Handles errors that occur during script execution.
+     *
+     * @param source the source code being executed
+     * @param throwable the exception that was thrown
+     */
+    private void onError(String source, Throwable throwable) {
+        if(throwable instanceof ChromatynkException e) {
+            outputArea.setText(e.getFullMessage(source));
+        } else {
+            StringWriter sw = new StringWriter();
+            throwable.printStackTrace(new PrintWriter(sw));
+            outputArea.setText(sw.toString());
+        }
+
+        infoLabel.setText("ERREUR - Dessin échoué");
+        statusLabel.setText("L'exécution a été arrêtée par une erreur.");
+
+        postExecution();
+    }
+
+	/**
+     * Handles successful script execution.
+     */
+    private void onSuccess() {
+        infoLabel.setText("INFO - Dessin complété");
+        statusLabel.setText("Les instructions de dessin ont pu être complétées.");
+		
+        postExecution();
+    }
+
+	/**
+     * Handles progress updates during script execution.
+     *
+     * @param context the evaluation context
+     */
+    private void onProgress(EvalContext context) {
+        stepLabel.setText("Instruction " + context.getNextAddress()+1);
+    }
+
+	/**
+     * Runs the script currently in the code area.
+     */
     public void runScript() {
-        // Disable tab system, code area, and buttons
-        tabPane.setDisable(true);
-        codeArea.setDisable(true);
-        runButton.setDisable(true);
-        clearTextAreaButton.setDisable(true);
+        stopScript();
 
-        // Wait for drawing to be finished
+        stopButton.setDisable(false);
 
-        // The features would be re-enabled here.
+		// Empty output and canvas
+		outputArea.setText("");
+		GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+		graphicsContext.setFill(Color.WHITE);
+		graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		// Mark execution as currently running
+		infoLabel.setText("INFO - Dessin en cours");
+		statusLabel.setText("Les instructions de dessin sont en cours d'exécution.");
+
+        try {
+            EvalContext context = Chromatynk.compileSource(codeArea.getText(), graphicsContext);
+            currentExecution = new ExecutionTimer(context, getClock(), this::onSuccess, e -> onError(codeArea.getText(), e), this::onProgress);
+            currentExecution.start();
+        } catch (Throwable t) {
+            onError(codeArea.getText(), t);
+        }
+    }
+
+	/**
+     * Stops the currently running script early.
+     */
+    public void stopScript() {
+        if(currentExecution != null) {
+            currentExecution.stop();
+            currentExecution = null;
+        }
+
+		// Mark execution as stopped early
+		infoLabel.setText("WARN - Dessin arrêté");
+		statusLabel.setText("Le dessin a été manuellement interrompu lors de son exécution.");
+
+        postExecution();
+    }
+
+	/**
+     * Refreshes the secondary clock based on the step-by-step mode.
+     */
+    public void refreshSecondaryClock() {
+        secondaryClock = stepByStepCheckbox.isSelected() ? stepByStepClock : getPeriodClock();
+        if(currentExecution != null) currentExecution.setClock(secondaryClock);
+    }
+
+	/**
+     * Executes the next instruction in step-by-step mode.
+     */
+    public void nextInstruction() {
+        stepByStepClock.resume();
     }
 }

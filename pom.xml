@@ -28,6 +28,13 @@
             <version>0.11.2</version>
             <scope>compile</scope>
         </dependency>
+		<!-- Save images -->
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-swing</artifactId>
+			<version>21.0.3</version>
+			<scope>compile</scope>
+		</dependency>
         <!-- JUnit/Test dependency -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

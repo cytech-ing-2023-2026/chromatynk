@@ -19,12 +19,6 @@ public class CodeEditor extends Application {
 
     @Override
     @SuppressWarnings("exports")
-    /**
-     * Start the JavaFX code editor application
-     * @param primaryStage the primary stage
-     * @throws IOException if the FXML file cannot be loaded
-     * @see CodeEditorController
-     */
     public void start(Stage primaryStage) throws IOException {
         Font.loadFont(getClass().getResourceAsStream("/fonts/JetBrainsMono-Regular.ttf"), 15);
         Font.loadFont(getClass().getResourceAsStream("/fonts/JetBrainsMono-Bold.ttf"), 15);
@@ -37,14 +31,14 @@ public class CodeEditor extends Application {
 
         // Set the stage
         primaryStage.setTitle("Chromat'ynk");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setScene(new Scene(root, 800, 700));
         primaryStage.show();
     }
 
     /**
      * Launch the JavaFX application
      *
-     * @param args
+     * @param args the command line arguments
      */
     public static void main(String[] args) {
         launch(args);

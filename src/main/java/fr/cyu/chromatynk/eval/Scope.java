@@ -5,7 +5,6 @@ import fr.cyu.chromatynk.draw.CursorId;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Stack;
 
 /**
  * The scope of an evaluated block.

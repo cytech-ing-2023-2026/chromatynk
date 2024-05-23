@@ -17,7 +17,8 @@ public class StepByStepClock implements Clock{
     }
 
     @Override
-    public boolean tick() {
+    public boolean tick(boolean isEffectful) {
+        if(!isEffectful) return true;
         if(resumed) {
             pause();
             return true;

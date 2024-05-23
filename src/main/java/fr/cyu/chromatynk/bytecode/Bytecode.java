@@ -17,7 +17,21 @@ public sealed interface Bytecode {
      */
     Range range();
 
+    /**
+     * Check if this instruction is effectful.
+     *
+     * @return `true` if this instruction produces an effect.
+     */
+    default boolean isEffectful() {
+        return this instanceof Effectful;
+    }
+
     //Control
+
+    /**
+     * An expression that has an effect (mutation, drawing...).
+     */
+    sealed interface Effectful extends Bytecode {}
 
     /**
      * Push a value to the stack.
@@ -41,7 +55,7 @@ public sealed interface Bytecode {
      * @param range the starting and ending {@link Position} of this instruction
      * @param name the name of the variable to store the value into
      */
-    record Store(Range range, String name) implements Bytecode {}
+    record Store(Range range, String name) implements Effectful {}
 
     /**
      * Declare a variable and pop a value from the stack to assign to it.
@@ -49,7 +63,7 @@ public sealed interface Bytecode {
      * @param range the starting and ending {@link Position} of this instruction
      * @param name the name of the declared variable
      */
-    record Declare(Range range, Type type, String name) implements Bytecode {}
+    record Declare(Range range, Type type, String name) implements Effectful {}
 
     /**
      * Delete a variable.
@@ -57,7 +71,7 @@ public sealed interface Bytecode {
      * @param range the starting and ending {@link Position} of this instruction
      * @param name the name of the variable to delete
      */
-    record Delete(Range range, String name) implements Bytecode {}
+    record Delete(Range range, String name) implements Effectful {}
 
     /**
      * Jump to the given address.
@@ -74,6 +88,13 @@ public sealed interface Bytecode {
      * @param addressFalse the address to jump to if the popped value is `false`
      */
     record GoToIfFalse(Range range, int addressFalse) implements Bytecode {}
+
+    /**
+     * The end of the scope.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
+    record End(Range range) implements Bytecode {}
 
     /**
      * Create a new enclosed scope.
@@ -203,138 +224,131 @@ public sealed interface Bytecode {
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record Forward(Range range) implements Bytecode {}
+    record Forward(Range range) implements Effectful {}
 
     /**
      * Move backward on the given distance.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record Backward(Range range) implements Bytecode {}
+    record Backward(Range range) implements Effectful {}
 
     /**
      * A Turn {@code angle}.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record Turn(Range range) implements Bytecode {}
+    record Turn(Range range) implements Effectful {}
 
     /**
      * Teleport the cursor to the given position.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record Pos(Range range) implements Bytecode {}
+    record Pos(Range range) implements Effectful {}
 
     /**
      * Move the current cursor relatively
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record Move(Range range) implements Bytecode {}
+    record Move(Range range) implements Effectful {}
 
     /**
      * Hide the given cursor.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record Hide(Range range) implements Bytecode {}
+    record Hide(Range range) implements Effectful {}
 
     /**
      * Show the given cursor.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record Show(Range range) implements Bytecode {}
+    record Show(Range range) implements Effectful {}
 
     /**
      * Set the opacity of the cursor.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record Press(Range range) implements Bytecode {}
+    record Press(Range range) implements Effectful {}
 
     /**
      * Set the color of the cursor.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record Color(Range range) implements Bytecode {}
+    record Color(Range range) implements Effectful {}
 
     /**
      * Set the color of the cursor. Takes 3 arguments: red, green, blue.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record ColorRGB(Range range) implements Bytecode {}
+    record ColorRGB(Range range) implements Effectful {}
 
     /**
      * Set the thickness of the cursor.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record Thick(Range range) implements Bytecode {}
+    record Thick(Range range) implements Effectful {}
 
     /**
      * Make the current cursor look at the given one.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record LookAtCursor(Range range) implements Bytecode {}
+    record LookAtCursor(Range range) implements Effectful {}
 
     /**
      * Make the current cursor look at the given position.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record LookAtPos(Range range) implements Bytecode {}
+    record LookAtPos(Range range) implements Effectful {}
 
     /**
      * Create a new cursor with the given id.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record CreateCursor(Range range) implements Bytecode {}
+    record CreateCursor(Range range) implements Effectful {}
 
     /**
      * Select a cursor.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record SelectCursor(Range range) implements Bytecode {}
+    record SelectCursor(Range range) implements Effectful {}
 
     /**
      * Remove a cursor.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record RemoveCursor(Range range) implements Bytecode {}
+    record RemoveCursor(Range range) implements Effectful {}
 
     /**
      * Create a new cursor mimicking the given one.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record Mimic(Range range) implements Bytecode {}
+    record Mimic(Range range) implements Effectful {}
 
     /**
      * Duplicate the current cursor by making a central symmetry.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record MirrorCentral(Range range) implements Bytecode {}
+    record MirrorCentral(Range range) implements Effectful {}
 
     /**
      * Duplicate the current cursor by making an axial symmetry.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
-    record MirrorAxial(Range range) implements Bytecode {}
-
-    /**
-     * The end of the scope.
-     *
-     * @param range the starting and ending {@link Position} of this instruction
-     */
-    record End(Range range) implements Bytecode {}
+    record MirrorAxial(Range range) implements Effectful {}
 }

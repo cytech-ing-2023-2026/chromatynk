@@ -21,15 +21,15 @@ Users can customize the thickness and color of the lines drawn. The program incl
 
 | | Support |
 | --- | --- |
-| Performs unit drawing instructions | ? |
-| Shows results | ? |
-| Open & save files | ? |
-| Save canvasses | ? |
-| Choose draw speed | ? |
-| Step-by-step mode | ? |
-| Proper error management | ? |
-| Parallel cursors | ? |
-| Tab system | ? |
+| Performs unit drawing instructions | ✅ |
+| Shows results | ✅ |
+| Open & save files | ✅ |
+| Save canvasses | ✅ |
+| Choose draw speed | ✅ |
+| Step-by-step mode | ✅ |
+| Proper error management | ✅ |
+| Parallel cursors | ✅ |
+| Tab system | ✅ |
 </div>
 
 ## How to build

@@ -14,6 +14,10 @@
     -fx-fill: #871094;
 }
 
+.error {
+    -fx-fill: red;
+}
+
 .paragraph-text, .lineno {
     -fx-font-family: "JetBrains Mono";
     -fx-font-size: 15.0;
@@ -25,4 +29,8 @@
 
 .paragraph-box:has-caret {
     -fx-background-color: #eee;
+}
+
+#outputArea {
+    -fx-font-family: "JetBrains Mono";
 }

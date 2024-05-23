@@ -25,26 +25,26 @@
 					</Menu>
 					<Menu text="Image">
 						<items>
-							<MenuItem text="Enregistrer sous"/>
+							<MenuItem text="Enregistrer sous" onAction="#saveImage"/>
 						</items>
 					</Menu>
-					<Menu text="Exécution">
+					<Menu text="Exécution" fx:id="executionMenu">
 						<items>
-							<Menu text="Vitesse">
+							<Menu text="Vitesse" onAction="#refreshSecondaryClock">
 								<items>
 									<fx:define>
 										<ToggleGroup fx:id="radioSpeedGroup"/>
 									</fx:define>
-									<RadioMenuItem text="Pleine puissance" toggleGroup="$radioSpeedGroup"/>
-									<RadioMenuItem text="16 instructions/s" toggleGroup="$radioSpeedGroup"/>
-									<RadioMenuItem text="8 instructions/s" toggleGroup="$radioSpeedGroup"/>
-									<RadioMenuItem text="4 instructions/s" toggleGroup="$radioSpeedGroup"/>
-									<RadioMenuItem text="2 instructions/s" toggleGroup="$radioSpeedGroup"/>
-									<RadioMenuItem text="1 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speedFull" text="Pleine puissance" toggleGroup="$radioSpeedGroup" selected="true"/>
+									<RadioMenuItem fx:id="speed16" text="16 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speed8" text="8 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speed4" text="4 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speed2" text="2 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speed1" text="1 instructions/s" toggleGroup="$radioSpeedGroup"/>
 								</items>
 							</Menu>
 							<SeparatorMenuItem/>
-							<CheckMenuItem text="Mode étape par étape" fx:id="stepByStepCheckbox"/> <!-- fx:id="" -->
+							<CheckMenuItem text="Mode étape par étape" fx:id="stepByStepCheckbox" onAction="#refreshSecondaryClock"/> <!-- fx:id="" -->
 						</items>
 					</Menu>
 					<Menu text="Aide">
@@ -81,6 +81,7 @@
 						<padding><Insets top="10" /></padding>
 
 						<Button text="Exécuter" fx:id="runButton" onAction="#runScript"/>
+						<Button text="Arrêter" fx:id="stopButton" onAction="#stopScript"/>
 						<Button text="Supprimer" fx:id="clearTextAreaButton" onAction="#clearTextArea"/>
 					</HBox>
 				</VBox>
@@ -97,8 +98,8 @@
 							</BorderPane>
 							
 							<HBox fx:id="stepByStepControls" spacing="10" alignment="CENTER">
-								<Label text="Étape 1"/>
-								<Button fx:id="stepByStepForwardButton" text="Avancer"/>
+								<Label fx:id="stepLabel" text="Instruction 1"/>
+								<Button fx:id="stepByStepForwardButton" text="Avancer" onAction="#nextInstruction"/>
 							</HBox>
 						</VBox>
 
@@ -119,9 +120,9 @@
 			<padding>
 				<Insets topRightBottomLeft="10" />
 			</padding>
-			<Label fx:id="infoLabel" text="INFO - Message d'information utile..."/>
+			<Label fx:id="infoLabel" text="INFO - Aucun dessin n'a été exécuté."/>
 			<Region HBox.hgrow="ALWAYS"/>
-			<Label fx:id="statusLabel" text="Dessin en cours..."/>
+			<Label fx:id="statusLabel" text="En attente..."/>
 		</HBox>
 	</bottom>
 </BorderPane>

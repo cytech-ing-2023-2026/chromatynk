@@ -719,7 +719,7 @@ public class Interpreter {
     }
 
     public static EvalContext evaluateAll(EvalContext context, Clock clock) throws EvalException {
-        while (context.hasNext() && clock.tick()){
+        while (context.hasNext() && clock.tick(context.peek().isEffectful())){
             evaluate(context, context.next());
         }
         return context;
