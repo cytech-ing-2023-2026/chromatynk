@@ -245,6 +245,9 @@ public class EvalContext {
      */
     public void setValue(String name, Value value) throws MissingVariableException, TypeMismatchException {
         Variable variable = getVariable(name).orElseThrow(() -> new MissingVariableException(getCurrentRange(), name));
+        if (value instanceof Value.Int intValue && variable.getType() == Type.FLOAT) {
+            value = new Value.Float(intValue.value());
+        }
         if (variable.getType() == value.getType()) variable.setValue(value);
         else throw new TypeMismatchException(getCurrentRange(), Set.of(variable.getType()), value.getType());
     }
@@ -259,8 +262,14 @@ public class EvalContext {
      */
     public void declareVariable(String name, Variable variable) throws TypeMismatchException, VariableAlreadyExistsException {
         if (getCurrentScope().containsVariable(name)) throw new VariableAlreadyExistsException(getCurrentRange(), name);
-        else if(variable.getValue().getType() == variable.getType()) getCurrentScope().declareVariable(name, variable);
-        else throw new TypeMismatchException(getCurrentRange(), Set.of(variable.getType()), variable.getValue().getType());
+        else {
+            if(variable.getValue() instanceof Value.Int intValue && variable.getType()==Type.FLOAT) {
+                variable.setValue(new Value.Float(intValue.value()));
+            }
+
+            if(variable.getValue().getType() == variable.getType()) getCurrentScope().declareVariable(name, variable);
+            else throw new TypeMismatchException(getCurrentRange(), Set.of(variable.getType()), variable.getValue().getType());
+        }
     }
 
     /**
