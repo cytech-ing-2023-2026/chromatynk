@@ -55,6 +55,8 @@ public class CodeEditorController implements Initializable {
     private Button stopButton;
     @FXML
     private Button clearTextAreaButton;
+	@FXML
+	private Button clearCanvasButton;
 
     // Bottom bar
     @FXML
@@ -170,9 +172,7 @@ public class CodeEditorController implements Initializable {
         });
 
         // Set background color of the canvas
-        GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
-        graphicsContext.setFill(Color.WHITE);
-        graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        clearCanvas();
 
         // Makes the bottom bar's background slightly darker
         bottomBar.setStyle("-fx-background-color: rgba(0, 0, 0, 0.07);");
@@ -310,6 +310,18 @@ public class CodeEditorController implements Initializable {
     }
 
 	/**
+	 * Wipes the canvas.
+	 */
+	public void clearCanvas() {
+		GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+		graphicsContext.setFill(Color.WHITE);
+		graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+		infoLabel.setText("INFO - Dessin effacé");
+		statusLabel.setText("Le dessin a été manuellement effacé.");
+	}
+
+	/**
      * Closes the application.
      */
     public void quit() {
@@ -321,6 +333,7 @@ public class CodeEditorController implements Initializable {
      */
     private void postExecution() {
         stopButton.setDisable(true);
+		clearCanvasButton.setDisable(false);
     }
 
 	/**
@@ -370,18 +383,16 @@ public class CodeEditorController implements Initializable {
         stopScript();
 
         stopButton.setDisable(false);
+		clearCanvasButton.setDisable(true);
 
 		// Empty output and canvas
-		outputArea.setText("");
-		GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
-		graphicsContext.setFill(Color.WHITE);
-		graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		clearCanvas();
 		// Mark execution as currently running
 		infoLabel.setText("INFO - Dessin en cours");
 		statusLabel.setText("Les instructions de dessin sont en cours d'exécution.");
 
         try {
-            EvalContext context = Chromatynk.compileSource(codeArea.getText(), graphicsContext);
+            EvalContext context = Chromatynk.compileSource(codeArea.getText(), canvas.getGraphicsContext2D());
             currentExecution = new ExecutionTimer(context, getClock(), this::onSuccess, e -> onError(codeArea.getText(), e), this::onProgress);
             currentExecution.start();
         } catch (Throwable t) {

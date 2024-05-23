@@ -87,7 +87,7 @@
 				</VBox>
 				<SplitPane dividerPositions="0.5" orientation="VERTICAL">
 					<items>
-						<!-- Canvas & step-by-step controls -->
+						<!-- Canvas, clear canvas button & step-by-step controls -->
 						<VBox>
 							<padding><Insets topRightBottomLeft="10"/></padding>
 
@@ -101,6 +101,8 @@
 								<Label fx:id="stepLabel" text="Instruction 1"/>
 								<Button fx:id="stepByStepForwardButton" text="Avancer" onAction="#nextInstruction"/>
 							</HBox>
+
+							<Button text="Effacer" fx:id="clearCanvasButton" onAction="#clearCanvas"/>
 						</VBox>
 
 						<!-- Output area -->
