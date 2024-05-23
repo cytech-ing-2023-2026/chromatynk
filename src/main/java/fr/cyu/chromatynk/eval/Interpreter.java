@@ -88,9 +88,19 @@ public class Interpreter {
                     .getValue(name)
                     .orElseThrow(() -> new MissingVariableException(range, name)));
 
-            case Bytecode.Store(Range ignored, String name) -> context.setValue(name, context.popValue());
-            case Bytecode.Declare(Range ignored, Type type, String name) ->
-                    context.declareVariable(name, new Variable(type, context.popValue()));
+            case Bytecode.Store(Range ignored, String name) -> {
+
+                context.setValue(name, context.popValue());
+
+            }
+
+            case Bytecode.Declare(Range ignored, Type type, String name) -> {
+
+                Value value = context.popValue();
+
+
+                context.declareVariable(name, new Variable(type, value));
+            }
             case Bytecode.Delete(Range ignored, String name) -> context.deleteVariable(name);
             case Bytecode.GoTo(Range ignored, int address) -> context.setNextAddress(address);
             case Bytecode.GoToIfFalse(Range range, int addressFalse) -> {
