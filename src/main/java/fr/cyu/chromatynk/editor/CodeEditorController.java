@@ -322,6 +322,9 @@ public class CodeEditorController implements Initializable {
 		GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 		graphicsContext.setFill(Color.WHITE);
 		graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		// Mark execution as currently running
+		infoLabel.setText("INFO - Dessin en cours");
+		statusLabel.setText("Les instructions de dessin sont en cours d'exécution.");
 
         try {
             EvalContext context = Chromatynk.compileSource(codeArea.getText(), graphicsContext);
