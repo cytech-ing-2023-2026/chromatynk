@@ -224,7 +224,7 @@ public class Typer {
             /** reprendre l'égalité */
             case Equal(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
                 case INT -> switch (getType(right, context)) {
-                    case INT, FLOAT -> Type.FLOAT;
+                    case INT, FLOAT -> Type.INT;
                     case Type actual ->
                             throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT), actual);
                 };
