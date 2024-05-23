@@ -81,6 +81,7 @@
 						<padding><Insets top="10" /></padding>
 
 						<Button text="Exécuter" fx:id="runButton" onAction="#runScript"/>
+						<Button text="Arrêter" fx:id="stopButton" onAction="#stopScript"/>
 						<Button text="Supprimer" fx:id="clearTextAreaButton" onAction="#clearTextArea"/>
 					</HBox>
 				</VBox>
