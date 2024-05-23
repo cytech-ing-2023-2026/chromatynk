@@ -399,7 +399,7 @@ public class CodeEditorController implements Initializable {
         }
 
 		// Mark execution as stopped early
-		infoLabel.setText("WARN - Dessin arrêté.");
+		infoLabel.setText("WARN - Dessin arrêté");
 		statusLabel.setText("Le dessin a été manuellement interrompu lors de son exécution.");
 
         postExecution();
