@@ -89,6 +89,7 @@ public class Lexer {
             Map.entry("{", BraceOpen::new),
             Map.entry("}", BraceClosed::new),
             Map.entry("=", Assign::new),
+            Map.entry("->", Arrow::new),
             Map.entry(",", Comma::new)
     );
 

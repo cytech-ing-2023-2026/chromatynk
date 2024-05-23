@@ -92,6 +92,13 @@ public sealed interface Token extends PrettyPrintable {
     record BraceClosed(Range range) implements Token {}
 
     /**
+     * An arrow which delimits a one line body
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Arrow(Range range) implements Token{}
+
+    /**
      * A comma.
      *
      * @param range the starting and ending position of this token

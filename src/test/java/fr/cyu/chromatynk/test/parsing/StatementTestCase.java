@@ -173,6 +173,40 @@ public class StatementTestCase {
     }
 
     @Test
+    public void body() {
+        //-> HIDE
+        assertParse(
+                new Statement.Body(
+                        Range.sameLine(0,7),
+                        List.of(new Statement.Hide(Range.sameLine(3,7)))
+                ),
+               StatementParser.body(),
+                ParsingIterator.of(
+                        new Token.Arrow(Range.sameLine(0,2)),
+                        new Token.Hide(Range.sameLine(3,7))
+                )
+        );
+
+        /*
+        {
+          HIDE
+        }
+         */
+        assertParse(
+                new Statement.Body(
+                        new Range(new Position(0,0), new Position(1, 2)),
+                        List.of(new Statement.Hide(Range.sameLine(2,6, 1)))
+                ),
+                StatementParser.body(),
+                ParsingIterator.of(
+                        new Token.BraceOpen(Range.sameLine(0,1)),
+                        new Token.Hide(Range.sameLine(2,6, 1)),
+                        new Token.BraceClosed(Range.sameLine(0,1, 2))
+                )
+        );
+    }
+
+    @Test
     public void whileLoop() {
         /*
         WHILE true {
