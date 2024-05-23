@@ -375,10 +375,9 @@ public class Typer {
         };
     }
 
-    public void assertTypeMatch(Range range, Set<Type> expected, Type actualType) throws TypeMismatchException {
+    public static void assertTypeMatch(Range range, Set<Type> expected, Type actualType) throws TypeMismatchException {
         if (!expected.contains(actualType)) throw new TypeMismatchException(range, expected, actualType);
     }
-
 
     /**
      * A voic checkTypes which throws an exception with different cases inside
@@ -386,7 +385,7 @@ public class Typer {
      * @param statement the statement used
      * @param context   the context needed for the instruction
      */
-    public void checkTypes(Statement statement, TypingContext context) throws TypingException {
+    public static void checkTypes(Statement statement, TypingContext context) throws TypingException {
         switch (statement) {
             case Statement.Body(Range ignored, List<Statement> statements) -> {
                 for (Statement stat : statements) {

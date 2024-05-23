@@ -1,6 +1,7 @@
 package fr.cyu.chromatynk;
 
 import fr.cyu.chromatynk.ast.Program;
+import fr.cyu.chromatynk.ast.Statement;
 import fr.cyu.chromatynk.bytecode.Bytecode;
 import fr.cyu.chromatynk.bytecode.Compiler;
 import fr.cyu.chromatynk.eval.Clock;
@@ -9,6 +10,9 @@ import fr.cyu.chromatynk.eval.EvalException;
 import fr.cyu.chromatynk.eval.Interpreter;
 import fr.cyu.chromatynk.parsing.Lexer;
 import fr.cyu.chromatynk.parsing.*;
+import fr.cyu.chromatynk.typing.Typer;
+import fr.cyu.chromatynk.typing.TypingContext;
+import fr.cyu.chromatynk.typing.TypingException;
 import javafx.scene.canvas.GraphicsContext;
 
 import java.util.List;
@@ -40,8 +44,18 @@ public class Chromatynk {
                 .value();
     }
 
-    public static EvalContext compileSource(String source, GraphicsContext graphics) throws ParsingException {
-        List<Bytecode> instructions = Compiler.compileProgram(parseSource(source));
+    public static Program typecheckSource(String source) throws ParsingException, TypingException {
+        Program result = parseSource(source);
+        TypingContext typingContext = new TypingContext();
+        for(Statement statement : result.statements()) Typer.checkTypes(statement, typingContext);
+
+        return result;
+    }
+
+    public static EvalContext compileSource(String source, GraphicsContext graphics) throws ParsingException, TypingException {
+        Program program = typecheckSource(source);
+
+        List<Bytecode> instructions = Compiler.compileProgram(program);
         return EvalContext.create(instructions, graphics);
     }
 
