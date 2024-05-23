@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>Chromat'ynk</h1>
+  <h1><img src="src/main/resources/icon.png" height=50/> Chromat'ynk</h1>
 </div>
 
 *Chromat'ynk* allows users to draw arbitrary shapes on a canvas using simple instructions, such as moving forward by a certain number of pixels or turning by a specific angle.

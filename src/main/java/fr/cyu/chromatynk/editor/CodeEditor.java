@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -32,6 +33,11 @@ public class CodeEditor extends Application {
         // Set the stage
         primaryStage.setTitle("Chromat'ynk");
         primaryStage.setScene(new Scene(root, 800, 700));
+		primaryStage.setMinWidth(700);
+		primaryStage.setMinHeight(700);
+		// Add icon
+		Image icon = new Image(getClass().getResourceAsStream("/icon.png"));
+		primaryStage.getIcons().add(icon);
         primaryStage.show();
     }
 
