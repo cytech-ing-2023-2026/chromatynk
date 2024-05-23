@@ -263,46 +263,59 @@ public class Interpreter {
 
             case Bytecode.Div(Range range) -> context.pushValue(
                     switch (context.popValue()) {
-                        case Value.Int(int right) -> switch (context.popValue()) {
-                            case Value.Int left -> new Value.Int(left.value() / right);
-                            case Value.Float left -> new Value.Float(left.value() / right);
-                            case Value.Color left ->
-                                    new Value.Color(left.red() / right, left.green() / right, left.blue() / right, left.alpha());
-                            case Value actual ->
-                                    throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR), actual.getType());
-                        };
+                        case Value.Int(int right) -> {
+                            if(right == 0) throw new InvalidExpressionException(range, "You can not divide by 0.");
 
-                        case Value.Float(double right) -> switch (context.popValue()) {
-                            case Value.Int left -> new Value.Float(left.value() * right);
-                            case Value.Float left -> new Value.Float(left.value() * right);
-                            case Value.Color left ->
-                                    new Value.Color(left.red() * right, left.green() * right, left.blue() * right, left.alpha());
-                            case Value actual ->
-                                    throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR), actual.getType());
-                        };
+                            yield switch (context.popValue()) {
+                                case Value.Int left -> new Value.Int(left.value() / right);
+                                case Value.Float left -> new Value.Float(left.value() / right);
+                                case Value.Color left ->
+                                        new Value.Color(left.red() / right, left.green() / right, left.blue() / right, left.alpha());
+                                case Value actual ->
+                                        throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR), actual.getType());
+                            };
+                        }
 
-                        case Value.Color right -> switch (context.popValue()) {
-                            case Value.Int left -> {
-                                double red = Math.min(255, Math.max(0, left.value() * right.red()));
-                                double green = Math.min(255, Math.max(0, left.value() * right.green()));
-                                double blue = Math.min(255, Math.max(0, left.value() * right.blue()));
-                                double alpha = Math.min(255, Math.max(0, left.value() * right.alpha()));
+                        case Value.Float(double right) -> {
+                            if (right == 0) throw new InvalidExpressionException(range, "You can not divide by 0.");
 
-                                yield new Value.Color(red, green, blue, alpha);
-                            }
+                            yield switch (context.popValue()) {
+                                case Value.Int left -> new Value.Float(left.value() / right);
+                                case Value.Float left -> new Value.Float(left.value() / right);
+                                case Value.Color left ->
+                                        new Value.Color(left.red() / right, left.green() / right, left.blue() / right, left.alpha());
+                                case Value actual ->
+                                        throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR), actual.getType());
+                            };
+                        }
 
-                            case Value.Float left -> {
-                                double red = Math.min(255, Math.max(0, left.value() * right.red()));
-                                double green = Math.min(255, Math.max(0, left.value() * right.green()));
-                                double blue = Math.min(255, Math.max(0, left.value() * right.blue()));
-                                double alpha = Math.min(255, Math.max(0, left.value() * right.alpha()));
+                        case Value.Color right -> {
+                            if (right.red() == 0 || right.green() == 0 || right.blue() == 0)
+                                throw new InvalidExpressionException(range, "You can not divide by 0.");
 
-                                yield new Value.Color(red, green, blue, alpha);
-                            }
+                            yield switch (context.popValue()) {
+                                case Value.Int left -> {
+                                    double red = Math.min(255, Math.max(0, left.value() / right.red()));
+                                    double green = Math.min(255, Math.max(0, left.value() / right.green()));
+                                    double blue = Math.min(255, Math.max(0, left.value() / right.blue()));
+                                    double alpha = Math.min(255, Math.max(0, left.value() / right.alpha()));
 
-                            case Value actual ->
-                                    throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT), actual.getType());
-                        };
+                                    yield new Value.Color(red, green, blue, alpha);
+                                }
+
+                                case Value.Float left -> {
+                                    double red = Math.min(255, Math.max(0, left.value() / right.red()));
+                                    double green = Math.min(255, Math.max(0, left.value() / right.green()));
+                                    double blue = Math.min(255, Math.max(0, left.value() / right.blue()));
+                                    double alpha = Math.min(255, Math.max(0, left.value() / right.alpha()));
+
+                                    yield new Value.Color(red, green, blue, alpha);
+                                }
+
+                                case Value actual ->
+                                        throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT), actual.getType());
+                            };
+                        }
 
                         case Value actual ->
                                 throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR), actual.getType());
@@ -571,9 +584,12 @@ public class Interpreter {
             case Bytecode.Hide ignored -> context.getCurrentCursor().setVisible(false);
             case Bytecode.Show ignored -> context.getCurrentCursor().setVisible(true);
 
-            case Bytecode.Press(Range range) -> context
-                    .getCurrentCursor()
-                    .setOpacity(asNumericOrPercentage(range, context.popValue(), 1));
+            case Bytecode.Press(Range range) -> {
+                double value = asNumericOrPercentage(range, context.popValue(), 1);
+                if(value<0 || value>1) throw new InvalidExpressionException(range, "Opacity must be between 0 / 0% and 1 / 100%");
+                context.getCurrentCursor().setOpacity(value);
+            }
+
 
             case Bytecode.Color(Range range) -> {
                 Tuple2<Color, Double> colorAndAlpha = asColorAndAlpha(range, context.popValue());
@@ -621,7 +637,11 @@ public class Interpreter {
                 context.getCurrentCursor().setColor(color);
             }
 
-            case Bytecode.Thick(Range range) -> context.getCurrentCursor().setThickness(asNumeric(range, context.popValue()));
+            case Bytecode.Thick(Range range) -> {
+                double value = asNumeric(range, context.popValue());
+                if(value<0) throw new InvalidExpressionException(range, "Thickness must be positive");
+                context.getCurrentCursor().setThickness(value);
+            }
 
             case Bytecode.LookAtCursor(Range range) -> {
                 Cursor current = context.getCurrentCursor();
