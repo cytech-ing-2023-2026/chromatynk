@@ -169,10 +169,30 @@ public class Compiler {
             case Statement.For(
                     Range range, String iterator, Expr from, Expr to, Optional<Expr> step, Statement.Body body
             ) -> {
-                //INT iterator = from
+                instructions.add(new Bytecode.NewScope(range));
 
-                List<Statement> bodyStatements = new ArrayList<>(body.statements());
-                bodyStatements.add(new Statement.AssignVariable(
+                compileStatement(new Statement.DeclareVariable(
+                        range,
+                        Type.INT,
+                        iterator,
+                        Optional.of(from)
+                ), instructions, offset);
+
+                int conditionAddr = instructions.size() + offset;
+
+                compileExpression(new Expr.Less(
+                        range,
+                        new Expr.VarCall(range, iterator),
+                        to
+                ), instructions);
+
+                int whileAddr = instructions.size() + offset;
+
+                List<Bytecode> bodyInstructions = new LinkedList<>();
+                bodyInstructions.add(new Bytecode.NewScope(body.range()));
+                compileStatement(body, bodyInstructions, whileAddr + 1);
+                bodyInstructions.add(new Bytecode.ExitScope(body.range()));
+                compileStatement(new Statement.AssignVariable(
                         range,
                         iterator,
                         new Expr.Add(
@@ -180,27 +200,14 @@ public class Compiler {
                                 new Expr.VarCall(range, iterator),
                                 step.orElse(new Expr.LiteralInt(range, 1))
                         )
-                ));
+                ), bodyInstructions, whileAddr + 1);
 
-                compileStatement(new Statement.Body(
-                        range,
-                        List.of(
-                                new Statement.DeclareVariable(
-                                        range,
-                                        Type.INT,
-                                        iterator,
-                                        Optional.of(from)
-                                ),
-                                new Statement.While(
-                                        range,
-                                        new Expr.Less(range, new Expr.VarCall(range, iterator), to),
-                                        new Statement.Body(
-                                                range,
-                                                bodyStatements
-                                        )
-                                )
-                        )
-                ), instructions, offset);
+                int endAddr = whileAddr + bodyInstructions.size() + 2;
+
+                instructions.add(new Bytecode.GoToIfFalse(range, endAddr));
+                instructions.addAll(bodyInstructions);
+                instructions.add(new Bytecode.GoTo(range, conditionAddr));
+                instructions.add(new Bytecode.ExitScope(range));
             }
 
             case Statement.Turn(Range range, Expr angle) -> {
