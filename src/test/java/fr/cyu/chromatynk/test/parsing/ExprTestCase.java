@@ -57,25 +57,19 @@ public class ExprTestCase {
         assertParse(
                 new Expr.LiteralInt(Range.sameLine(1, 2), 5),
                 ExprParser.prefixOperator(),
-                ParsingIterator.of(new Token.Operator(Range.sameLine(0, 1), "+"), new Token.LiteralInt(Range.sameLine(1, 2), 5))
+                ParsingIterator.of(new Token.Plus(Range.sameLine(0, 1)), new Token.LiteralInt(Range.sameLine(1, 2), 5))
         );
 
         assertParse(
                 new Expr.Negation(Range.sameLine(0, 2), new Expr.LiteralInt(Range.sameLine(1, 2), 5)),
                 ExprParser.prefixOperator(),
-                ParsingIterator.of(new Token.Operator(Range.sameLine(0, 1), "-"), new Token.LiteralInt(Range.sameLine(1, 2), 5))
+                ParsingIterator.of(new Token.Minus(Range.sameLine(0, 1)), new Token.LiteralInt(Range.sameLine(1, 2), 5))
         );
 
         assertParse(
                 new Expr.Not(Range.sameLine(0, 5), new Expr.LiteralBool(Range.sameLine(1, 5), true)),
                 ExprParser.prefixOperator(),
-                ParsingIterator.of(new Token.Operator(Range.sameLine(0, 1), "!"), new Token.LiteralBool(Range.sameLine(1, 5), true))
-        );
-
-        assertParseFailure(
-                UnexpectedInputException.class,
-                ExprParser.prefixOperator(),
-                ParsingIterator.of(new Token.Operator(Range.sameLine(0, 1), "?"), new Token.LiteralBool(Range.sameLine(1, 5), true))
+                ParsingIterator.of(new Token.Not(Range.sameLine(0, 1)), new Token.LiteralBool(Range.sameLine(1, 5), true))
         );
     }
 
@@ -84,13 +78,13 @@ public class ExprTestCase {
         assertParse(
                 new Expr.Percent(Range.sameLine(0, 2), new Expr.LiteralInt(Range.sameLine(0, 1), 5)),
                 ExprParser.suffixOperator(),
-                ParsingIterator.of(new Token.LiteralInt(Range.sameLine(0, 1), 5), new Token.Operator(Range.sameLine(1, 2), "%"))
+                ParsingIterator.of(new Token.LiteralInt(Range.sameLine(0, 1), 5), new Token.Percent(Range.sameLine(1, 2)))
         );
 
         assertParseFailure(
                 UnexpectedInputException.class,
                 ExprParser.suffixOperator(),
-                ParsingIterator.of(new Token.LiteralBool(Range.sameLine(0, 4), true), new Token.Operator(Range.sameLine(4, 5), "!"))
+                ParsingIterator.of(new Token.LiteralBool(Range.sameLine(0, 4), true), new Token.Not(Range.sameLine(4, 5)))
         );
     }
 
@@ -106,7 +100,7 @@ public class ExprTestCase {
                 ExprParser.multiplicationOperator(),
                 ParsingIterator.of(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
-                        new Token.Operator(Range.sameLine(2, 3), "*"),
+                        new Token.Mul(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2)
                 )
         );
@@ -121,7 +115,7 @@ public class ExprTestCase {
                 ExprParser.multiplicationOperator(),
                 ParsingIterator.of(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
-                        new Token.Operator(Range.sameLine(2, 3), "/"),
+                        new Token.Div(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2)
                 )
         );
@@ -140,9 +134,9 @@ public class ExprTestCase {
                 ExprParser.multiplicationOperator(),
                 ParsingIterator.of(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
-                        new Token.Operator(Range.sameLine(2, 3), "/"),
+                        new Token.Div(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2),
-                        new Token.Operator(Range.sameLine(6, 7), "*"),
+                        new Token.Mul(Range.sameLine(6, 7)),
                         new Token.LiteralInt(Range.sameLine(8, 10), 10)
                 )
         );
@@ -160,7 +154,7 @@ public class ExprTestCase {
                 ExprParser.arithmeticOperator(),
                 ParsingIterator.of(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
-                        new Token.Operator(Range.sameLine(2, 3), "+"),
+                        new Token.Plus(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2)
                 )
         );
@@ -175,7 +169,7 @@ public class ExprTestCase {
                 ExprParser.arithmeticOperator(),
                 ParsingIterator.of(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
-                        new Token.Operator(Range.sameLine(2, 3), "-"),
+                        new Token.Minus(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2)
                 )
         );
@@ -194,9 +188,9 @@ public class ExprTestCase {
                 ExprParser.arithmeticOperator(),
                 ParsingIterator.of(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
-                        new Token.Operator(Range.sameLine(2, 3), "-"),
+                        new Token.Minus(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2),
-                        new Token.Operator(Range.sameLine(6, 7), "+"),
+                        new Token.Plus(Range.sameLine(6, 7)),
                         new Token.LiteralInt(Range.sameLine(8, 10), 10)
                 )
         );
@@ -214,7 +208,7 @@ public class ExprTestCase {
                 ExprParser.comparisonOperator(),
                 ParsingIterator.of(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
-                        new Token.Operator(Range.sameLine(2, 4), "=="),
+                        new Token.Equal(Range.sameLine(2, 4)),
                         new Token.LiteralInt(Range.sameLine(5, 6), 2)
                 )
         );
@@ -229,7 +223,7 @@ public class ExprTestCase {
                 ExprParser.comparisonOperator(),
                 ParsingIterator.of(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
-                        new Token.Operator(Range.sameLine(2, 4), "!="),
+                        new Token.NotEqual(Range.sameLine(2, 4)),
                         new Token.LiteralInt(Range.sameLine(5, 6), 2)
                 )
         );
@@ -244,7 +238,7 @@ public class ExprTestCase {
                 ExprParser.comparisonOperator(),
                 ParsingIterator.of(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
-                        new Token.Operator(Range.sameLine(2, 4), ">="),
+                        new Token.GreaterEqual(Range.sameLine(2, 4)),
                         new Token.LiteralInt(Range.sameLine(5, 6), 2)
                 )
         );
@@ -259,7 +253,7 @@ public class ExprTestCase {
                 ExprParser.comparisonOperator(),
                 ParsingIterator.of(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
-                        new Token.Operator(Range.sameLine(2, 3), ">"),
+                        new Token.Greater(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2)
                 )
         );
@@ -277,7 +271,7 @@ public class ExprTestCase {
                 ExprParser.booleanOperator(),
                 ParsingIterator.of(
                         new Token.LiteralBool(Range.sameLine(0, 4), true),
-                        new Token.Operator(Range.sameLine(5, 7), "&&"),
+                        new Token.And(Range.sameLine(5, 7)),
                         new Token.LiteralBool(Range.sameLine(8, 13), false)
                 )
         );
@@ -292,7 +286,7 @@ public class ExprTestCase {
                 ExprParser.booleanOperator(),
                 ParsingIterator.of(
                         new Token.LiteralBool(Range.sameLine(0, 4), true),
-                        new Token.Operator(Range.sameLine(5, 7), "||"),
+                        new Token.Or(Range.sameLine(5, 7)),
                         new Token.LiteralBool(Range.sameLine(8, 13), false)
                 )
         );
@@ -311,9 +305,9 @@ public class ExprTestCase {
                 ExprParser.booleanOperator(),
                 ParsingIterator.of(
                         new Token.LiteralBool(Range.sameLine(0, 4), true),
-                        new Token.Operator(Range.sameLine(5, 7), "||"),
+                        new Token.Or(Range.sameLine(5, 7)),
                         new Token.LiteralBool(Range.sameLine(8, 13), false),
-                        new Token.Operator(Range.sameLine(14, 16), "&&"),
+                        new Token.And(Range.sameLine(14, 16)),
                         new Token.LiteralBool(Range.sameLine(17, 21), true)
                 )
         );
@@ -332,7 +326,7 @@ public class ExprTestCase {
                 ParsingIterator.of(
                         new Token.ParenthesisOpen(Range.sameLine(0, 1)),
                         new Token.LiteralInt(Range.sameLine(1, 2), 3),
-                        new Token.Operator(Range.sameLine(3, 4), "*"),
+                        new Token.Mul(Range.sameLine(3, 4)),
                         new Token.LiteralInt(Range.sameLine(5, 6), 2),
                         new Token.ParenthesisClosed(Range.sameLine(6, 7))
                 )
@@ -350,7 +344,7 @@ public class ExprTestCase {
                         new Token.ParenthesisOpen(Range.sameLine(0, 1)),
                         new Token.LiteralInt(Range.sameLine(1, 2), 3),
                         new Token.ParenthesisClosed(Range.sameLine(2, 3)),
-                        new Token.Operator(Range.sameLine(4, 5), "*"),
+                        new Token.Mul(Range.sameLine(4, 5)),
                         new Token.LiteralInt(Range.sameLine(6, 7), 2)
                 )
         );
@@ -372,9 +366,9 @@ public class ExprTestCase {
                 ExprParser.anyExpr(),
                 ParsingIterator.of(
                         new Token.LiteralInt(Range.sameLine(0, 1), 5),
-                        new Token.Operator(Range.sameLine(2, 3), "+"),
+                        new Token.Plus(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 3),
-                        new Token.Operator(Range.sameLine(6, 7), "*"),
+                        new Token.Mul(Range.sameLine(6, 7)),
                         new Token.LiteralInt(Range.sameLine(8, 9), 4)
                 )
         );
@@ -393,10 +387,10 @@ public class ExprTestCase {
                 ExprParser.anyExpr(),
                 ParsingIterator.of(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
-                        new Token.Operator(Range.sameLine(2, 3), "*"),
-                        new Token.Operator(Range.sameLine(4, 5), "-"),
+                        new Token.Mul(Range.sameLine(2, 3)),
+                        new Token.Minus(Range.sameLine(4, 5)),
                         new Token.LiteralInt(Range.sameLine(5, 6), 4),
-                        new Token.Operator(Range.sameLine(7, 8), "+"),
+                        new Token.Plus(Range.sameLine(7, 8)),
                         new Token.LiteralInt(Range.sameLine(9, 10), 5)
                 )
         );
@@ -416,10 +410,10 @@ public class ExprTestCase {
                 ParsingIterator.of(
                         new Token.ParenthesisOpen(Range.sameLine(0, 1)),
                         new Token.LiteralInt(Range.sameLine(1, 2), 5),
-                        new Token.Operator(Range.sameLine(3, 4), "+"),
+                        new Token.Plus(Range.sameLine(3, 4)),
                         new Token.LiteralInt(Range.sameLine(5, 6), 3),
                         new Token.ParenthesisClosed(Range.sameLine(6, 7)),
-                        new Token.Operator(Range.sameLine(8, 9), "*"),
+                        new Token.Mul(Range.sameLine(8, 9)),
                         new Token.LiteralInt(Range.sameLine(10, 11), 4)
                 )
         );

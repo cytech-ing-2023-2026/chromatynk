@@ -97,43 +97,43 @@ public class ExprParser {
                 .mapError(e -> new ParsingException.NonFatal(e.getRange(), "Illegal invokable expression"));
     }
 
-    private static final Map<String, BiFunction<Range, Expr, Expr>> PREFIX_OPS = Map.ofEntries(
-            Map.entry("+", (ignored, expr) -> expr),
-            Map.entry("-", Expr.Negation::new),
-            Map.entry("!", Expr.Not::new)
+    private static final Map<Class<? extends Token.Operator>, BiFunction<Range, Expr, Expr>> PREFIX_OPS = Map.ofEntries(
+            Map.entry(Token.Plus.class, (ignored, expr) -> expr),
+            Map.entry(Token.Minus.class, Expr.Negation::new),
+            Map.entry(Token.Not.class, Expr.Not::new)
     );
 
-    private static final Map<String, BiFunction<Range, Expr, Expr>> SUFFIX_OPS = Map.ofEntries(
-            Map.entry("%", Expr.Percent::new)
+    private static final Map<Class<? extends Token.Operator>, BiFunction<Range, Expr, Expr>> SUFFIX_OPS = Map.ofEntries(
+            Map.entry(Token.Percent.class, Expr.Percent::new)
     );
 
-    private static final Map<String, TriFunction<Range, Expr, Expr, Expr>> BOOLEAN_OPS = Map.ofEntries(
-            Map.entry("&&", Expr.And::new),
-            Map.entry("||", Expr.Or::new)
+    private static final Map<Class<? extends Token.Operator>, TriFunction<Range, Expr, Expr, Expr>> BOOLEAN_OPS = Map.ofEntries(
+            Map.entry(Token.And.class, Expr.And::new),
+            Map.entry(Token.Or.class, Expr.Or::new)
     );
 
-    private static final Map<String, TriFunction<Range, Expr, Expr, Expr>> COMPARISON_OPS = Map.ofEntries(
-            Map.entry("==", Expr.Equal::new),
-            Map.entry("!=", Expr.NotEqual::new),
-            Map.entry(">", Expr.Greater::new),
-            Map.entry("<", Expr.Less::new),
-            Map.entry(">=", Expr.GreaterEqual::new),
-            Map.entry("<=", Expr.LessEqual::new)
+    private static final Map<Class<? extends Token.Operator>, TriFunction<Range, Expr, Expr, Expr>> COMPARISON_OPS = Map.ofEntries(
+            Map.entry(Token.Equal.class, Expr.Equal::new),
+            Map.entry(Token.NotEqual.class, Expr.NotEqual::new),
+            Map.entry(Token.Greater.class, Expr.Greater::new),
+            Map.entry(Token.Less.class, Expr.Less::new),
+            Map.entry(Token.GreaterEqual.class, Expr.GreaterEqual::new),
+            Map.entry(Token.LessEqual.class, Expr.LessEqual::new)
     );
 
-    private static final Map<String, TriFunction<Range, Expr, Expr, Expr>> ARITHMETIC_OPS = Map.ofEntries(
-            Map.entry("+", Expr.Add::new),
-            Map.entry("-", Expr.Sub::new)
+    private static final Map<Class<? extends Token.Operator>, TriFunction<Range, Expr, Expr, Expr>> ARITHMETIC_OPS = Map.ofEntries(
+            Map.entry(Token.Plus.class, Expr.Add::new),
+            Map.entry(Token.Minus.class, Expr.Sub::new)
     );
 
-    private static final Map<String, TriFunction<Range, Expr, Expr, Expr>> MULTIPLICATION_OPS = Map.ofEntries(
-            Map.entry("*", Expr.Mul::new),
-            Map.entry("/", Expr.Div::new)
+    private static final Map<Class<? extends Token.Operator>, TriFunction<Range, Expr, Expr, Expr>> MULTIPLICATION_OPS = Map.ofEntries(
+            Map.entry(Token.Mul.class, Expr.Mul::new),
+            Map.entry(Token.Div.class, Expr.Div::new)
     );
 
-    private static Expr parseUnaryOperator(Token.Operator opToken, Expr expr, String opType, Map<String, BiFunction<Range, Expr, Expr>> operators) throws ParsingException {
-        if (operators.containsKey(opToken.operator()))
-            return operators.get(opToken.operator()).apply(opToken.range().merge(expr.range()), expr);
+    private static Expr parseUnaryOperator(Token.Operator opToken, Expr expr, String opType, Map<Class<? extends Token.Operator>, BiFunction<Range, Expr, Expr>> operators) throws ParsingException {
+        if (operators.containsKey(opToken.getClass()))
+            return operators.get(opToken.getClass()).apply(opToken.range().merge(expr.range()), expr);
         else
             throw new UnexpectedInputException(opToken.range(), opType + " operator", "Operator \"" + opToken.toPrettyString() + "\"");
     }
@@ -165,10 +165,10 @@ public class ExprParser {
                 .mapError(e -> new ParsingException.NonFatal(e.getRange(), "Illegal prefixed/suffixed invokable expression"));
     }
 
-    private static Parser<Token, Expr> binaryOperatorParser(Parser<Token, Expr> operand, String opType, Map<String, TriFunction<Range, Expr, Expr, Expr>> operators) {
+    private static Parser<Token, Expr> binaryOperatorParser(Parser<Token, Expr> operand, String opType, Map<Class<? extends Token.Operator>, TriFunction<Range, Expr, Expr, Expr>> operators) {
         return operand.repeatReduce(tokenOf(Token.Operator.class).map(opToken -> {
-            if (operators.containsKey(opToken.operator()))
-                return (left, right) -> operators.get(opToken.operator()).apply(left.range().merge(right.range()), left, right);
+            if (operators.containsKey(opToken.getClass()))
+                return (left, right) -> operators.get(opToken.getClass()).apply(left.range().merge(right.range()), left, right);
             else
                 throw new UnexpectedInputException(opToken.range(), opType + " operator", "Operator \"" + opToken.toPrettyString() + "\"");
         }));

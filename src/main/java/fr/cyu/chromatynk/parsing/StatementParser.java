@@ -176,7 +176,7 @@ public class StatementParser {
     public static Parser<Token, Statement.Body> oneLineBody() {
         return tokenOf(Token.Arrow.class)
                 .zip(Parser.lazy(StatementParser::anyStatement).fatal())
-                .map(tpl->new Statement.Body(tpl.a().range().merge(tpl.b().range()), List.of(tpl.b())));
+                .map(tpl -> new Statement.Body(tpl.a().range().merge(tpl.b().range()), List.of(tpl.b())));
     }
 
     /**

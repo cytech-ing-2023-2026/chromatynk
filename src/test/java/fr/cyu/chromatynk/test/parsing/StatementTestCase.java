@@ -544,7 +544,7 @@ public class StatementTestCase {
                         new Token.Identifier(Range.sameLine(2, 3, 3), "r"),
                         new Token.Assign(Range.sameLine(4, 5, 3)),
                         new Token.Identifier(Range.sameLine(6, 7, 3), "r"),
-                        new Token.Operator(Range.sameLine(7, 8, 3), "*"),
+                        new Token.Mul(Range.sameLine(7, 8, 3)),
                         new Token.Identifier(Range.sameLine(8, 9, 3), "i"),
 
                         //}

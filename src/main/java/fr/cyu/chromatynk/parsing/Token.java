@@ -56,14 +56,6 @@ public sealed interface Token extends PrettyPrintable {
     record LiteralColor(Range range, String hex) implements Token {}
 
     /**
-     * A lexical operator
-     *
-     * @param range the starting and ending position of this token
-     * @param operator the symbol of this operator
-     */
-    record Operator(Range range, String operator) implements Token {}
-
-    /**
      * An open parenthesis `(` symbol.
      *
      * @param range the starting and ending position of this token
@@ -111,6 +103,109 @@ public sealed interface Token extends PrettyPrintable {
      * @param range the starting and ending position of this token
      */
     record Assign(Range range) implements Token {}
+
+    /**
+     * A lexical operator
+     */
+    sealed interface Operator extends Token {}
+
+    /**
+     * {@code &&} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record And(Range range) implements Operator {}
+
+    /**
+     * {@code ||} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Or(Range range) implements Operator {}
+
+    /**
+     * {@code ==} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Equal(Range range) implements Operator {}
+
+    /**
+     * {@code !=} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record NotEqual(Range range) implements Operator {}
+
+    /**
+     * {@code !} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Not(Range range) implements Operator {}
+
+    /**
+     * {@code >} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Greater(Range range) implements Operator {}
+
+    /**
+     * {@code <} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Less(Range range) implements Operator {}
+
+    /**
+     * {@code >=} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record GreaterEqual(Range range) implements Operator {}
+
+    /**
+     * {@code <=} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record LessEqual(Range range) implements Operator {}
+
+    /**
+     * {@code %} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Percent(Range range) implements Operator {}
+
+    /**
+     * {@code +} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Plus(Range range) implements Operator {}
+
+    /**
+     * {@code -} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Minus(Range range) implements Operator {}
+
+    /**
+     * {@code *} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Mul(Range range) implements Operator {}
+
+    /**
+     * {@code /} operator.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Div(Range range) implements Operator {}
 
     /**
      * A keyword token.
@@ -314,13 +409,25 @@ public sealed interface Token extends PrettyPrintable {
             case LiteralInt(Range ignored, int value) -> String.valueOf(value);
             case LiteralFloat(Range ignored, double value) -> String.valueOf(value);
             case LiteralColor(Range ignored, String hex) -> hex;
-            case Operator(Range ignored, String operator) -> operator;
             case ParenthesisOpen ignored -> "(";
             case ParenthesisClosed ignored -> ")";
             case BraceOpen ignored -> "{";
             case BraceClosed ignored -> "}";
             case Comma ignored -> ",";
             case Assign ignored -> "=";
+            case And ignored -> "&&";
+            case Or ignored -> "||";
+            case Equal ignored -> "==";
+            case NotEqual ignored -> "!=";
+            case Not ignored -> "!";
+            case Greater ignored -> ">";
+            case Less ignored -> "<";
+            case GreaterEqual ignored -> ">=";
+            case LessEqual ignored -> "<=";
+            case Plus ignored -> "+";
+            case Minus ignored -> "-";
+            case Mul ignored -> "*";
+            case Div ignored -> "/";
             case Identifier(Range ignored, String name) -> name;
             case Token token -> token.getClass().getSimpleName().toUpperCase();
         };
