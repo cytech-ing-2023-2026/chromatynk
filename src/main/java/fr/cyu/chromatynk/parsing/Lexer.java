@@ -93,6 +93,7 @@ public class Lexer {
     //Keywords
 
     private static final List<Map.Entry<String, ParsingFunction<Range, Token>>> KEYWORDS = List.of(
+            Map.entry("MOD", Mod::new),
             Map.entry("FWD", Fwd::new),
             Map.entry("BWD", Bwd::new),
             Map.entry("TURN", Turn::new),

@@ -77,7 +77,7 @@ public sealed interface Token extends PrettyPrintable {
     record BraceOpen(Range range) implements Token {}
 
     /**
-     * An closed brace `}` symbol.
+     * A closed brace `}` symbol.
      *
      * @param range the starting and ending position of this token
      */
@@ -211,6 +211,13 @@ public sealed interface Token extends PrettyPrintable {
      * A keyword token.
      */
     sealed interface Keyword extends Token {}
+
+    /**
+     * A `MOD` keyword.
+     *
+     * @param range the starting and ending position of this token
+     */
+    record Mod(Range range) implements Keyword, Operator {}
 
     /**
      * A `FWD` keyword.

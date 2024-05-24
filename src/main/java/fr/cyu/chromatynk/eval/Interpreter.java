@@ -121,6 +121,7 @@ public class Interpreter {
                     switch (context.popValue()) {
                         case Value.Int(int value) -> new Value.Int(-value);
                         case Value.Float(double value) -> new Value.Float(-value);
+                        case Value.Percentage(double value) -> new Value.Percentage(-value);
                         case Value actual ->
                                 throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT), actual.getType());
                     }
@@ -163,10 +164,10 @@ public class Interpreter {
                         case Value.Color right -> switch (context.popValue()) {
                             case Value.Str left -> new Value.Str(left.value() + right);
                             case Value.Color left -> {
-                                double red = Math.min(255, left.red() + right.red());
-                                double green = Math.min(255, left.green() + right.green());
-                                double blue = Math.min(255, left.blue() + right.blue());
-                                double alpha = Math.min(255, left.alpha() + right.alpha());
+                                double red = Math.min(1, left.red() + right.red());
+                                double green = Math.min(1, left.green() + right.green());
+                                double blue = Math.min(1, left.blue() + right.blue());
+                                double alpha = Math.min(1, left.alpha() + right.alpha());
 
                                 yield new Value.Color(red, green, blue, alpha);
                             }
@@ -230,8 +231,9 @@ public class Interpreter {
                             case Value.Float left -> new Value.Float(left.value() * right);
                             case Value.Color left ->
                                     new Value.Color(left.red() * right, left.green() * right, left.blue() * right, left.alpha());
+                            case Value.Percentage left -> new Value.Percentage(left.value() * right);
                             case Value actual ->
-                                    throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR), actual.getType());
+                                    throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR, Type.PERCENTAGE), actual.getType());
                         };
 
                         case Value.Float(double right) -> switch (context.popValue()) {
@@ -239,29 +241,37 @@ public class Interpreter {
                             case Value.Float left -> new Value.Float(left.value() * right);
                             case Value.Color left ->
                                     new Value.Color(left.red() * right, left.green() * right, left.blue() * right, left.alpha());
+                            case Value.Percentage left -> new Value.Percentage(left.value() * right);
                             case Value actual ->
-                                    throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR), actual.getType());
+                                    throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR, Type.PERCENTAGE), actual.getType());
                         };
 
                         case Value.Color right -> switch (context.popValue()) {
                             case Value.Int left -> {
-                                double red = Math.min(255, Math.max(0, left.value() * right.red()));
-                                double green = Math.min(255, Math.max(0, left.value() * right.green()));
-                                double blue = Math.min(255, Math.max(0, left.value() * right.blue()));
-                                double alpha = Math.min(255, Math.max(0, left.value() * right.alpha()));
+                                double red = Math.min(1, Math.max(0, left.value() * right.red()));
+                                double green = Math.min(1, Math.max(0, left.value() * right.green()));
+                                double blue = Math.min(1, Math.max(0, left.value() * right.blue()));
+                                double alpha = Math.min(1, Math.max(0, left.value() * right.alpha()));
 
                                 yield new Value.Color(red, green, blue, alpha);
                             }
 
                             case Value.Float left -> {
-                                double red = Math.min(255, Math.max(0, left.value() * right.red()));
-                                double green = Math.min(255, Math.max(0, left.value() * right.green()));
-                                double blue = Math.min(255, Math.max(0, left.value() * right.blue()));
-                                double alpha = Math.min(255, Math.max(0, left.value() * right.alpha()));
+                                double red = Math.min(1, Math.max(0, left.value() * right.red()));
+                                double green = Math.min(1, Math.max(0, left.value() * right.green()));
+                                double blue = Math.min(1, Math.max(0, left.value() * right.blue()));
+                                double alpha = Math.min(1, Math.max(0, left.value() * right.alpha()));
 
                                 yield new Value.Color(red, green, blue, alpha);
                             }
 
+                            case Value actual ->
+                                    throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT), actual.getType());
+                        };
+
+                        case Value.Percentage(double right) -> switch (context.popValue()) {
+                            case Value.Int left -> new Value.Percentage(left.value() * right);
+                            case Value.Float left -> new Value.Percentage(left.value() * right);
                             case Value actual ->
                                     throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT), actual.getType());
                         };
@@ -281,8 +291,9 @@ public class Interpreter {
                                 case Value.Float left -> new Value.Float(left.value() / right);
                                 case Value.Color left ->
                                         new Value.Color(left.red() / right, left.green() / right, left.blue() / right, left.alpha());
+                                case Value.Percentage left -> new Value.Percentage(left.value() / right);
                                 case Value actual ->
-                                        throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR), actual.getType());
+                                        throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR, Type.PERCENTAGE), actual.getType());
                             };
                         }
 
@@ -294,41 +305,45 @@ public class Interpreter {
                                 case Value.Float left -> new Value.Float(left.value() / right);
                                 case Value.Color left ->
                                         new Value.Color(left.red() / right, left.green() / right, left.blue() / right, left.alpha());
+                                case Value.Percentage left -> new Value.Percentage(left.value() / right);
                                 case Value actual ->
-                                        throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR), actual.getType());
-                            };
-                        }
-
-                        case Value.Color right -> {
-                            if (right.red() == 0 || right.green() == 0 || right.blue() == 0)
-                                throw new InvalidExpressionException(range, "You can not divide by 0.");
-
-                            yield switch (context.popValue()) {
-                                case Value.Int left -> {
-                                    double red = Math.min(255, Math.max(0, left.value() / right.red()));
-                                    double green = Math.min(255, Math.max(0, left.value() / right.green()));
-                                    double blue = Math.min(255, Math.max(0, left.value() / right.blue()));
-                                    double alpha = Math.min(255, Math.max(0, left.value() / right.alpha()));
-
-                                    yield new Value.Color(red, green, blue, alpha);
-                                }
-
-                                case Value.Float left -> {
-                                    double red = Math.min(255, Math.max(0, left.value() / right.red()));
-                                    double green = Math.min(255, Math.max(0, left.value() / right.green()));
-                                    double blue = Math.min(255, Math.max(0, left.value() / right.blue()));
-                                    double alpha = Math.min(255, Math.max(0, left.value() / right.alpha()));
-
-                                    yield new Value.Color(red, green, blue, alpha);
-                                }
-
-                                case Value actual ->
-                                        throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT), actual.getType());
+                                        throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR, Type.PERCENTAGE), actual.getType());
                             };
                         }
 
                         case Value actual ->
                                 throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.COLOR), actual.getType());
+                    }
+            );
+
+            case Bytecode.Modulo(Range range) -> context.pushValue(
+                    switch (context.popValue()) {
+                        case Value.Int(int right) -> {
+                            if(right == 0) throw new InvalidExpressionException(range, "You can not divide by 0.");
+
+                            yield switch (context.popValue()) {
+                                case Value.Int left -> new Value.Int(left.value() % right);
+                                case Value.Float left -> new Value.Float(left.value() % right);
+                                case Value.Percentage left -> new Value.Percentage(left.value() % right);
+                                case Value actual ->
+                                        throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.PERCENTAGE), actual.getType());
+                            };
+                        }
+
+                        case Value.Float(double right) -> {
+                            if (right == 0) throw new InvalidExpressionException(range, "You can not divide by 0.");
+
+                            yield switch (context.popValue()) {
+                                case Value.Int left -> new Value.Float(left.value() % right);
+                                case Value.Float left -> new Value.Float(left.value() % right);
+                                case Value.Percentage left -> new Value.Percentage(left.value() % right);
+                                case Value actual ->
+                                        throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT, Type.PERCENTAGE), actual.getType());
+                            };
+                        }
+
+                        case Value actual ->
+                                throw new TypeMismatchException(range, Set.of(Type.INT, Type.FLOAT), actual.getType());
                     }
             );
 

@@ -70,6 +70,12 @@ public class Compiler {
                 instructions.add(new Bytecode.Div(range));
             }
 
+            case Expr.Modulo(Range range, Expr left, Expr right) -> {
+                compileExpression(left, instructions);
+                compileExpression(right, instructions);
+                instructions.add(new Bytecode.Modulo(range));
+            }
+
             case Expr.Or(Range range, Expr left, Expr right) -> {
                 compileExpression(left, instructions);
                 compileExpression(right, instructions);

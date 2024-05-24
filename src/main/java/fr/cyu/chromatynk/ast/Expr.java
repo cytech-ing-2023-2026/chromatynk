@@ -103,7 +103,7 @@ public sealed interface Expr {
     record Mul(Range range, Expr left, Expr right) implements Expr {}
 
     /**
-     * A division {@code left+right}.
+     * A division {@code left/right}.
      *
      * @param range the starting and ending {@link Position} of this expression
      * @param left  the left member of the division
@@ -111,6 +111,14 @@ public sealed interface Expr {
      */
     record Div(Range range, Expr left, Expr right) implements Expr {}
 
+    /**
+     * A modulo {@code left%right}.
+     *
+     * @param range the starting and ending {@link Position} of this expression
+     * @param left  the left member of the modulo
+     * @param right the right member of the modulo
+     */
+    record Modulo(Range range, Expr left, Expr right) implements Expr {}
 
     /**
      * A boolean NOT.
