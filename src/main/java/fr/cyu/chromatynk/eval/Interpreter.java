@@ -164,10 +164,10 @@ public class Interpreter {
                         case Value.Color right -> switch (context.popValue()) {
                             case Value.Str left -> new Value.Str(left.value() + right);
                             case Value.Color left -> {
-                                double red = Math.min(255, left.red() + right.red());
-                                double green = Math.min(255, left.green() + right.green());
-                                double blue = Math.min(255, left.blue() + right.blue());
-                                double alpha = Math.min(255, left.alpha() + right.alpha());
+                                double red = Math.min(1, left.red() + right.red());
+                                double green = Math.min(1, left.green() + right.green());
+                                double blue = Math.min(1, left.blue() + right.blue());
+                                double alpha = Math.min(1, left.alpha() + right.alpha());
 
                                 yield new Value.Color(red, green, blue, alpha);
                             }
@@ -248,19 +248,19 @@ public class Interpreter {
 
                         case Value.Color right -> switch (context.popValue()) {
                             case Value.Int left -> {
-                                double red = Math.min(255, Math.max(0, left.value() * right.red()));
-                                double green = Math.min(255, Math.max(0, left.value() * right.green()));
-                                double blue = Math.min(255, Math.max(0, left.value() * right.blue()));
-                                double alpha = Math.min(255, Math.max(0, left.value() * right.alpha()));
+                                double red = Math.min(1, Math.max(0, left.value() * right.red()));
+                                double green = Math.min(1, Math.max(0, left.value() * right.green()));
+                                double blue = Math.min(1, Math.max(0, left.value() * right.blue()));
+                                double alpha = Math.min(1, Math.max(0, left.value() * right.alpha()));
 
                                 yield new Value.Color(red, green, blue, alpha);
                             }
 
                             case Value.Float left -> {
-                                double red = Math.min(255, Math.max(0, left.value() * right.red()));
-                                double green = Math.min(255, Math.max(0, left.value() * right.green()));
-                                double blue = Math.min(255, Math.max(0, left.value() * right.blue()));
-                                double alpha = Math.min(255, Math.max(0, left.value() * right.alpha()));
+                                double red = Math.min(1, Math.max(0, left.value() * right.red()));
+                                double green = Math.min(1, Math.max(0, left.value() * right.green()));
+                                double blue = Math.min(1, Math.max(0, left.value() * right.blue()));
+                                double alpha = Math.min(1, Math.max(0, left.value() * right.alpha()));
 
                                 yield new Value.Color(red, green, blue, alpha);
                             }
