@@ -1,7 +1,5 @@
 POS 50%, 50%
 FOR i FROM 0 TO 400 STEP 2{
   FWD i
-  FOR i FROM 1 TO 45{
-    TURN 2
-  }
+  TURN 88
 }

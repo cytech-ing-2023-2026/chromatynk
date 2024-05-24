@@ -36,6 +36,11 @@
 										<ToggleGroup fx:id="radioSpeedGroup"/>
 									</fx:define>
 									<RadioMenuItem fx:id="speedFull" text="Pleine puissance" toggleGroup="$radioSpeedGroup" selected="true"/>
+									<RadioMenuItem fx:id="speed512" text="512 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speed256" text="256 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speed128" text="128 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speed64" text="64 instructions/s" toggleGroup="$radioSpeedGroup"/>
+									<RadioMenuItem fx:id="speed32" text="32 instructions/s" toggleGroup="$radioSpeedGroup"/>
 									<RadioMenuItem fx:id="speed16" text="16 instructions/s" toggleGroup="$radioSpeedGroup"/>
 									<RadioMenuItem fx:id="speed8" text="8 instructions/s" toggleGroup="$radioSpeedGroup"/>
 									<RadioMenuItem fx:id="speed4" text="4 instructions/s" toggleGroup="$radioSpeedGroup"/>
