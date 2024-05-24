@@ -8,10 +8,7 @@ import fr.cyu.chromatynk.ast.Statement;
 import fr.cyu.chromatynk.ast.Type;
 import fr.cyu.chromatynk.util.Range;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A class Typer with a static function inside which handles different cases
@@ -24,7 +21,6 @@ public class Typer {
      * @param expr    the expression used
      * @param context the context needed for the expression
      */
-
     public static Type getType(Expr expr, TypingContext context) throws TypingException {
         return switch (expr) {
             case LiteralBool ignored -> Type.BOOLEAN;
@@ -42,8 +38,9 @@ public class Typer {
             case Negation(Range range, Expr value) -> switch (getType(value, context)) {
                 case INT -> Type.INT;
                 case FLOAT -> Type.FLOAT;
+                case PERCENTAGE -> Type.PERCENTAGE;
                 case Type actual ->
-                        throw new TypeMismatchException(range.merge(value.range()), Set.of(Type.INT, Type.FLOAT), actual);
+                        throw new TypeMismatchException(range.merge(value.range()), Set.of(Type.INT, Type.FLOAT, Type.PERCENTAGE), actual);
             };
 
             case Add(Range ignored, Expr left, Expr right) -> switch (getType(left, context)) {
@@ -88,51 +85,37 @@ public class Typer {
 
             case Sub(Range ignored, Expr left, Expr right) -> switch (getType(left, context)) {
 
-                case BOOLEAN -> switch (getType(left, context)) {
-                    case STRING -> Type.STRING;
-                    case Type actual -> throw new TypeMismatchException(right.range(), Set.of(Type.STRING), actual);
-                };
-
-                case STRING -> Type.STRING;
-
                 case INT -> switch (getType(right, context)) {
                     case INT -> Type.INT;
                     case FLOAT -> Type.FLOAT;
-                    case STRING -> Type.STRING;
                     case Type actual ->
-                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT, Type.STRING), actual);
+                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
                 };
 
                 case FLOAT -> switch (getType(right, context)) {
                     case INT -> Type.FLOAT;
                     case FLOAT -> Type.FLOAT;
-                    case STRING -> Type.STRING;
                     case Type actual ->
-                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT, Type.STRING), actual);
+                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
                 };
 
                 case COLOR -> switch (getType(right, context)) {
-                    case STRING -> Type.STRING;
                     case COLOR -> Type.COLOR;
                     case Type actual ->
-                            throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.COLOR), actual);
+                            throw new TypeMismatchException(right.range(), Set.of(Type.COLOR), actual);
                 };
 
                 case PERCENTAGE -> switch (getType(right, context)) {
-                    case STRING -> Type.STRING;
                     case PERCENTAGE -> Type.PERCENTAGE;
                     case Type actual ->
-                            throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.PERCENTAGE), actual);
+                            throw new TypeMismatchException(right.range(), Set.of(Type.PERCENTAGE), actual);
                 };
+
+                case Type actual ->
+                        throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT, Type.COLOR, Type.PERCENTAGE), actual);
             };
 
             case Mul(Range ignored, Expr left, Expr right) -> switch (getType(left, context)) {
-
-                case BOOLEAN ->
-                        throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.INT, Type.FLOAT), Type.BOOLEAN);
-
-                case STRING -> Type.STRING;
-
                 case INT -> switch (getType(right, context)) {
                     case INT -> Type.INT;
                     case FLOAT -> Type.FLOAT;
@@ -148,77 +131,111 @@ public class Typer {
                             throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
                 };
 
-                case COLOR ->
-                        throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.INT, Type.FLOAT), Type.COLOR);
+                case COLOR -> switch (getType(right, context)) {
+                    case INT, FLOAT -> Type.COLOR;
+                    case Type actual ->
+                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
+                };
 
                 case PERCENTAGE -> switch (getType(right, context)) {
-                    case STRING -> Type.STRING;
-                    case PERCENTAGE -> Type.PERCENTAGE;
+                    case INT, FLOAT -> Type.PERCENTAGE;
                     case Type actual ->
-                            throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.PERCENTAGE), actual);
+                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
                 };
+
+                case Type actual ->
+                        throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT, Type.COLOR, Type.PERCENTAGE), actual);
             };
 
             case Div(Range ignored, Expr left, Expr right) -> switch (getType(left, context)) {
 
-                case BOOLEAN ->
-                        throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.INT, Type.FLOAT), Type.BOOLEAN);
-
-                case STRING -> Type.STRING;
-
                 case INT -> switch (getType(right, context)) {
                     case INT -> Type.INT;
                     case FLOAT -> Type.FLOAT;
-                    case STRING -> Type.STRING;
                     case Type actual ->
-                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT, Type.STRING), actual);
+                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
+                };
+
+                case FLOAT -> switch (getType(right, context)) {
+                    case INT, FLOAT -> Type.FLOAT;
+                    case Type actual ->
+                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
+                };
+
+                case COLOR -> switch (getType(right, context)) {
+                    case INT, FLOAT -> Type.COLOR;
+                    case Type actual ->
+                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
+                };
+
+                case PERCENTAGE -> switch (getType(right, context)) {
+                    case INT, FLOAT -> Type.PERCENTAGE;
+                    case Type actual ->
+                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
+                };
+
+                case Type actual ->
+                        throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT, Type.COLOR, Type.PERCENTAGE), actual);
+            };
+
+            case Modulo(Range ignored, Expr left, Expr right) -> switch (getType(left, context)) {
+                case INT -> switch (getType(right, context)) {
+                    case INT -> Type.INT;
+                    case FLOAT -> Type.FLOAT;
+                    case Type actual ->
+                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
                 };
 
                 case FLOAT -> switch (getType(right, context)) {
                     case INT -> Type.FLOAT;
                     case FLOAT -> Type.FLOAT;
                     case Type actual ->
-                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT, Type.STRING), actual);
+                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
                 };
 
-                case COLOR ->
-                        throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.INT, Type.FLOAT), Type.COLOR);
-
+                case COLOR -> switch (getType(right, context)) {
+                    case INT, FLOAT -> Type.COLOR;
+                    case Type actual ->
+                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
+                };
 
                 case PERCENTAGE -> switch (getType(right, context)) {
-                    case STRING -> Type.STRING;
-                    case PERCENTAGE -> Type.PERCENTAGE;
+                    case INT -> Type.PERCENTAGE;
+                    case FLOAT -> Type.PERCENTAGE;
                     case Type actual ->
-                            throw new TypeMismatchException(right.range(), Set.of(Type.STRING, Type.PERCENTAGE), actual);
+                            throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT), actual);
                 };
+
+                case Type actual ->
+                        throw new TypeMismatchException(right.range(), Set.of(Type.INT, Type.FLOAT, Type.COLOR, Type.PERCENTAGE), actual);
             };
 
             case Not(Range range, Expr value) -> switch (getType(value, context)) {
-                case INT -> Type.FLOAT;
-                case FLOAT -> Type.INT;
-                // autres types?
+                case BOOLEAN -> Type.BOOLEAN;
                 case Type actual ->
-                        throw new TypeMismatchException(range.merge(value.range()), Set.of(Type.INT, Type.FLOAT), actual);
+                        throw new TypeMismatchException(range.merge(value.range()), Set.of(Type.BOOLEAN), actual);
             };
 
             case Or(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
-                case INT -> Type.INT;// il faut aussi l'autre type du or
-                case FLOAT -> Type.FLOAT;
-                case STRING -> Type.STRING;
-                case PERCENTAGE -> Type.PERCENTAGE;
-                case COLOR -> Type.COLOR;
+                case BOOLEAN -> switch (getType(right, context)) {
+                    case BOOLEAN -> Type.BOOLEAN;
+                    case Type actual ->
+                            throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.BOOLEAN), actual);
+                };
+
                 case Type actual ->
-                        throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.STRING, Type.PERCENTAGE, Type.COLOR), actual);
+                        throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.BOOLEAN), actual);
             };
 
             case And(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
-                case INT -> Type.INT;// il faut aussi l'autre type du and
-                case FLOAT -> Type.FLOAT;
-                case STRING -> Type.STRING;
-                case PERCENTAGE -> Type.PERCENTAGE;
-                case COLOR -> Type.COLOR;
+                case BOOLEAN -> switch (getType(right, context)) {
+                    case BOOLEAN -> Type.BOOLEAN;
+                    case Type actual ->
+                            throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.BOOLEAN), actual);
+                };
+
                 case Type actual ->
-                        throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.STRING, Type.PERCENTAGE, Type.COLOR), actual);
+                        throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.BOOLEAN), actual);
             };
 
             case Equal(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
@@ -228,11 +245,11 @@ public class Typer {
                             throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT), actual);
                 };
 
-                case Type leftType -> {
-                    if(getType(right, context) == leftType) yield Type.BOOLEAN;
-                    else throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.STRING, Type.PERCENTAGE, Type.COLOR), leftType);
-                }
-
+                case Type leftType -> switch (getType(right, context)) {
+                    case Type rightType when rightType == leftType -> Type.BOOLEAN;
+                    case Type actual ->
+                            throw new TypeMismatchException(range.merge(right.range()), Set.of(leftType), actual);
+                };
             };
 
             case NotEqual(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
@@ -242,11 +259,11 @@ public class Typer {
                             throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT), actual);
                 };
 
-                case Type leftType -> {
-                    if(getType(right, context) == leftType) yield Type.BOOLEAN;
-                    else throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.STRING, Type.PERCENTAGE, Type.COLOR), leftType);
-                }
-
+                case Type leftType -> switch (getType(right, context)) {
+                    case Type rightType when rightType == leftType -> Type.BOOLEAN;
+                    case Type actual ->
+                            throw new TypeMismatchException(range.merge(right.range()), Set.of(leftType), actual);
+                };
             };
 
             case Greater(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
@@ -263,7 +280,7 @@ public class Typer {
                 };
 
                 case Type actual ->
-                        throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.STRING, Type.PERCENTAGE, Type.COLOR), actual);
+                        throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.PERCENTAGE), actual);
             };
 
             case Less(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
@@ -280,7 +297,7 @@ public class Typer {
                 };
 
                 case Type actual ->
-                        throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.STRING, Type.PERCENTAGE, Type.COLOR), actual);
+                        throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.PERCENTAGE), actual);
             };
 
             case GreaterEqual(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
@@ -297,7 +314,7 @@ public class Typer {
                 };
 
                 case Type actual ->
-                        throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.STRING, Type.PERCENTAGE, Type.COLOR), actual);
+                        throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.PERCENTAGE), actual);
             };
 
             case LessEqual(Range range, Expr left, Expr right) -> switch (getType(left, context)) {
@@ -314,7 +331,7 @@ public class Typer {
                 };
 
                 case Type actual ->
-                        throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.STRING, Type.PERCENTAGE, Type.COLOR), actual);
+                        throw new TypeMismatchException(range.merge(right.range()), Set.of(Type.INT, Type.FLOAT, Type.PERCENTAGE), actual);
             };
 
             case VarCall(Range range, String name) -> context

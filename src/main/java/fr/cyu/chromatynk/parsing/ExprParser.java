@@ -128,7 +128,8 @@ public class ExprParser {
 
     private static final Map<Class<? extends Token.Operator>, TriFunction<Range, Expr, Expr, Expr>> MULTIPLICATION_OPS = Map.ofEntries(
             Map.entry(Token.Mul.class, Expr.Mul::new),
-            Map.entry(Token.Div.class, Expr.Div::new)
+            Map.entry(Token.Div.class, Expr.Div::new),
+            Map.entry(Token.Mod.class, Expr.Modulo::new)
     );
 
     private static Expr parseUnaryOperator(Token.Operator opToken, Expr expr, String opType, Map<Class<? extends Token.Operator>, BiFunction<Range, Expr, Expr>> operators) throws ParsingException {

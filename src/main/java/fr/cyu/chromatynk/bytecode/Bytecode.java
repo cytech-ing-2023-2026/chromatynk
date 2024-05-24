@@ -155,6 +155,13 @@ public sealed interface Bytecode {
     record Div(Range range) implements Bytecode {}
 
     /**
+     * Pop two values from the stack then push modulo.
+     *
+     * @param range the starting and ending {@link Position} of this instruction
+     */
+    record Modulo(Range range) implements Bytecode {}
+
+    /**
      * Pop a boolean from the stack then push opposite.
      *
      * @param range the starting and ending {@link Position} of this instruction
