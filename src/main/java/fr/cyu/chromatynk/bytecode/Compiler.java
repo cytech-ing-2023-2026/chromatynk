@@ -179,10 +179,24 @@ public class Compiler {
 
                 int conditionAddr = instructions.size() + offset;
 
-                compileExpression(new Expr.Less(
+                Expr stepExpr = step.orElse(new Expr.LiteralInt(range, 1));
+
+                compileExpression(new Expr.Or(
                         range,
-                        new Expr.VarCall(range, iterator),
-                        to
+                        new Expr.And(
+                                range,
+                                new Expr.Less(range, stepExpr, new Expr.LiteralInt(range, 0)),
+                                new Expr.Greater(
+                                    range,
+                                    new Expr.VarCall(range, iterator),
+                                    to
+                                )
+                        ),
+                        new Expr.Less(
+                                range,
+                                new Expr.VarCall(range, iterator),
+                                to
+                        )
                 ), instructions);
 
                 int whileAddr = instructions.size() + offset;
@@ -197,7 +211,7 @@ public class Compiler {
                         new Expr.Add(
                                 range,
                                 new Expr.VarCall(range, iterator),
-                                step.orElse(new Expr.LiteralInt(range, 1))
+                                stepExpr
                         )
                 ), bodyInstructions, whileAddr + 1);
 
