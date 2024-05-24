@@ -102,7 +102,7 @@
 								<Button fx:id="stepByStepForwardButton" text="Avancer" onAction="#nextInstruction"/>
 							</HBox>
 
-							<Button text="Effacer" fx:id="clearCanvasButton" onAction="#clearCanvas"/>
+							<Button text="Effacer" onAction="#clearCanvas"/>
 						</VBox>
 
 						<!-- Output area -->

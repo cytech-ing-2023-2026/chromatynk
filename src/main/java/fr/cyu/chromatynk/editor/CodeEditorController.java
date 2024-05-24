@@ -55,8 +55,6 @@ public class CodeEditorController implements Initializable {
     private Button stopButton;
     @FXML
     private Button clearTextAreaButton;
-	@FXML
-	private Button clearCanvasButton;
 
     // Bottom bar
     @FXML
@@ -333,7 +331,6 @@ public class CodeEditorController implements Initializable {
      */
     private void postExecution() {
         stopButton.setDisable(true);
-		clearCanvasButton.setDisable(false);
     }
 
 	/**
@@ -383,7 +380,6 @@ public class CodeEditorController implements Initializable {
         stopScript();
 
         stopButton.setDisable(false);
-		clearCanvasButton.setDisable(true);
 
 		// Empty output and canvas
 		clearCanvas();
