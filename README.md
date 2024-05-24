@@ -59,7 +59,7 @@ This command will package the application into a `.jar` file, which you can easi
 ### Instructions
 
 Assuming you cloned the repo already, you can :
-- Following the build instructions and then run the packaged `.jar` file with your favorite Java 21-compatible JVM.
+- Follow the build instructions and then run the packaged `.jar` file with your favorite Java 21-compatible JVM.
 - Use this command to run directly from the root folder :
 
 | Linux | Windows |
