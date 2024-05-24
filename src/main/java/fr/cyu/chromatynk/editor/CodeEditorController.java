@@ -383,6 +383,7 @@ public class CodeEditorController implements Initializable {
 
 		// Empty output and canvas
 		clearCanvas();
+		outputArea.clear();
 		// Mark execution as currently running
 		infoLabel.setText("INFO - Dessin en cours");
 		statusLabel.setText("Les instructions de dessin sont en cours d'exécution.");
