@@ -116,6 +116,11 @@ public class CodeEditorController implements Initializable {
      */
     private Clock getPeriodClock() {
         long period = switch (((RadioMenuItem)radioSpeedGroup.getSelectedToggle()).getId()) {
+            case "speed512" -> 1000/512;
+            case "speed256" -> 1000/256;
+            case "speed128" -> 1000/128;
+            case "speed64" -> 1000/64;
+            case "speed32" -> 1000/32;
             case "speed16" -> 1000/16;
             case "speed8" -> 1000/8;
             case "speed4" -> 1000/4;
