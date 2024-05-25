@@ -73,7 +73,7 @@ Assuming you cloned the repo already, you can :
 
 ```mermaid
 classDiagram
-direction BT
+direction LR
 class AndClock {
   + AndClock(Clock, Clock) 
   + tick(boolean) boolean
