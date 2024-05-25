@@ -18,6 +18,8 @@ import java.io.IOException;
  */
 public class CodeEditor extends Application {
 
+    private CodeEditorController controller;
+
     @Override
     @SuppressWarnings("exports")
     public void start(Stage primaryStage) throws IOException {
@@ -27,7 +29,8 @@ public class CodeEditor extends Application {
         // Prepare and load the FXML file
         Parent root;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/CodeEditor.fxml"));
-        fxmlLoader.setController(new CodeEditorController(primaryStage));
+        controller = new CodeEditorController(primaryStage);
+        fxmlLoader.setController(controller);
         root = fxmlLoader.load();
 
         // Set the stage
@@ -39,6 +42,12 @@ public class CodeEditor extends Application {
 		Image icon = new Image(getClass().getResourceAsStream("/icon.png"));
 		primaryStage.getIcons().add(icon);
         primaryStage.show();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        controller.shutdown();
     }
 
     /**
