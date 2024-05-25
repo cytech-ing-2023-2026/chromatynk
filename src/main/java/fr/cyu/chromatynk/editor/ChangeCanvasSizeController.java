@@ -6,6 +6,13 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+/**
+ * @author JordanViknar
+ * @see CodeEditorController
+ * Controller for handling the change of canvas size in the editor.
+ * This class provides the functionality to apply the user-specified width and height
+ * to the canvas within the {@link CodeEditorController}.
+ */
 public class ChangeCanvasSizeController {
 	@FXML
 	private TextField widthField;
@@ -16,12 +23,22 @@ public class ChangeCanvasSizeController {
 	private final CodeEditorController codeEditorController;
 	private final Stage stage;
 
+	/**
+	 * Constructs a ChangeCanvasSizeController with the specified CodeEditorController and Stage.
+	 *
+	 * @param codeEditorController the CodeEditorController associated with this controller
+	 * @param stage the stage for this controller's dialog
+	 */
 	@SuppressWarnings("exports")
 	public ChangeCanvasSizeController(CodeEditorController codeEditorController, Stage stage) {
 		this.codeEditorController = codeEditorController;
 		this.stage = stage;
 	}
 
+	/**
+	 * Applies the changes to the canvas size based on the values entered in the width and height fields.
+	 * Validates the input and shows error alerts if the input is invalid.
+	 */
 	@FXML
 	private void applyChanges() {
 		try {
