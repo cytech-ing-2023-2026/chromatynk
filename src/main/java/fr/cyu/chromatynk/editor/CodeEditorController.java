@@ -30,6 +30,7 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.reactfx.Subscription;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -37,6 +38,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -107,6 +109,8 @@ public class CodeEditorController implements Initializable {
     private Clock secondaryClock;
     private StepByStepClock stepByStepClock = new StepByStepClock(false);
     private ExecutionTimer currentExecution;
+    private Subscription highlighting;
+    private ExecutorService executor;
 
 	/**
      * Constructor for the CodeEditorController.
@@ -155,13 +159,13 @@ public class CodeEditorController implements Initializable {
         timeoutClock = TimeoutClock.fps(30); //TODO change
         secondaryClock = getPeriodClock();
 
-        Executor executor = Executors.newSingleThreadExecutor();
+        executor = Executors.newSingleThreadExecutor();
 
         //Line numbers
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
         //Lexical highlighting
-        this.codeArea
+        highlighting = this.codeArea
                 .multiPlainChanges()
                 .successionEnds(Duration.ofMillis(125))
                 .retainLatestUntilLater(executor)
@@ -228,6 +232,11 @@ public class CodeEditorController implements Initializable {
 
         this.fileMenuController = new FileMenuController(primaryStage, codeArea);
 		this.imageMenuController = new ImageMenuController(primaryStage, canvas);
+    }
+
+    public void shutdown() {
+        highlighting.unsubscribe();
+        executor.shutdown();
     }
 
 	/**
