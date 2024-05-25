@@ -74,26 +74,49 @@ Assuming you cloned the repo already, you can :
 ```mermaid
 classDiagram
 direction BT
-class App {
-  + App() 
-  + main(String[]) void
-  + start(Stage) void
+class AndClock {
+  + AndClock(Clock, Clock) 
+  + tick(boolean) boolean
 }
 class AxialMirroredCursor {
-  + AxialMirroredCursor(Cursor, double, double) 
-  - getSymmetricX(double, double) double
+  + AxialMirroredCursor(Cursor, double, double, double, double) 
   + drawLineAt(GraphicsContext, double, double, double, double) void
-  - getSymmetricY(double, double) double
+  - getSymmetric(double, double) Tuple2~Double, Double~
+  + drawAt(GraphicsContext, double, double, double, double) void
+}
+class Bytecode {
+<<Interface>>
+  + range() Range
+   boolean effectful
 }
 class CentralMirroredCursor {
   + CentralMirroredCursor(Cursor, double, double) 
-  + drawLineAt(GraphicsContext, double, double, double, double) void
   - getSymmetricY(double) double
   - getSymmetricX(double) double
+  + drawAt(GraphicsContext, double, double, double, double) void
+  + drawLineAt(GraphicsContext, double, double, double, double) void
+}
+class ChangeCanvasSizeController {
+  + ChangeCanvasSizeController(CodeEditorController, Stage) 
+  - applyChanges() void
 }
 class Chromatynk {
   + Chromatynk() 
-  + parseProgram(String) Program
+  + execute(EvalContext, Clock) EvalContext
+  + typecheckProgram(Program) void
+  + lexSource(String) List~Token~
+  + compileSource(String, GraphicsContext) EvalContext
+  + parseSource(String) Program
+}
+class ChromatynkException {
+  + ChromatynkException(Range, String, String) 
+  + getFullMessage(String) String
+   Range range
+   String header
+}
+class Clock {
+<<Interface>>
+  + tick(boolean) boolean
 }
 class CodeEditor {
   + CodeEditor() 
@@ -102,41 +125,68 @@ class CodeEditor {
 }
 class CodeEditorController {
   + CodeEditorController(Stage) 
+  + nextInstruction() void
+  + computeHighlighting(Executor) Task~StyleSpans~Collection~String~~~
+  + saveImage() void
+  - modifyCanvas(ActionEvent) void
+  - onSuccess() void
+  - clearCursorCanvas() void
+  + stopScript() void
+  - onProgress(EvalContext) void
+  + refreshSecondaryClock() void
   + openFile() void
-  + quit() void
-  + initialize() void
   + saveFile() void
-  + clearTextArea() void
   + runScript() void
+  + initialize(URL, ResourceBundle) void
+  - onError(String, Throwable) void
+  + clearTextArea() void
+  + quit() void
+  - postExecution() void
+  + clearCanvas() void
+   Clock clock
+   Canvas canvas
+   Canvas cursorCanvas
+   Clock periodClock
 }
 class Color {
   + Color(double, double, double) 
-  + green() double
   + toANSI() String
+  + green() double
   + blue() double
   - distanceSquaredTo(Color) double
   + red() double
    double blueProjection
-   double redProjection
    double brightness
+   double redProjection
 }
 class CommonParser {
   + CommonParser() 
   + tokenOf(Class~T~) Parser~Token, T~
+  + tokenOf(Class~T~, String) Parser~Token, T~
   + anyToken() Parser~Token, Token~
+}
+class Compiler {
+  + Compiler() 
+  + compileExpression(Expr, List~Bytecode~) void
+  + compileProgram(Program) List~Bytecode~
+  + compileStatement(Statement, List~Bytecode~, int) void
 }
 class Cursor {
 <<Interface>>
-  + copyTangible() Cursor
+  + turn(double) void
   + drawLineAt(GraphicsContext, double, double, double, double) void
   + move(GraphicsContext, double, double) void
-   double opacity
-   Color color
-   double y
+  + drawAt(GraphicsContext, double, double, double, double) void
+  + copyTangible() Cursor
+  + move(GraphicsContext, double) void
    double dirY
+   Color color
+   double opacity
+   boolean visible
+   double thickness
+   double y
    double dirX
    double x
-   double thickness
 }
 class CursorAlreadyExistsException {
   + CursorAlreadyExistsException(Range, CursorId) 
@@ -147,24 +197,59 @@ class CursorId {
 }
 class DuplicatedCursor {
   + DuplicatedCursor(Cursor) 
-   Cursor duplicated
-   double opacity
-   Color color
-   double y
    double dirY
+   Cursor duplicated
+   Color color
+   double opacity
+   boolean visible
+   double thickness
+   double y
    double dirX
    double x
-   double thickness
 }
 class EvalContext {
-  + EvalContext(Scope, CursorId) 
-   Scope scope
+  + EvalContext(List~Bytecode~, int, Stack~Value~, Deque~Scope~, Deque~CursorId~, GraphicsContext) 
+  + containsCursor(CursorId) boolean
+  + deleteCursor(CursorId) void
+  + peek() Bytecode
+  + deleteVariable(String) void
+  + hasNext() boolean
+  + getCursor(CursorId) Optional~Cursor~
+  + exitScope() void
+  - removeDeletedCursorsFromHistory() void
+  + create(List~Bytecode~, GraphicsContext) EvalContext
+  + forEachCursor(Consumer~Cursor~) void
+  + pushValue(Value) void
+  + toString() String
+  + createScope() void
+  + declareCursor(CursorId, Cursor) void
+  + next() Bytecode
+  + declareVariable(String, Variable) void
+  + selectCursorId(CursorId) void
+  + containsVariable(String) boolean
+  + getType(String) Optional~Type~
+  + setValue(String, Value) void
+  + getVariable(String) Optional~Variable~
+  + getValue(String) Optional~Value~
+  + popValue() Value
+   int nextAddress
+   double largestDimension
+   double width
+   double height
    Cursor currentCursor
    CursorId currentCursorId
+   Scope currentScope
+   Range currentRange
+   Scope globalScope
+   GraphicsContext graphics
 }
 class EvalException {
   + EvalException(Range, String) 
-   Range range
+}
+class ExecutionTimer {
+  + ExecutionTimer(EvalContext, Clock, Runnable, Consumer~Throwable~, Consumer~EvalContext~) 
+  + handle(long) void
+   Clock clock
 }
 class Expr {
 <<Interface>>
@@ -172,35 +257,70 @@ class Expr {
 }
 class ExprParser {
   + ExprParser() 
-  - parseHexColor(Range, String) LiteralColor
-  + arithmeticOperator() Parser~Token, Expr~
-  + booleanOperator() Parser~Token, Expr~
   + invokable() Parser~Token, Expr~
-  + prefixOperator() Parser~Token, Expr~
-  + parenthesized() Parser~Token, Expr~
-  - parseColorComponent(String, double) double
-  + literal() Parser~Token, Expr~
-  + multiplicationOperator() Parser~Token, Expr~
+  - parseUnaryOperator(Operator, Expr, String, Map~Class~Operator~, BiFunction~Range, Expr, Expr~~) Expr
   + unaryOperator() Parser~Token, Expr~
-  - parseUnaryOperator(Operator, Expr, String, Map~String, BiFunction~Range, Expr, Expr~~) Expr
-  + varCall() Parser~Token, Expr~
-  + anyExpr() Parser~Token, Expr~
-  - binaryOperatorParser(Parser~Token, Expr~, String, Map~String, TriFunction~Range, Expr, Expr, Expr~~) Parser~Token, Expr~
-  + comparisonOperator() Parser~Token, Expr~
+  + parenthesized() Parser~Token, Expr~
+  + multiplicationOperator() Parser~Token, Expr~
   + suffixOperator() Parser~Token, Expr~
+  + anyExpr() Parser~Token, Expr~
+  + varCall() Parser~Token, Expr~
+  + literal() Parser~Token, Expr~
+  - binaryOperatorParser(Parser~Token, Expr~, String, Map~Class~Operator~, TriFunction~Range, Expr, Expr, Expr~~) Parser~Token, Expr~
+  - parseColorComponent(String, double) double
+  + arithmeticOperator() Parser~Token, Expr~
+  - parseHexColor(Range, String) LiteralColor
+  + comparisonOperator() Parser~Token, Expr~
+  + prefixOperator() Parser~Token, Expr~
+  + booleanOperator() Parser~Token, Expr~
 }
 class FileMenuController {
-  + FileMenuController(Stage, TextArea) 
-  + openFile() void
+  + FileMenuController(Stage, CodeArea) 
   + saveFile() void
+  + openFile() void
+}
+class ForeverClock {
+  + ForeverClock() 
+  + tick(boolean) boolean
+}
+class ImageMenuController {
+  + ImageMenuController(Stage, Canvas) 
+  - isImageBlank(WritableImage) boolean
+  + saveImage() void
+}
+class Interpreter {
+  + Interpreter() 
+  - asBoolean(Range, Value) boolean
+  - asPercentage(Range, Value, double) double
+  + evaluate(EvalContext, Bytecode) void
+  - asColorAndAlpha(Range, Value) Tuple2~Color, Double~
+  - asCursorId(Range, Value) CursorId
+  + evaluateAll(EvalContext, Clock) EvalContext
+  - isNumeric(Value) boolean
+  - asNumericOrPercentage(Range, Value, double) double
+  - asNumeric(Range, Value) double
+}
+class InvalidAddressException {
+  + InvalidAddressException(Range, int) 
+}
+class InvalidCanvasSizeException {
+  + InvalidCanvasSizeException(String, Double, Double) 
+}
+class InvalidExpressionException {
+  + InvalidExpressionException(Range, String) 
 }
 class Lexer {
   + Lexer() 
 }
+class Main {
+  + Main() 
+  + main(String[]) void
+}
 class MimickedCursor {
   + MimickedCursor(Cursor, double, double) 
-  + drawLineAt(GraphicsContext, double, double, double, double) void
   + at(Cursor, double, double) MimickedCursor
+  + drawLineAt(GraphicsContext, double, double, double, double) void
+  + drawAt(GraphicsContext, double, double, double, double) void
 }
 class MissingCursorException {
   + MissingCursorException(Range, CursorId) 
@@ -208,68 +328,82 @@ class MissingCursorException {
 class MissingVariableException {
   + MissingVariableException(Range, String) 
 }
+class MissingVariableException {
+  + MissingVariableException(Range, String) 
+}
 class Parser~I, O~ {
 <<Interface>>
-  + optional() Parser~I, Optional~O~~
-  + repeatReduce(Parser~I, BiFunction~O, O, O~~) Parser~I, O~
-  + mapWithRange(ParsingBiFunction~Range, O, T~) Parser~I, T~
-  + debug(String) Parser~I, O~
-  + matching(String) Parser~Character, String~
-  + anyOf(T[]) Parser~T, T~
   + pure(O) Parser~I, O~
-  + firstSucceeding(Iterable~Parser~I, O~~) Parser~I, O~
   + zip(Parser~I, O2~) Parser~I, Tuple2~O, O2~~
-  + anyOfSet(Set~T~) Parser~T, T~
-  + suffixed(Parser~I, ?~) Parser~I, O~
   + keyword(String) Parser~Character, String~
-  + mapError(Function~ParsingException, ParsingException~) Parser~I, O~
-  + parse(ParsingIterator~I~) Result~O~
-  + valueWithRange(ParsingFunction~Range, T~) Parser~I, T~
-  + map(ParsingFunction~O, T~) Parser~I, T~
-  + any() Parser~T, T~
-  + firstSucceeding(Parser~I, O~[]) Parser~I, O~
-  + prefixed(Parser~I, ?~) Parser~I, O~
-  + symbol(String) Parser~Character, String~
   + repeat() Parser~I, List~O~~
-  + lazy(Supplier~Parser~I, O~~) Parser~I, O~
+  + repeatUntil(Parser~I, ?~) Parser~I, List~O~~
   + fatal() Parser~I, O~
+  + optional() Parser~I, Optional~O~~
+  + map(ParsingFunction~O, T~) Parser~I, T~
+  + firstSucceeding(Parser~I, O~[]) Parser~I, O~
+  + matching(String) Parser~Character, String~
+  + mapWithRange(ParsingBiFunction~Range, O, T~) Parser~I, T~
+  + mapError(Function~ParsingException, ParsingException~) Parser~I, O~
+  + debug(String) Parser~I, O~
+  + anyOf(T[]) Parser~T, T~
+  + anyOfSet(Set~T~) Parser~T, T~
+  + prefixed(Parser~I, ?~) Parser~I, O~
+  + parse(ParsingIterator~I~) Result~O~
+  + symbol(String) Parser~Character, String~
+  + suffixed(Parser~I, ?~) Parser~I, O~
+  + lazy(Supplier~Parser~I, O~~) Parser~I, O~
+  + repeatReduce(Parser~I, BiFunction~O, O, O~~) Parser~I, O~
+  + firstSucceeding(Iterable~Parser~I, O~~) Parser~I, O~
+  + valueWithRange(ParsingFunction~Range, T~) Parser~I, T~
+  + any() Parser~T, T~
 }
 class ParsingBiFunction~I1, I2, O~ {
 <<Interface>>
   + apply(I1, I2) O
 }
 class ParsingException {
-  - ParsingException(Position, String) 
-   Position position
+  - ParsingException(Range, String) 
 }
 class ParsingFunction~I, O~ {
 <<Interface>>
   + apply(I) O
 }
 class ParsingIterator~T~ {
-  + ParsingIterator(List~T~) 
   + ParsingIterator(List~T~, int, Position, Predicate~T~, Predicate~T~) 
-  + forEachRemainingKeepWhitespaces(Consumer~T~) void
-  + copy() ParsingIterator~T~
+  + ParsingIterator(List~T~) 
   + nextKeepWhitespaces() T
   + handleWhitespaces() void
+  + next() T
+  + copy() ParsingIterator~T~
+  + of(T[]) ParsingIterator~T~
   + fromString(String) ParsingIterator~Character~
   + peek() T
-  + of(T[]) ParsingIterator~T~
   + hasNext() boolean
-  + next() T
+  + forEachRemainingKeepWhitespaces(Consumer~T~) void
+   Predicate~T~ lineSeparatorPredicate
    int cursor
    Position position
    List~T~ input
+   Predicate~T~ whitespacePredicate
+}
+class PeriodClock {
+  + PeriodClock(long) 
+  + tick(boolean) boolean
 }
 class Position {
   + Position(int, int) 
-  + column() int
-  + min(Position, Position) Position
+  + row() int
+  + isBefore(Position) boolean
   + nextRow() Position
+  + min(Position, Position) Position
   + max(Position, Position) Position
   + nextColumn() Position
-  + row() int
+  + column() int
+}
+class PrettyPrintable {
+<<Interface>>
+  + toPrettyString() String
 }
 class Program {
   + Program(List~Statement~) 
@@ -281,29 +415,38 @@ class QuadriFunction~I1, I2, I3, I4, R~ {
 }
 class Range {
   + Range(Position, Position) 
-  + sameLine(int, int) Range
   + to() Position
   + merge(Range) Range
-  + sameLine(int, int, int) Range
   + from() Position
+  + subLines(String) String
+  + sameLine(int, int) Range
+  + toCursorRange(String) Tuple2~Integer, Integer~
+  + sameLine(int, int, int) Range
+   boolean sameLine
+}
+class Ranged {
+<<Interface>>
+  + range() Range
+}
+class RangedParsingIterator~T~ {
+  + RangedParsingIterator(List~T~) 
+  + RangedParsingIterator(List~T~, int, Position, Predicate~T~, Predicate~T~) 
+  + ofRanged(T[]) ParsingIterator~T~
+  + copy() ParsingIterator~T~
+   Position position
 }
 class Scope {
-  + Scope(Scope, Map~String, Variable~, Map~CursorId, Cursor~) 
-  + getDirectVariable(String) Optional~Variable~
-  + containsVariable(String) boolean
-  + getType(String) Optional~Type~
-  + getCursor(CursorId) Optional~Cursor~
-  + declareCursor(CursorId, Cursor, Range) void
-  + setValue(String, Value, Range) void
-  + declareVariable(String, Variable, Range) void
-  + toString() String
-  + getDirectCursor(CursorId) Optional~Cursor~
-  + getValue(String) Optional~Value~
-  + deleteVariable(String, Range) void
+  + Scope(Map~String, Variable~, Map~CursorId, Cursor~) 
   + containsCursor(CursorId) boolean
-  + deleteCursor(CursorId, Range) void
   + getVariable(String) Optional~Variable~
-   Optional~Scope~ parent
+  + declareVariable(String, Variable) void
+  + deleteVariable(String) void
+  + containsVariable(String) boolean
+  + deleteCursor(CursorId) void
+  + declareCursor(CursorId, Cursor) void
+  + getCursor(CursorId) Optional~Cursor~
+  + toString() String
+   Collection~Cursor~ cursors
 }
 class Statement {
 <<Interface>>
@@ -311,36 +454,55 @@ class Statement {
 }
 class StatementParser {
   + StatementParser() 
-  + anyStatement() Parser~Token, Statement~
-  + instruction() Parser~Token, Statement~
+  + ifCondition() Parser~Token, Statement~
   + variableAssignment() Parser~Token, Statement~
+  + oneLineBody() Parser~Token, Body~
   + program() Parser~Token, Program~
+  + mirrorAxial() Parser~Token, Statement~
   + twoArgs() Parser~Token, Statement~
+  + deleteVariable() Parser~Token, Statement~
+  + forLoop() Parser~Token, Statement~
+  + anyStatement() Parser~Token, Statement~
+  + mirrorCentral() Parser~Token, Statement~
   + zeroArg() Parser~Token, Statement~
+  + multiLineBody() Parser~Token, Body~
+  + mimic() Parser~Token, Statement~
+  + oneArg() Parser~Token, Statement~
   + variableDeclaration() Parser~Token, Statement~
+  + whileLoop() Parser~Token, Statement~
+  + instruction() Parser~Token, Statement~
   + threeArgs() Parser~Token, Statement~
   + body() Parser~Token, Body~
   + type() Parser~Token, Tuple2~Range, Type~~
-  + forLoop() Parser~Token, Statement~
-  + oneArg() Parser~Token, Statement~
-  + ifCondition() Parser~Token, Statement~
-  + whileLoop() Parser~Token, Statement~
+}
+class StepByStepClock {
+  + StepByStepClock(boolean) 
+  + resume() void
+  + tick(boolean) boolean
+  + pause() void
 }
 class TangibleCursor {
-  + TangibleCursor(double, double, double, double, Color, double, double) 
   + TangibleCursor(double, double) 
+  + TangibleCursor(double, double, double, double, boolean, Color, double, double) 
   + drawLineAt(GraphicsContext, double, double, double, double) void
-   double opacity
-   Color color
-   double y
+  + drawAt(GraphicsContext, double, double, double, double) void
    double dirY
+   Color color
+   double opacity
+   boolean visible
+   double thickness
+   double y
    double dirX
    double x
-   double thickness
+}
+class TimeoutClock {
+  + TimeoutClock(long) 
+  + tick(boolean) boolean
+  + fps(int) TimeoutClock
 }
 class Token {
 <<Interface>>
-  + range() Range
+  + toPrettyString() String
 }
 class TriFunction~I1, I2, I3, R~ {
 <<Interface>>
@@ -351,21 +513,51 @@ class Tuple2~A, B~ {
   + a() A
   + b() B
 }
+class Tuple3~A, B, C~ {
+  + Tuple3(A, B, C) 
+  + a() A
+  + b() B
+  + c() C
+}
 class Type {
 <<enumeration>>
-  - Type(String) 
+  - Type(String, Value) 
   + fromName(String) Optional~Type~
-  + values() Type[]
   + valueOf(String) Type
+  + values() Type[]
    String name
+   Value defaultValue
+   boolean numeric
 }
 class TypeMismatchException {
-  + TypeMismatchException(Range, Type, Type) 
+  + TypeMismatchException(Range, Set~Type~, Type) 
+}
+class TypeMismatchException {
+  + TypeMismatchException(Range, Set~Type~, Type) 
+}
+class Typer {
+  + Typer() 
+  + assertTypeMatch(Range, Set~Type~, Type) void
+  + getType(Expr, TypingContext) Type
+  + checkTypes(Statement, TypingContext) void
+}
+class TypingContext {
+  + TypingContext() 
+  + TypingContext(TypingContext, Map~String, Type~) 
+  + getDirectType(String) Optional~Type~
+  + deleteVariable(String, Range) void
+  + getType(String) Optional~Type~
+  + declareVariable(String, Type, Range) void
+  + containsVariable(String) boolean
+   Optional~TypingContext~ parent
+}
+class TypingException {
+  + TypingException(Range, String) 
 }
 class UnexpectedInputException {
-  + UnexpectedInputException(Position, String, String) 
-  + anyOf(Position, Set~T~, String) UnexpectedInputException
-  + anyOfValue(Position, Set~T~, T) UnexpectedInputException
+  + UnexpectedInputException(Range, String, String) 
+  + anyOf(Range, Set~T~, String) UnexpectedInputException
+  + anyOfValue(Range, Set~T~, T) UnexpectedInputException
    String actual
    String expected
 }
@@ -377,61 +569,127 @@ class Variable {
   + Variable(Type) 
   + Variable(Type, Value) 
   + toString() String
-   Optional~Value~ value
    Type type
+   Value value
+}
+class VariableAlreadyDeclaredException {
+  + VariableAlreadyDeclaredException(Range, String) 
 }
 class VariableAlreadyExistsException {
   + VariableAlreadyExistsException(Range, String) 
 }
 
+AndClock  ..>  Clock 
+AndClock "1" *--> "clockA 1" Clock 
 AxialMirroredCursor  -->  DuplicatedCursor 
+AxialMirroredCursor  ..>  Tuple2~A, B~ : «create»
 CentralMirroredCursor  -->  DuplicatedCursor 
-Chromatynk  ..>  ParsingIterator~T~ : «create»
+ChangeCanvasSizeController "1" *--> "codeEditorController 1" CodeEditorController 
+ChangeCanvasSizeController  ..>  InvalidCanvasSizeException : «create»
+Chromatynk  ..>  RangedParsingIterator~T~ : «create»
+Chromatynk  ..>  TypingContext : «create»
+ChromatynkException "1" *--> "range 1" Range 
 CodeEditor  ..>  CodeEditorController : «create»
+CodeEditorController  ..>  AndClock : «create»
+CodeEditorController  ..>  ChangeCanvasSizeController : «create»
+CodeEditorController "1" *--> "timeoutClock 1" Clock 
+CodeEditorController  ..>  ExecutionTimer : «create»
+CodeEditorController "1" *--> "currentExecution 1" ExecutionTimer 
 CodeEditorController  ..>  FileMenuController : «create»
 CodeEditorController "1" *--> "fileMenuController 1" FileMenuController 
+CodeEditorController  ..>  ImageMenuController : «create»
+CodeEditorController "1" *--> "imageMenuController 1" ImageMenuController 
+CodeEditorController  ..>  ParsingIterator~T~ : «create»
+CodeEditorController  ..>  PeriodClock : «create»
+CodeEditorController  ..>  StepByStepClock : «create»
+CodeEditorController "1" *--> "stepByStepClock 1" StepByStepClock 
 CommonParser  ..>  UnexpectedInputException : «create»
+Compiler  ..>  Position : «create»
+Compiler  ..>  Range : «create»
 Cursor  ..>  TangibleCursor : «create»
 CursorAlreadyExistsException  -->  EvalException 
 DuplicatedCursor  ..>  Cursor 
 DuplicatedCursor "1" *--> "duplicated 1" Cursor 
-EvalContext "1" *--> "currentCursorId 1" CursorId 
-EvalContext "1" *--> "scope 1" Scope 
-EvalException "1" *--> "range 1" Range 
+EvalContext "1" *--> "instructions *" Bytecode 
+EvalContext  ..>  CursorAlreadyExistsException : «create»
+EvalContext "1" *--> "selectionHistory *" CursorId 
+EvalContext  ..>  EvalException : «create»
+EvalContext  ..>  InvalidAddressException : «create»
+EvalContext  ..>  MissingCursorException : «create»
+EvalContext  ..>  MissingVariableException : «create»
+EvalContext "1" *--> "scopes *" Scope 
+EvalContext  ..>  Scope : «create»
+EvalContext  ..>  TangibleCursor : «create»
+EvalContext  ..>  TypeMismatchException : «create»
+EvalContext  ..>  VariableAlreadyExistsException : «create»
+EvalException  -->  ChromatynkException 
+ExecutionTimer "1" *--> "clock 1" Clock 
+ExecutionTimer "1" *--> "context 1" EvalContext 
 ExprParser "1" *--> "BOOLEAN_OPS *" TriFunction~I1, I2, I3, R~ 
 ExprParser  ..>  UnexpectedInputException : «create»
+ForeverClock  ..>  Clock 
+Interpreter  ..>  AxialMirroredCursor : «create»
+Interpreter  ..>  CentralMirroredCursor : «create»
+Interpreter  ..>  Color : «create»
+Interpreter  ..>  EvalException : «create»
+Interpreter  ..>  InvalidExpressionException : «create»
+Interpreter  ..>  MissingCursorException : «create»
+Interpreter  ..>  MissingVariableException : «create»
+Interpreter  ..>  TangibleCursor : «create»
+Interpreter  ..>  Tuple2~A, B~ : «create»
+Interpreter  ..>  Tuple3~A, B, C~ : «create»
+Interpreter  ..>  TypeMismatchException : «create»
+Interpreter  ..>  Variable : «create»
+InvalidAddressException  -->  EvalException 
+InvalidExpressionException  -->  EvalException 
 Lexer "1" *--> "LITERAL_BOOL_PARSER 1" Parser~I, O~ 
 Lexer  ..>  UnexpectedInputException : «create»
 MimickedCursor  -->  DuplicatedCursor 
 MissingCursorException  -->  EvalException 
 MissingVariableException  -->  EvalException 
+MissingVariableException  -->  TypingException 
 Parser~I, O~  ..>  Range : «create»
 Parser~I, O~  ..>  Tuple2~A, B~ : «create»
 Parser~I, O~  ..>  UnexpectedInputException : «create»
-ParsingException "1" *--> "position 1" Position 
-ParsingIterator~T~ "1" *--> "position 1" Position 
+ParsingException  -->  ChromatynkException 
 ParsingIterator~T~  ..>  Position : «create»
+ParsingIterator~T~ "1" *--> "position 1" Position 
+PeriodClock  ..>  Clock 
 Program "1" *--> "statements *" Statement 
 Range  ..>  Position : «create»
 Range "1" *--> "from 1" Position 
-Scope "1" *--> "directCursors *" Cursor 
-Scope  ..>  CursorAlreadyExistsException : «create»
-Scope "1" *--> "directCursors *" CursorId 
-Scope  ..>  MissingCursorException : «create»
-Scope  ..>  MissingVariableException : «create»
-Scope  ..>  TypeMismatchException : «create»
-Scope "1" *--> "directVariables *" Variable 
-Scope  ..>  VariableAlreadyExistsException : «create»
+Range  ..>  Tuple2~A, B~ : «create»
+RangedParsingIterator~T~  -->  ParsingIterator~T~ 
+RangedParsingIterator~T~  ..>  Position : «create»
+RangedParsingIterator~T~  ..>  Ranged 
+Scope "1" *--> "cursors *" Cursor 
+Scope "1" *--> "cursors *" CursorId 
+Scope "1" *--> "variables *" Variable 
 StatementParser "1" *--> "THREE_ARG_STATEMENTS *" QuadriFunction~I1, I2, I3, I4, R~ 
 StatementParser "1" *--> "TWO_ARG_STATEMENTS *" TriFunction~I1, I2, I3, R~ 
 StatementParser  ..>  Tuple2~A, B~ : «create»
 StatementParser  ..>  UnexpectedInputException : «create»
+StepByStepClock  ..>  Clock 
 TangibleCursor  ..>  Color : «create»
 TangibleCursor "1" *--> "color 1" Color 
 TangibleCursor  ..>  Cursor 
+TimeoutClock  ..>  Clock 
+Token  -->  PrettyPrintable 
+Token  -->  Ranged 
+Type "1" *--> "defaultValue 1" Value 
 TypeMismatchException  -->  EvalException 
+TypeMismatchException  -->  TypingException 
+Typer  ..>  MissingVariableException : «create»
+Typer  ..>  TypeMismatchException : «create»
+Typer  ..>  TypingContext : «create»
+Typer  ..>  TypingException : «create»
+TypingContext  ..>  MissingVariableException : «create»
+TypingContext "1" *--> "directVariables *" Type 
+TypingContext  ..>  VariableAlreadyDeclaredException : «create»
+TypingException  -->  ChromatynkException 
 UnexpectedInputException  -->  ParsingException 
 Variable "1" *--> "type 1" Type 
 Variable "1" *--> "value 1" Value 
+VariableAlreadyDeclaredException  -->  TypingException 
 VariableAlreadyExistsException  -->  EvalException 
 ```
