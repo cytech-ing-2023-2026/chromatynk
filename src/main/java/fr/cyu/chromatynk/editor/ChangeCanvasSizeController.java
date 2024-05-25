@@ -1,6 +1,7 @@
 package fr.cyu.chromatynk.editor;
 
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
@@ -51,8 +52,11 @@ public class ChangeCanvasSizeController {
 				throw new InvalidCanvasSizeException("Taille trop grande (maximum 1540x720)", width, height);
 			}
 
-			codeEditorController.canvas.setWidth(Double.parseDouble(widthField.getText()));
-			codeEditorController.canvas.setHeight(Double.parseDouble(heightField.getText()));
+			Canvas[] canvasList = { codeEditorController.getCanvas(), codeEditorController.getCursorCanvas() };
+			for (Canvas canvas : canvasList) {
+				canvas.setWidth(width);
+				canvas.setHeight(height);
+			}
 			codeEditorController.clearCanvas();
 
 			stage.close();

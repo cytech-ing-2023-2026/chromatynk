@@ -52,8 +52,10 @@ public class CodeEditorController implements Initializable {
     private CodeArea codeArea;
     @FXML
     private Canvas canvas;
+	public Canvas getCanvas() { return canvas; }
     @FXML
     private Canvas cursorCanvas;
+	public Canvas getCursorCanvas() { return cursorCanvas; }
 
     // Interaction buttons
     @FXML
