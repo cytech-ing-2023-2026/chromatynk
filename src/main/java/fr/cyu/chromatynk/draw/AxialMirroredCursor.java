@@ -53,4 +53,16 @@ public class AxialMirroredCursor extends DuplicatedCursor {
 
         getDuplicated().drawLineAt(graphics, symmetricStart.a(), symmetricStart.b(), symmetricEnd.a(), symmetricEnd.b());
     }
+
+    @Override
+    public void drawAt(GraphicsContext graphics, double x, double y, double dirX, double dirY) {
+        getDuplicated().drawAt(graphics, x, y, dirX, dirY);
+
+        Tuple2<Double, Double> symmetricPos = getSymmetric(x, y);
+        Tuple2<Double, Double> symmetricDir = getSymmetric(dirX, dirY);
+
+        double length = Math.sqrt(symmetricDir.a()*symmetricDir.a() + symmetricDir.b()*symmetricDir.b());
+
+        getDuplicated().drawAt(graphics, symmetricPos.a(), symmetricPos.b(), symmetricDir.a()/length, symmetricDir.b()/length);
+    }
 }

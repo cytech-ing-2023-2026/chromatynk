@@ -3,6 +3,7 @@ package fr.cyu.chromatynk.eval;
 import fr.cyu.chromatynk.draw.Cursor;
 import fr.cyu.chromatynk.draw.CursorId;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -51,7 +52,7 @@ public class Scope {
      * @param name the name of the variable
      * @param variable the declared variable
      */
-    public void declareVariable(String name, Variable variable) throws TypeMismatchException, VariableAlreadyExistsException {
+    public void declareVariable(String name, Variable variable) {
         variables.put(name, variable);
     }
 
@@ -101,6 +102,10 @@ public class Scope {
      */
     public boolean containsCursor(CursorId id) {
         return cursors.containsKey(id);
+    }
+
+    public Collection<Cursor> getCursors() {
+        return cursors.values();
     }
 
     @Override

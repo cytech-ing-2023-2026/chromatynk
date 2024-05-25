@@ -113,6 +113,17 @@ public interface Cursor {
     void drawLineAt(GraphicsContext graphics, double x, double y, double dx, double dy);
 
     /**
+     * Draw this cursor.
+     *
+     * @param graphics the graphics context to draw on
+     * @param x the X coordinate of the rendered cursor
+     * @param y the Y coordinate of the rendered cursor
+     * @param dirX the direction X of the rendered cursor
+     * @param dirY the direction Y of the rendered cursor
+     */
+    void drawAt(GraphicsContext graphics, double x, double y, double dirX, double dirY);
+
+    /**
      * Move this cursor to another position, tracing a line between the starting and ending positions.
      *
      * @param graphics the graphics context to draw on

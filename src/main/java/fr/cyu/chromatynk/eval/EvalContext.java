@@ -9,6 +9,7 @@ import fr.cyu.chromatynk.util.Range;
 import javafx.scene.canvas.GraphicsContext;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * An evaluation context.
@@ -341,6 +342,12 @@ public class EvalContext {
         }
 
         throw new MissingCursorException(getCurrentRange(), id);
+    }
+
+    public void forEachCursor(Consumer<Cursor> consumer) {
+        for(Scope scope : scopes) {
+            for(Cursor cursor : scope.getCursors()) consumer.accept(cursor);
+        }
     }
 
     @Override

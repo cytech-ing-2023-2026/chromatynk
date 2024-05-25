@@ -47,6 +47,8 @@ public class CodeEditorController implements Initializable {
     private CodeArea codeArea;
     @FXML
     private Canvas canvas;
+    @FXML
+    private Canvas cursorCanvas;
 
     // Interaction buttons
     @FXML
@@ -320,9 +322,16 @@ public class CodeEditorController implements Initializable {
 		graphicsContext.setFill(Color.WHITE);
 		graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
+        clearCursorCanvas();
+
 		infoLabel.setText("INFO - Dessin effacé");
 		statusLabel.setText("Le dessin a été manuellement effacé.");
 	}
+
+    private void clearCursorCanvas() {
+        GraphicsContext graphicsContext = cursorCanvas.getGraphicsContext2D();
+        graphicsContext.clearRect(0, 0, cursorCanvas.getWidth(), cursorCanvas.getHeight());
+    }
 
 	/**
      * Closes the application.
@@ -376,6 +385,10 @@ public class CodeEditorController implements Initializable {
      */
     private void onProgress(EvalContext context) {
         stepLabel.setText("Instruction " + context.getNextAddress()+1);
+        clearCursorCanvas();
+        context.forEachCursor(cursor -> {
+            if(cursor.isVisible()) cursor.drawAt(cursorCanvas.getGraphicsContext2D(), cursor.getX(), cursor.getY(), cursor.getDirX(), cursor.getDirY());
+        });
     }
 
 	/**
