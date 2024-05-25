@@ -13,6 +13,7 @@ import fr.cyu.chromatynk.parsing.*;
 import fr.cyu.chromatynk.typing.Typer;
 import fr.cyu.chromatynk.typing.TypingContext;
 import fr.cyu.chromatynk.typing.TypingException;
+import fr.cyu.chromatynk.editor.CodeEditor;
 import javafx.scene.canvas.GraphicsContext;
 
 import java.util.List;

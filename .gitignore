@@ -8,3 +8,6 @@ target
 
 # Crash reports
 hs_err_pid*.log
+
+# Package
+dependency-reduced-pom.xml
