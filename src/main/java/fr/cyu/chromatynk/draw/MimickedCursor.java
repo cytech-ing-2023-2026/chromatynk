@@ -29,6 +29,12 @@ public class MimickedCursor extends DuplicatedCursor {
         getDuplicated().drawLineAt(graphics, x+translateX, y+translateY, translateX+dx, translateY+dy);
     }
 
+    @Override
+    public void drawAt(GraphicsContext graphics, double x, double y, double dirX, double dirY) {
+        getDuplicated().drawAt(graphics, x, y, dirX, dirY);
+        getDuplicated().drawAt(graphics, x+translateX, y+translateY, dirX, dirY);
+    }
+
     /**
      * Mimic a cursor at the given absolute position.
      *

@@ -98,7 +98,10 @@
 
 							<BorderPane VBox.vgrow="ALWAYS">
 								<center>
-									<Canvas fx:id="canvas" width="400" height="400"/>
+									<StackPane>
+										<Canvas fx:id="canvas" width="400" height="400"/>
+										<Canvas fx:id="cursorCanvas" width="400" height="400"/>
+									</StackPane>
 								</center>
 							</BorderPane>
 							
