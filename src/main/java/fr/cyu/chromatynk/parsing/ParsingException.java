@@ -15,7 +15,7 @@ public sealed class ParsingException extends ChromatynkException {
      * @param message the error message
      */
     private ParsingException(Range range, String message) {
-        super(range, "Parsing error.\n" + message);
+        super(range, message, "Parsing error.");
     }
 
     /**

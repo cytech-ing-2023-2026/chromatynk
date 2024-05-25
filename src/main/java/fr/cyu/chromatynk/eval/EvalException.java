@@ -15,7 +15,7 @@ public class EvalException extends ChromatynkException {
      * @param message the error message
      */
     public EvalException(Range range, String message) {
-        super(range, "Evaluation error.\n" + message);
+        super(range, message, "Evaluation error.");
     }
 
 }
