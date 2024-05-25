@@ -55,8 +55,14 @@ public class ChromatynkException extends Exception {
                     .append(line)
                     .append('\n');
 
-            for (int i = 0; i < line.length(); i++) {
-                result.append(i >= range.from().column() && i < range.to().column() ? '^' : ' ');
+            int fromCol = range.from().column();
+            int toCol = range.to().column();
+            boolean samePos = fromCol == toCol;
+
+            int length = Math.max(line.length(), toCol+1);
+
+            for (int i = 0; i < length; i++) {
+                result.append(i >= fromCol && (i < toCol || (i == fromCol && samePos)) ? '^' : ' ');
             }
 
             result.append('\n').append('\n');
