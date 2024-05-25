@@ -23,7 +23,7 @@ public record Range(Position from, Position to) {
     /**
      * Check if the range is on a single line.
      *
-     * @return `true` if the starting and ending row is the same
+     * @return {@code true} if the starting and ending row is the same
      */
     public boolean isSameLine() {
         return from.row() == to.row();
@@ -80,7 +80,7 @@ public record Range(Position from, Position to) {
      * @param from the starting column
      * @param to the ending column
      * @param row the row
-     * @return a new {@link Range} starting from (`from`, `row`) to (`to`, `row`)
+     * @return a new {@link Range} starting from ({@code from`, `row`) to (`to`, `row})
      */
     public static Range sameLine(int from, int to, int row) {
         return new Range(new Position(from, row), new Position(to, row));
@@ -91,7 +91,7 @@ public record Range(Position from, Position to) {
      *
      * @param from the starting column
      * @param to the ending column
-     * @return a new {@link Range} starting from (`from`, `row`) to (`to`, `row`)
+     * @return a new {@link Range} starting from ({@code from`, `row`) to (`to`, `row})
      */
     public static Range sameLine(int from, int to) {
         return sameLine(from, to, 0);

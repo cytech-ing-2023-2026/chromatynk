@@ -171,7 +171,7 @@ public class StatementParser {
     }
 
     /**
-     * Body `-> ...` parser.
+     * Body {@code -> ...} parser.
      */
     public static Parser<Token, Statement.Body> oneLineBody() {
         return tokenOf(Token.Arrow.class)
@@ -180,7 +180,7 @@ public class StatementParser {
     }
 
     /**
-     * Body `{...}` parser.
+     * Body {@code {...}} parser.
      */
     public static Parser<Token, Statement.Body> multiLineBody() {
         return tokenOf(Token.BraceOpen.class, "{")

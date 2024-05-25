@@ -6,7 +6,7 @@ package fr.cyu.chromatynk.parsing;
 public class CommonParser {
 
     /**
-     * Accept any token. Alias for `Parser.<Token>any()`.
+     * Accept any token. Alias for {@code Parser.<Token>any()}.
      */
     public static Parser<Token, Token> anyToken() {
         return Parser.any();
@@ -24,7 +24,7 @@ public class CommonParser {
     }
 
     /**
-     * Alias for `tokenOf(allowedType, allowedType.getSimpleName())`
+     * Alias for {@code tokenOf(allowedType, allowedType.getSimpleName())}
      */
     public static <T extends Token> Parser<Token, T> tokenOf(Class<T> allowedType) {
         return tokenOf(allowedType, allowedType.getSimpleName());

@@ -51,14 +51,14 @@ public sealed interface Token extends Ranged, PrettyPrintable {
     record LiteralColor(Range range, String hex) implements Token {}
 
     /**
-     * An open parenthesis `(` symbol.
+     * An open parenthesis {@code (} symbol.
      *
      * @param range the starting and ending position of this token
      */
     record ParenthesisOpen(Range range) implements Token {}
 
     /**
-     * A closed parenthesis `)` symbol.
+     * A closed parenthesis {@code )} symbol.
      *
      * @param range the starting and ending position of this token
      */
@@ -93,7 +93,7 @@ public sealed interface Token extends Ranged, PrettyPrintable {
     record Comma(Range range) implements Token {}
 
     /**
-     * An equal `=` symbol.
+     * An equal {@code =} symbol.
      *
      * @param range the starting and ending position of this token
      */
@@ -208,175 +208,175 @@ public sealed interface Token extends Ranged, PrettyPrintable {
     sealed interface Keyword extends Token {}
 
     /**
-     * A `MOD` keyword.
+     * A {@code MOD} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Mod(Range range) implements Keyword, Operator {}
 
     /**
-     * A `FWD` keyword.
+     * A {@code FWD} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Fwd(Range range) implements Keyword {}
 
     /**
-     * A `BWD` keyword.
+     * A {@code BWD} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Bwd(Range range) implements Keyword {}
 
     /**
-     * A `TURN` keyword.
+     * A {@code TURN} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Turn(Range range) implements Keyword {}
 
     /**
-     * A `MOV` keyword.
+     * A {@code MOV} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Mov(Range range) implements Keyword {}
 
     /**
-     * A `POS` keyword.
+     * A {@code POS} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Pos(Range range) implements Keyword {}
 
     /**
-     * A `HIDE` keyword.
+     * A {@code HIDE} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Hide(Range range) implements Keyword {}
 
     /**
-     * A `SHOW` keyword.
+     * A {@code SHOW} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Show(Range range) implements Keyword {}
 
     /**
-     * A `PRESS` keyword.
+     * A {@code PRESS} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Press(Range range) implements Keyword {}
 
     /**
-     * A `COLOR` keyword.
+     * A {@code COLOR} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Color(Range range) implements Keyword {}
 
     /**
-     * A `THICK` keyword.
+     * A {@code THICK} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Thick(Range range) implements Keyword {}
 
     /**
-     * A `LOOKAT` keyword.
+     * A {@code LOOKAT} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record LookAt(Range range) implements Keyword {}
 
     /**
-     * A `CURSOR` keyword.
+     * A {@code CURSOR} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Cursor(Range range) implements Keyword {}
 
     /**
-     * A `SELECT` keyword.
+     * A {@code SELECT} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Select(Range range) implements Keyword {}
 
     /**
-     * A `REMOVE` keyword.
+     * A {@code REMOVE} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Remove(Range range) implements Keyword {}
 
     /**
-     * A `IF` keyword.
+     * A {@code IF} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record If(Range range) implements Keyword {}
 
     /**
-     * A `ELSE` keyword.
+     * A {@code ELSE} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Else(Range range) implements Keyword {}
 
     /**
-     * A `FOR` keyword.
+     * A {@code FOR} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record For(Range range) implements Keyword {}
 
     /**
-     * A `FROM` keyword.
+     * A {@code FROM} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record From(Range range) implements Keyword {}
 
     /**
-     * A `TO` keyword.
+     * A {@code TO} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record To(Range range) implements Keyword {}
 
     /**
-     * A `STEP` keyword.
+     * A {@code STEP} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Step(Range range) implements Keyword {}
 
     /**
-     * A `WHILE` keyword.
+     * A {@code WHILE} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record While(Range range) implements Keyword {}
 
     /**
-     * A `MIMIC` keyword.
+     * A {@code MIMIC} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Mimic(Range range) implements Keyword {}
 
     /**
-     * A `MIRROR` keyword.
+     * A {@code MIRROR} keyword.
      *
      * @param range the starting and ending position of this token
      */
     record Mirror(Range range) implements Keyword {}
 
     /**
-     * A `DEL` keyword.
+     * A {@code DEL} keyword.
      *
      * @param range the starting and ending position of this token
      */

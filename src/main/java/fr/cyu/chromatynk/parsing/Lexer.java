@@ -17,7 +17,7 @@ public class Lexer {
     //Literals
 
     /**
-     * Parser for boolean literals (`true` or `false`).
+     * Parser for boolean literals ({@code true` or `false}).
      */
     public static final Parser<Character, LiteralBool> LITERAL_BOOL_PARSER = firstSucceeding(keyword("true"), keyword("false"))
             .map(Boolean::parseBoolean)
@@ -25,7 +25,7 @@ public class Lexer {
             .mapError(e -> new UnexpectedInputException(e.getRange(), "true or false", "Invalid boolean"));
 
     /**
-     * Parser for String literals (e.g `"Hello World"`).
+     * Parser for String literals (e.g {@code "Hello World"}).
      */
     public static final Parser<Character, LiteralString> LITERAL_STRING_PARSER = matching("\"[^\"]*\"")
             .mapWithRange((r, value) -> new LiteralString(r, value.substring(1, value.length() - 1)))
@@ -134,7 +134,7 @@ public class Lexer {
 
     /**
      * Parser for any identifier. An identifier is alphanumeric and must start with an alphabetic character.
-     * It can also contain or/and start with underscores like `_abc` or `abc_def`.
+     * It can also contain or/and start with underscores like {@code _abc` or `abc_def}.
      */
     public static final Parser<Character, Identifier> IDENTIFIER_PARSER = matching("([A-Za-z]|_)([A-Za-z0-9]|_)*")
             .mapWithRange(Identifier::new)

@@ -197,7 +197,7 @@ public class ExprParser {
     }
 
     /**
-     * And/Or parser (`Not` is a prefix operator). Lowest precedence.
+     * And/Or parser ({@code Not} is a prefix operator). Lowest precedence.
      */
     public static Parser<Token, Expr> booleanOperator() {
         return binaryOperatorParser(comparisonOperator(), "Boolean", BOOLEAN_OPS);

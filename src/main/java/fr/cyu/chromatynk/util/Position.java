@@ -35,7 +35,7 @@ public record Position(int column, int row) {
      *
      * @param a the first position to compare
      * @param b the second position to compare
-     * @return `a` if `a` is smaller, `b` otherwise
+     * @return {@code a` if `a` is smaller, `b} otherwise
      */
     public static Position min(Position a, Position b) {
         return a.isBefore(b) ? a : b;
@@ -46,7 +46,7 @@ public record Position(int column, int row) {
      *
      * @param a the first position to compare
      * @param b the second position to compare
-     * @return `a` if `a` is greater, `b` otherwise
+     * @return {@code a` if `a` is greater, `b} otherwise
      */
     public static Position max(Position a, Position b) {
         return a.isBefore(b) ? b : a;

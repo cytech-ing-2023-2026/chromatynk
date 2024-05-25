@@ -45,7 +45,7 @@ public final class UnexpectedInputException extends ParsingException.NonFatal {
     }
 
     /**
-     * Create an {@link UnexpectedInputException} instance from a {@link Set} of expected elements of type `T`.
+     * Create an {@link UnexpectedInputException} instance from a {@link Set} of expected elements of type {@code T}.
      *
      * @param position the position where the error occurred
      * @param expected the expected values
@@ -63,7 +63,7 @@ public final class UnexpectedInputException extends ParsingException.NonFatal {
     }
 
     /**
-     * Create an {@link UnexpectedInputException} instance from a {@link Set} of expected elements of type `T`.
+     * Create an {@link UnexpectedInputException} instance from a {@link Set} of expected elements of type {@code T}.
      *
      * @param position the position where the error occurred
      * @param expected the expected values

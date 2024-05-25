@@ -147,7 +147,7 @@ public sealed interface Expr {
     record And(Range range, Expr left, Expr right) implements Expr {}
 
     /**
-     * A comparison `left == right`.
+     * A comparison {@code left == right}.
      *
      * @param range the starting and ending {@link Position} of this expression
      * @param left  the left member of the comparison
@@ -156,7 +156,7 @@ public sealed interface Expr {
     record Equal(Range range, Expr left, Expr right) implements Expr {}
 
     /**
-     * A comparison `left != right`.
+     * A comparison {@code left != right}.
      *
      * @param range the starting and ending {@link Position} of this expression
      * @param left  the left member of the comparison
@@ -165,7 +165,7 @@ public sealed interface Expr {
     record NotEqual(Range range, Expr left, Expr right) implements Expr {}
 
     /**
-     * A comparison `left > right`.
+     * A comparison {@code left > right}.
      *
      * @param range the starting and ending {@link Position} of this expression
      * @param left  the left member of the comparison
@@ -174,7 +174,7 @@ public sealed interface Expr {
     record Greater(Range range, Expr left, Expr right) implements Expr {}
 
     /**
-     * A comparison `left < right`.
+     * A comparison {@code left < right}.
      *
      * @param range the starting and ending {@link Position} of this expression
      * @param left  the left member of the comparison
@@ -183,7 +183,7 @@ public sealed interface Expr {
     record Less(Range range, Expr left, Expr right) implements Expr {}
 
     /**
-     * A comparison `left >= right`.
+     * A comparison {@code left >= right}.
      *
      * @param range the starting and ending {@link Position} of this expression
      * @param left  the left member of the comparison
@@ -192,7 +192,7 @@ public sealed interface Expr {
     record GreaterEqual(Range range, Expr left, Expr right) implements Expr {}
 
     /**
-     * A comparison `left <= right`.
+     * A comparison {@code left <= right}.
      *
      * @param range the starting and ending {@link Position} of this expression
      * @param left  the left member of the comparison

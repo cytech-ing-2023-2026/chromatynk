@@ -1,0 +1,10 @@
+module:fr.cyu
+fr.cyu.chromatynk
+fr.cyu.chromatynk.ast
+fr.cyu.chromatynk.bytecode
+fr.cyu.chromatynk.draw
+fr.cyu.chromatynk.editor
+fr.cyu.chromatynk.eval
+fr.cyu.chromatynk.parsing
+fr.cyu.chromatynk.typing
+fr.cyu.chromatynk.util

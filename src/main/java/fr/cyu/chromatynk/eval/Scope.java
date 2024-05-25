@@ -88,7 +88,7 @@ public class Scope {
      * Check if a variable exists.
      *
      * @param name the name to check for
-     * @return `true` if a variable with the given name is found
+     * @return {@code true} if a variable with the given name is found
      */
     public boolean containsVariable(String name) {
         return variables.containsKey(name);
@@ -98,7 +98,7 @@ public class Scope {
      * Check if a cursor exists.
      *
      * @param id the id to check for
-     * @return `true` if a cursor with the given id is found
+     * @return {@code true} if a cursor with the given id is found
      */
     public boolean containsCursor(CursorId id) {
         return cursors.containsKey(id);

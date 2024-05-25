@@ -79,8 +79,8 @@ public class ImageMenuController {
 	 * Lazy method to check if a canvas is blank. However, it should work no matter what at least.
 	 * 
 	 * @param writableImage the image to check
-	 * @return `true` if the image is blank
-	 * @return `false` if the image is not blank
+	 * @return {@code true} if the image is blank
+	 * @return {@code false} if the image is not blank
 	 */
 	private boolean isImageBlank(WritableImage writableImage) {
 		PixelReader pixelReader = writableImage.getPixelReader();

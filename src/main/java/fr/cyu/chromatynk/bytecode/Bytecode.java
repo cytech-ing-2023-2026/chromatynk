@@ -20,7 +20,7 @@ public sealed interface Bytecode {
     /**
      * Check if this instruction is effectful.
      *
-     * @return `true` if this instruction produces an effect.
+     * @return {@code true} if this instruction produces an effect.
      */
     default boolean isEffectful() {
         return this instanceof Effectful;
@@ -82,10 +82,10 @@ public sealed interface Bytecode {
     record GoTo(Range range, int address) implements Bytecode {}
 
     /**
-     * Pop a value from the stack then jump to an address if the popped value is `false`.
+     * Pop a value from the stack then jump to an address if the popped value is {@code false}.
      *
      * @param range the starting and ending {@link Position} of this instruction
-     * @param addressFalse the address to jump to if the popped value is `false`
+     * @param addressFalse the address to jump to if the popped value is {@code false}
      */
     record GoToIfFalse(Range range, int addressFalse) implements Bytecode {}
 
@@ -183,42 +183,42 @@ public sealed interface Bytecode {
     record And(Range range) implements Bytecode {}
 
     /**
-     * Pop two values from the stack then push `true` if the popped values are equal, `false` otherwise.
+     * Pop two values from the stack then push {@code true` if the popped values are equal, `false} otherwise.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
     record Equal(Range range) implements Bytecode {}
 
     /**
-     * Pop two values from the stack then push `true` if the popped values are not equal, `false` otherwise.
+     * Pop two values from the stack then push {@code true` if the popped values are not equal, `false} otherwise.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
     record NotEqual(Range range) implements Bytecode {}
 
     /**
-     * Pop two values from the stack then push `true` if the first popped value is greater than the second, `false` otherwise.
+     * Pop two values from the stack then push {@code true` if the first popped value is greater than the second, `false} otherwise.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
     record Greater(Range range) implements Bytecode {}
 
     /**
-     * Pop two values from the stack then push `true` if the first popped value is less than the second, `false` otherwise.
+     * Pop two values from the stack then push {@code true` if the first popped value is less than the second, `false} otherwise.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
     record Less(Range range) implements Bytecode {}
 
     /**
-     * Pop two values from the stack then push `true` if the first popped value is greater or equal to the second, `false` otherwise.
+     * Pop two values from the stack then push {@code true` if the first popped value is greater or equal to the second, `false} otherwise.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */
     record GreaterEqual(Range range) implements Bytecode {}
 
     /**
-     * Pop two values from the stack then push `true` if the first popped value is less or equal to the second, `false` otherwise.
+     * Pop two values from the stack then push {@code true` if the first popped value is less or equal to the second, `false} otherwise.
      *
      * @param range the starting and ending {@link Position} of this instruction
      */

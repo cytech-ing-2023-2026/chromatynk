@@ -33,7 +33,7 @@ public interface Parser<I, O> {
      *
      * @param f the function to apply
      * @return a new parser equivalent to this one with f applied to the output
-     * @param <T> the output type of `f`
+     * @param <T> the output type of {@code f}
      */
     default <T> Parser<I, T> mapWithRange(ParsingBiFunction<Range, O, T> f) {
         return iterator -> {
@@ -47,7 +47,7 @@ public interface Parser<I, O> {
      *
      * @param f the function to apply
      * @return a new parser equivalent to this one with f applied to the output
-     * @param <T> the output type of `f`
+     * @param <T> the output type of {@code f}
      */
     default <T> Parser<I, T> map(ParsingFunction<O, T> f) {
         return this.mapWithRange((r, o) -> f.apply(o));
@@ -57,7 +57,7 @@ public interface Parser<I, O> {
      * Map non-fatal errors thrown by this parser if any.
      *
      * @param f the function to apply to the eventually thrown error
-     * @return a new parser similar to this one but with `f` applied to any error thrown by it
+     * @return a new parser similar to this one but with {@code f} applied to any error thrown by it
      */
     default Parser<I, O> mapError(Function<ParsingException, ? extends ParsingException> f) {
         return iterator -> {
@@ -82,8 +82,8 @@ public interface Parser<I, O> {
      * Create a value from the parsed range if this parser succeeds.
      *
      * @param f the function to apply on the range
-     * @return a new parser equivalent to this one but with the result of `f` as output
-     * @param <T> the output type of `f`
+     * @return a new parser equivalent to this one but with the result of {@code f} as output
+     * @param <T> the output type of {@code f}
      */
     default <T> Parser<I, T> valueWithRange(ParsingFunction<Range, T> f) {
         return mapWithRange((r, v) -> f.apply(r));
@@ -92,7 +92,7 @@ public interface Parser<I, O> {
     /**
      * Make this parser optional.
      *
-     * @return the same parser wrapping the result in a `Optional` and recovering with `Optional.empty()` in case of failure
+     * @return the same parser wrapping the result in a {@code Optional` and recovering with `Optional.empty()} in case of failure
      */
     default Parser<I, Optional<O>> optional() {
         return iterator -> {
@@ -152,7 +152,7 @@ public interface Parser<I, O> {
      * Repeat this parser until the given one succeeds.
      *
      * @param parser the parser signaling the end of the repetition
-     * @return a parser parsing zero or multiple outputs of this parser until it fails or `parser` succeeds
+     * @return a parser parsing zero or multiple outputs of this parser until it fails or {@code parser} succeeds
      */
     default Parser<I, List<O>> repeatUntil(Parser<I, ?> parser) {
         Parser<I, ?> stopIfEnd = parser
@@ -188,8 +188,8 @@ public interface Parser<I, O> {
      * Right-zip a parser to this one.
      *
      * @param next the parser to zip to this one
-     * @return a new parser using this one then `next`, zipping the results in a tuple.
-     * @param <O2> the output type of `next`
+     * @return a new parser using this one then {@code next}, zipping the results in a tuple.
+     * @param <O2> the output type of {@code next}
      */
     default <O2> Parser<I, Tuple2<O, O2>> zip(Parser<I, O2> next) {
         return iterator -> {
@@ -289,7 +289,7 @@ public interface Parser<I, O> {
      * Parse any of the given values.
      *
      * @param expected the allowed tokens
-     * @return the parsed token if it is contained in `expected`
+     * @return the parsed token if it is contained in {@code expected}
      * @param <T> the token type
      */
     static <T> Parser<T, T> anyOfSet(Set<T> expected) {
@@ -308,7 +308,7 @@ public interface Parser<I, O> {
      * Parse any of the given values.
      *
      * @param expected the allowed tokens
-     * @return the parsed token if it is contained in `expected`
+     * @return the parsed token if it is contained in {@code expected}
      * @param <T> the token type
      */
     @SafeVarargs
@@ -346,7 +346,7 @@ public interface Parser<I, O> {
                     iterator.setCursor(parserIterator.getCursor());
                     iterator.setPosition(parserIterator.getPosition());
 
-                    //Cast safe since Parser is supposed to be covariant in `O`.
+                    //Cast safe since Parser is supposed to be covariant in {@code O}.
                     return (Result<O>) result;
                 } catch (ParsingException.NonFatal ignored) {}
             }

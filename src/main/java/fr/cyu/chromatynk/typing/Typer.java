@@ -409,7 +409,7 @@ public class Typer {
                                 - INT (0-255), INT (0-255), INT (0-255)
                                 - NUM (0-1), NUM (0-1), NUM (0-1).
                                 - 0-100%, 0-100%, 0-100%
-                                Note: INT can implicitly be converted to NUM so that `COLOR 1.0, 1, 0` works (yellow).""";
+                                Note: INT can implicitly be converted to NUM so that {@code COLOR 1.0, 1, 0} works (yellow).""";
 
                     throw new TypingException(range, message + "\n\nGot: " + actualTypes);
                 }

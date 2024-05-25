@@ -43,7 +43,7 @@ public sealed interface Statement {
     record Backward(Range range, Expr distance) implements Statement {}
 
     /**
-     * A for loop, repeating while the iterator is less than `to`.
+     * A for loop, repeating while the iterator is less than {@code to}.
      *
      * <pre>
      *     FOR iterator FROM from TO to STEP step {
@@ -196,7 +196,7 @@ public sealed interface Statement {
      * </pre>
      *
      * @param range the starting and ending {@link Position} of this statement
-     * @param condition the condition used to choose between `ifTrue` or `ifFalse`
+     * @param condition the condition used to choose between {@code ifTrue` or `ifFalse}
      * @param ifTrue the body to execute if the condition is true
      * @param ifFalse the optional body to execute if the condition is false aka the "else" body
      */

@@ -41,7 +41,7 @@ public class MimickedCursor extends DuplicatedCursor {
      * @param mimicked the mimicked cursor
      * @param x the X position of the mimic
      * @param y the Y position of the mimic
-     * @return a new {@link MimickedCursor} with `mimicked` as the cursor being mimicked
+     * @return a new {@link MimickedCursor} with {@code mimicked} as the cursor being mimicked
      */
     public static MimickedCursor at(Cursor mimicked, double x, double y) {
         return new MimickedCursor(mimicked, x - mimicked.getX(), y - mimicked.getY());

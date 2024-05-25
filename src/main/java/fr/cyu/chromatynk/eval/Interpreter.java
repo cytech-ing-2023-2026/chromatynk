@@ -653,7 +653,7 @@ public class Interpreter {
                                 - INT (0-255), INT (0-255), INT (0-255)
                                 - NUM (0-1), NUM (0-1), NUM (0-1).
                                 - 0-100%, 0-100%, 0-100%
-                                Note: INT can implicitly be converted to NUM so that `COLOR 1.0, 1, 0` works (yellow).""";
+                                Note: INT can implicitly be converted to NUM so that {@code COLOR 1.0, 1, 0} works (yellow).""";
 
                         throw new EvalException(range, message + "\n\nGot: " + actualTypes);
                     }
@@ -675,7 +675,7 @@ public class Interpreter {
                         .getCursor(targetId)
                         .orElseThrow(() -> new MissingCursorException(range, targetId));
 
-                //Translation vector from `current` to `target`
+                //Translation vector from {@code current` to `target}
                 double dx = target.getX()-current.getX();
                 double dy = target.getY()-current.getY();
 
@@ -692,7 +692,7 @@ public class Interpreter {
                 double targetY = asNumericOrPercentage(range, context.popValue(), context.getHeight());
                 double targetX = asNumericOrPercentage(range, context.popValue(), context.getWidth());
 
-                //Translation vector from `current` to (targetX, targetY)
+                //Translation vector from {@code current} to (targetX, targetY)
                 double dx = targetX-current.getX();
                 double dy = targetY-current.getY();
 
