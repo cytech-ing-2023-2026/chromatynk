@@ -11,15 +11,20 @@ import fr.cyu.chromatynk.parsing.Token;
 import fr.cyu.chromatynk.util.Tuple2;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -47,8 +52,10 @@ public class CodeEditorController implements Initializable {
     private CodeArea codeArea;
     @FXML
     private Canvas canvas;
+	public Canvas getCanvas() { return canvas; }
     @FXML
     private Canvas cursorCanvas;
+	public Canvas getCursorCanvas() { return cursorCanvas; }
 
     // Interaction buttons
     @FXML
@@ -176,8 +183,10 @@ public class CodeEditorController implements Initializable {
             }
         });
 
-        // Set background color of the canvas
-        clearCanvas();
+		// Set background color of the canvas (without using the function to prevent setting the status text)
+		GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+		graphicsContext.setFill(Color.WHITE);
+		graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         // Makes the bottom bar's background slightly darker
         bottomBar.setStyle("-fx-background-color: rgba(0, 0, 0, 0.07);");
@@ -332,6 +341,31 @@ public class CodeEditorController implements Initializable {
         GraphicsContext graphicsContext = cursorCanvas.getGraphicsContext2D();
         graphicsContext.clearRect(0, 0, cursorCanvas.getWidth(), cursorCanvas.getHeight());
     }
+
+	@FXML
+	private void modifyCanvas(ActionEvent event) {
+		try {
+			// Prepare and load the FXML file
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/ChangeCanvasSizeWindow.fxml"));
+
+			Stage stage = new Stage();
+			fxmlLoader.setController(new ChangeCanvasSizeController(this, stage));
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.setTitle("Changer la taille du canvas");
+			stage.setScene(new Scene(fxmlLoader.load()));
+			stage.setResizable(false);
+			stage.setMinWidth(200);
+			stage.setMinHeight(100);
+
+			// Add icon
+			Image icon = new Image(getClass().getResourceAsStream("/icon.png"));
+			stage.getIcons().add(icon);
+
+			stage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
      * Closes the application.

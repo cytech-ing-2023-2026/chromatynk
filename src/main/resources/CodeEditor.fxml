@@ -26,6 +26,9 @@
 					<Menu text="Image">
 						<items>
 							<MenuItem text="Enregistrer sous" onAction="#saveImage"/>
+							<SeparatorMenuItem/>
+							<MenuItem text="Changer la taille du canvas" onAction="#modifyCanvas"/>
+							<MenuItem text="Effacer" onAction="#clearCanvas"/>
 						</items>
 					</Menu>
 					<Menu text="Exécution" fx:id="executionMenu">
