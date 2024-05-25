@@ -1,0 +1,6 @@
+POS 50%, 50%
+FOR i FROM 0 TO 200 {
+  COLOR i MOD 255, (i * i) MOD 255, (i * i * i) MOD 255
+  FWD i
+  TURN i
+}
