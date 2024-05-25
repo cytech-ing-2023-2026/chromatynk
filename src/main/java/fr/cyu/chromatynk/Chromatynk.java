@@ -19,13 +19,6 @@ import javafx.scene.canvas.GraphicsContext;
 import java.util.List;
 
 public class Chromatynk {
-	/**
-	 * Workaround necessary to launch the JavaFX application from a .jar
-	 * @param args
-	 */
-	public static void main(final String[] args) {
-		CodeEditor.launch(CodeEditor.class, args);
-	}
 
     /**
      * Parse a sequence of token from the given source.
