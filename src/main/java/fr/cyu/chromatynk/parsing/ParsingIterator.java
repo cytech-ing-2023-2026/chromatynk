@@ -84,6 +84,14 @@ public class ParsingIterator<T> implements Iterator<T> {
         this.position = position;
     }
 
+    public Predicate<T> getWhitespacePredicate() {
+        return whitespace;
+    }
+
+    public Predicate<T> getLineSeparatorPredicate() {
+        return lineSeparator;
+    }
+
     /**
      * Get this {@link ParsingIterator}'s input.
      *

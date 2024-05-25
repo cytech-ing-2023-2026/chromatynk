@@ -8,6 +8,7 @@ import fr.cyu.chromatynk.util.Range;
 public class ChromatynkException extends Exception {
 
     private final Range range;
+    private final String header;
 
     /**
      * Create a new Chromat'ynk exception.
@@ -15,9 +16,10 @@ public class ChromatynkException extends Exception {
      * @param range the range where the error occurred
      * @param message the error message
      */
-    public ChromatynkException(Range range, String message) {
+    public ChromatynkException(Range range, String message, String header) {
         super(message);
         this.range = range;
+        this.header = header;
     }
 
     /**
@@ -28,13 +30,23 @@ public class ChromatynkException extends Exception {
     }
 
     /**
+     * Get full message's header of this error.
+     */
+    public String getHeader() {
+        return header;
+    }
+
+    /**
      * Get pretty-printed representation of this exception.
      *
      * @param sourceCode the source code to extract information from
      * @return a pretty-formatted String representation of this exception
      */
     public String getFullMessage(String sourceCode) {
-        StringBuilder result = new StringBuilder(getMessage()).append('\n');
+        StringBuilder result = new StringBuilder(getHeader())
+                .append('\n')
+                .append(getMessage())
+                .append('\n');
 
         if (range.isSameLine()) {
             String line = range.subLines(sourceCode);
@@ -43,8 +55,14 @@ public class ChromatynkException extends Exception {
                     .append(line)
                     .append('\n');
 
-            for (int i = 0; i < line.length(); i++) {
-                result.append(i >= range.from().column() && i < range.to().column() ? '^' : ' ');
+            int fromCol = range.from().column();
+            int toCol = range.to().column();
+            boolean samePos = fromCol == toCol;
+
+            int length = Math.max(line.length(), toCol+1);
+
+            for (int i = 0; i < length; i++) {
+                result.append(i >= fromCol && (i < toCol || (i == fromCol && samePos)) ? '^' : ' ');
             }
 
             result.append('\n').append('\n');

@@ -40,7 +40,7 @@ public class Chromatynk {
     public static Program parseSource(String source) throws ParsingException {
         return StatementParser
                 .program()
-                .parse(new ParsingIterator<>(lexSource(source)))
+                .parse(new RangedParsingIterator<>(lexSource(source)))
                 .value();
     }
 
