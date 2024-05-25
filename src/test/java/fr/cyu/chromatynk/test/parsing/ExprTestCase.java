@@ -1,10 +1,7 @@
 package fr.cyu.chromatynk.test.parsing;
 
 import fr.cyu.chromatynk.ast.Expr;
-import fr.cyu.chromatynk.parsing.ExprParser;
-import fr.cyu.chromatynk.parsing.ParsingIterator;
-import fr.cyu.chromatynk.parsing.Token;
-import fr.cyu.chromatynk.parsing.UnexpectedInputException;
+import fr.cyu.chromatynk.parsing.*;
 import fr.cyu.chromatynk.util.Range;
 import org.junit.jupiter.api.Test;
 
@@ -18,37 +15,37 @@ public class ExprTestCase {
         assertParse(
                 new Expr.LiteralBool(Range.sameLine(0, 4), true),
                 ExprParser.literal(),
-                ParsingIterator.of(new Token.LiteralBool(Range.sameLine(0, 4), true))
+                RangedParsingIterator.ofRanged(new Token.LiteralBool(Range.sameLine(0, 4), true))
         );
 
         assertParse(
                 new Expr.LiteralString(Range.sameLine(0, 5), "abc"),
                 ExprParser.literal(),
-                ParsingIterator.of(new Token.LiteralString(Range.sameLine(0, 5), "abc"))
+                RangedParsingIterator.ofRanged(new Token.LiteralString(Range.sameLine(0, 5), "abc"))
         );
 
         assertParse(
                 new Expr.LiteralInt(Range.sameLine(0, 1), 5),
                 ExprParser.literal(),
-                ParsingIterator.of(new Token.LiteralInt(Range.sameLine(0, 1), 5))
+                RangedParsingIterator.ofRanged(new Token.LiteralInt(Range.sameLine(0, 1), 5))
         );
 
         assertParse(
                 new Expr.LiteralFloat(Range.sameLine(0, 3), 2.5),
                 ExprParser.literal(),
-                ParsingIterator.of(new Token.LiteralFloat(Range.sameLine(0, 3), 2.5))
+                RangedParsingIterator.ofRanged(new Token.LiteralFloat(Range.sameLine(0, 3), 2.5))
         );
 
         assertParse(
                 new Expr.LiteralColor(Range.sameLine(0, 5), 1, 0, 0, 1),
                 ExprParser.literal(),
-                ParsingIterator.of(new Token.LiteralColor(Range.sameLine(0, 5), "#F00F"))
+                RangedParsingIterator.ofRanged(new Token.LiteralColor(Range.sameLine(0, 5), "#F00F"))
         );
 
         assertParse(
                 new Expr.LiteralColor(Range.sameLine(0, 5), 1, 0, 0, 1),
                 ExprParser.literal(),
-                ParsingIterator.of(new Token.LiteralColor(Range.sameLine(0, 5), "#FF0000"))
+                RangedParsingIterator.ofRanged(new Token.LiteralColor(Range.sameLine(0, 5), "#FF0000"))
         );
     }
 
@@ -57,19 +54,19 @@ public class ExprTestCase {
         assertParse(
                 new Expr.LiteralInt(Range.sameLine(1, 2), 5),
                 ExprParser.prefixOperator(),
-                ParsingIterator.of(new Token.Plus(Range.sameLine(0, 1)), new Token.LiteralInt(Range.sameLine(1, 2), 5))
+                RangedParsingIterator.ofRanged(new Token.Plus(Range.sameLine(0, 1)), new Token.LiteralInt(Range.sameLine(1, 2), 5))
         );
 
         assertParse(
                 new Expr.Negation(Range.sameLine(0, 2), new Expr.LiteralInt(Range.sameLine(1, 2), 5)),
                 ExprParser.prefixOperator(),
-                ParsingIterator.of(new Token.Minus(Range.sameLine(0, 1)), new Token.LiteralInt(Range.sameLine(1, 2), 5))
+                RangedParsingIterator.ofRanged(new Token.Minus(Range.sameLine(0, 1)), new Token.LiteralInt(Range.sameLine(1, 2), 5))
         );
 
         assertParse(
                 new Expr.Not(Range.sameLine(0, 5), new Expr.LiteralBool(Range.sameLine(1, 5), true)),
                 ExprParser.prefixOperator(),
-                ParsingIterator.of(new Token.Not(Range.sameLine(0, 1)), new Token.LiteralBool(Range.sameLine(1, 5), true))
+                RangedParsingIterator.ofRanged(new Token.Not(Range.sameLine(0, 1)), new Token.LiteralBool(Range.sameLine(1, 5), true))
         );
     }
 
@@ -78,13 +75,13 @@ public class ExprTestCase {
         assertParse(
                 new Expr.Percent(Range.sameLine(0, 2), new Expr.LiteralInt(Range.sameLine(0, 1), 5)),
                 ExprParser.suffixOperator(),
-                ParsingIterator.of(new Token.LiteralInt(Range.sameLine(0, 1), 5), new Token.Percent(Range.sameLine(1, 2)))
+                RangedParsingIterator.ofRanged(new Token.LiteralInt(Range.sameLine(0, 1), 5), new Token.Percent(Range.sameLine(1, 2)))
         );
 
         assertParseFailure(
                 UnexpectedInputException.class,
                 ExprParser.suffixOperator(),
-                ParsingIterator.of(new Token.LiteralBool(Range.sameLine(0, 4), true), new Token.Not(Range.sameLine(4, 5)))
+                RangedParsingIterator.ofRanged(new Token.LiteralBool(Range.sameLine(0, 4), true), new Token.Not(Range.sameLine(4, 5)))
         );
     }
 
@@ -98,7 +95,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(4, 5), 2)
                 ),
                 ExprParser.multiplicationOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
                         new Token.Mul(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2)
@@ -113,7 +110,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(4, 5), 2)
                 ),
                 ExprParser.multiplicationOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
                         new Token.Div(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2)
@@ -132,7 +129,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(8, 10), 10)
                 ),
                 ExprParser.multiplicationOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
                         new Token.Div(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2),
@@ -152,7 +149,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(4, 5), 2)
                 ),
                 ExprParser.arithmeticOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
                         new Token.Plus(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2)
@@ -167,7 +164,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(4, 5), 2)
                 ),
                 ExprParser.arithmeticOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
                         new Token.Minus(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2)
@@ -186,7 +183,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(8, 10), 10)
                 ),
                 ExprParser.arithmeticOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
                         new Token.Minus(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2),
@@ -206,7 +203,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(5, 6), 2)
                 ),
                 ExprParser.comparisonOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
                         new Token.Equal(Range.sameLine(2, 4)),
                         new Token.LiteralInt(Range.sameLine(5, 6), 2)
@@ -221,7 +218,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(5, 6), 2)
                 ),
                 ExprParser.comparisonOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
                         new Token.NotEqual(Range.sameLine(2, 4)),
                         new Token.LiteralInt(Range.sameLine(5, 6), 2)
@@ -236,7 +233,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(5, 6), 2)
                 ),
                 ExprParser.comparisonOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
                         new Token.GreaterEqual(Range.sameLine(2, 4)),
                         new Token.LiteralInt(Range.sameLine(5, 6), 2)
@@ -251,7 +248,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(4, 5), 2)
                 ),
                 ExprParser.comparisonOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
                         new Token.Greater(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 2)
@@ -269,7 +266,7 @@ public class ExprTestCase {
                         new Expr.LiteralBool(Range.sameLine(8, 13), false)
                 ),
                 ExprParser.booleanOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralBool(Range.sameLine(0, 4), true),
                         new Token.And(Range.sameLine(5, 7)),
                         new Token.LiteralBool(Range.sameLine(8, 13), false)
@@ -284,7 +281,7 @@ public class ExprTestCase {
                         new Expr.LiteralBool(Range.sameLine(8, 13), false)
                 ),
                 ExprParser.booleanOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralBool(Range.sameLine(0, 4), true),
                         new Token.Or(Range.sameLine(5, 7)),
                         new Token.LiteralBool(Range.sameLine(8, 13), false)
@@ -303,7 +300,7 @@ public class ExprTestCase {
                         new Expr.LiteralBool(Range.sameLine(17, 21), true)
                 ),
                 ExprParser.booleanOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralBool(Range.sameLine(0, 4), true),
                         new Token.Or(Range.sameLine(5, 7)),
                         new Token.LiteralBool(Range.sameLine(8, 13), false),
@@ -323,7 +320,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(5, 6), 2)
                 ),
                 ExprParser.anyExpr(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.ParenthesisOpen(Range.sameLine(0, 1)),
                         new Token.LiteralInt(Range.sameLine(1, 2), 3),
                         new Token.Mul(Range.sameLine(3, 4)),
@@ -340,7 +337,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(6, 7), 2)
                 ),
                 ExprParser.multiplicationOperator(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.ParenthesisOpen(Range.sameLine(0, 1)),
                         new Token.LiteralInt(Range.sameLine(1, 2), 3),
                         new Token.ParenthesisClosed(Range.sameLine(2, 3)),
@@ -364,7 +361,7 @@ public class ExprTestCase {
                         )
                 ),
                 ExprParser.anyExpr(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralInt(Range.sameLine(0, 1), 5),
                         new Token.Plus(Range.sameLine(2, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 3),
@@ -385,7 +382,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(9, 10), 5)
                 ),
                 ExprParser.anyExpr(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.LiteralInt(Range.sameLine(0, 1), 3),
                         new Token.Mul(Range.sameLine(2, 3)),
                         new Token.Minus(Range.sameLine(4, 5)),
@@ -407,7 +404,7 @@ public class ExprTestCase {
                         new Expr.LiteralInt(Range.sameLine(10, 11), 4)
                 ),
                 ExprParser.anyExpr(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.ParenthesisOpen(Range.sameLine(0, 1)),
                         new Token.LiteralInt(Range.sameLine(1, 2), 5),
                         new Token.Plus(Range.sameLine(3, 4)),

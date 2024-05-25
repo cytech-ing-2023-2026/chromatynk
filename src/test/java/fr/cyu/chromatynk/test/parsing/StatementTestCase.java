@@ -4,7 +4,7 @@ import fr.cyu.chromatynk.ast.Expr;
 import fr.cyu.chromatynk.ast.Program;
 import fr.cyu.chromatynk.ast.Statement;
 import fr.cyu.chromatynk.ast.Type;
-import fr.cyu.chromatynk.parsing.ParsingIterator;
+import fr.cyu.chromatynk.parsing.RangedParsingIterator;
 import fr.cyu.chromatynk.parsing.StatementParser;
 import fr.cyu.chromatynk.parsing.Token;
 import fr.cyu.chromatynk.util.Position;
@@ -24,14 +24,14 @@ public class StatementTestCase {
         assertParse(
                 new Statement.Hide(Range.sameLine(0, 4)),
                 StatementParser.zeroArg(),
-                ParsingIterator.of(new Token.Hide(Range.sameLine(0, 4)))
+                RangedParsingIterator.ofRanged(new Token.Hide(Range.sameLine(0, 4)))
         );
 
         //SHOW
         assertParse(
                 new Statement.Show(Range.sameLine(0, 4)),
                 StatementParser.zeroArg(),
-                ParsingIterator.of(new Token.Show(Range.sameLine(0, 4)))
+                RangedParsingIterator.ofRanged(new Token.Show(Range.sameLine(0, 4)))
         );
     }
 
@@ -41,7 +41,7 @@ public class StatementTestCase {
         assertParse(
                 new Statement.Forward(Range.sameLine(0, 5), new Expr.LiteralInt(Range.sameLine(4, 5), 5)),
                 StatementParser.oneArg(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.Fwd(Range.sameLine(0, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 5)
                 )
@@ -58,7 +58,7 @@ public class StatementTestCase {
                         new Expr.LiteralInt(Range.sameLine(7, 8), 6)
                 ),
                 StatementParser.twoArgs(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.Mov(Range.sameLine(0, 3)),
                         new Token.LiteralInt(Range.sameLine(4, 5), 5),
                         new Token.Comma(Range.sameLine(5, 6)),
@@ -78,7 +78,7 @@ public class StatementTestCase {
                         new Expr.LiteralInt(Range.sameLine(16, 19), 255)
                 ),
                 StatementParser.threeArgs(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.Color(Range.sameLine(0, 5)),
                         new Token.LiteralInt(Range.sameLine(6, 9), 255),
                         new Token.Comma(Range.sameLine(9, 10)),
@@ -98,7 +98,7 @@ public class StatementTestCase {
                         new Expr.LiteralColor(Range.sameLine(6, 10), 1, 1, 1, 1)
                 ),
                 StatementParser.instruction(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.Color(Range.sameLine(0, 5)),
                         new Token.LiteralColor(Range.sameLine(6, 10), "#FFF")
                 )
@@ -113,7 +113,7 @@ public class StatementTestCase {
                         new Expr.LiteralInt(Range.sameLine(16, 19), 255)
                 ),
                 StatementParser.instruction(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.Color(Range.sameLine(0, 5)),
                         new Token.LiteralInt(Range.sameLine(6, 9), 255),
                         new Token.Comma(Range.sameLine(9, 10)),
@@ -130,7 +130,7 @@ public class StatementTestCase {
         assertParse(
                 new Statement.DeclareVariable(Range.sameLine(0, 6), Type.BOOLEAN, "x", Optional.empty()),
                 StatementParser.variableDeclaration(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.Identifier(Range.sameLine(0, 4), "BOOL"),
                         new Token.Identifier(Range.sameLine(5, 6), "x")
                 )
@@ -145,7 +145,7 @@ public class StatementTestCase {
                         Optional.of(new Expr.LiteralBool(Range.sameLine(9, 13), true))
                 ),
                 StatementParser.variableDeclaration(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.Identifier(Range.sameLine(0, 4), "BOOL"),
                         new Token.Identifier(Range.sameLine(5, 6), "x"),
                         new Token.Assign(Range.sameLine(7, 8)),
@@ -164,7 +164,7 @@ public class StatementTestCase {
                         new Expr.LiteralBool(Range.sameLine(4, 8), true)
                 ),
                 StatementParser.variableAssignment(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.Identifier(Range.sameLine(0, 1), "x"),
                         new Token.Assign(Range.sameLine(2, 3)),
                         new Token.LiteralBool(Range.sameLine(4, 8), true)
@@ -181,7 +181,7 @@ public class StatementTestCase {
                         List.of(new Statement.Hide(Range.sameLine(3,7)))
                 ),
                StatementParser.body(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.Arrow(Range.sameLine(0,2)),
                         new Token.Hide(Range.sameLine(3,7))
                 )
@@ -198,7 +198,7 @@ public class StatementTestCase {
                         List.of(new Statement.Hide(Range.sameLine(2,6, 1)))
                 ),
                 StatementParser.body(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.BraceOpen(Range.sameLine(0,1)),
                         new Token.Hide(Range.sameLine(2,6, 1)),
                         new Token.BraceClosed(Range.sameLine(0,1, 2))
@@ -223,7 +223,7 @@ public class StatementTestCase {
                         )
                 ),
                 StatementParser.whileLoop(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.While(Range.sameLine(0, 5)),
                         new Token.LiteralBool(Range.sameLine(6, 10), true),
                         new Token.BraceOpen(Range.sameLine(11, 12)),
@@ -253,7 +253,7 @@ public class StatementTestCase {
                         )
                 ),
                 StatementParser.forLoop(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.For(Range.sameLine(0, 3)),
                         new Token.Identifier(Range.sameLine(4, 5), "i"),
                         new Token.From(Range.sameLine(6, 10)),
@@ -284,7 +284,7 @@ public class StatementTestCase {
                         )
                 ),
                 StatementParser.forLoop(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.For(Range.sameLine(0, 3)),
                         new Token.Identifier(Range.sameLine(4, 5), "i"),
                         new Token.From(Range.sameLine(6, 10)),
@@ -318,7 +318,7 @@ public class StatementTestCase {
                         Optional.empty()
                 ),
                 StatementParser.ifCondition(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.If(Range.sameLine(0, 2)),
                         new Token.LiteralBool(Range.sameLine(3, 7), true),
                         new Token.BraceOpen(Range.sameLine(8, 9)),
@@ -348,7 +348,7 @@ public class StatementTestCase {
                         ))
                 ),
                 StatementParser.ifCondition(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.If(Range.sameLine(0, 2)),
                         new Token.LiteralBool(Range.sameLine(3, 7), true),
                         new Token.BraceOpen(Range.sameLine(8, 9)),
@@ -384,7 +384,7 @@ public class StatementTestCase {
                         )
                 ),
                 StatementParser.mimic(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.Mimic(Range.sameLine(0, 5)),
                         new Token.LiteralString(Range.sameLine(6, 14), "cursor"),
                         new Token.BraceOpen(Range.sameLine(15, 16)),
@@ -418,7 +418,7 @@ public class StatementTestCase {
                         )
                 ),
                 StatementParser.mirrorCentral(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.Mirror(Range.sameLine(0, 6)),
                         new Token.LiteralInt(Range.sameLine(7, 8), 0),
                         new Token.Comma(Range.sameLine(8, 9)),
@@ -456,7 +456,7 @@ public class StatementTestCase {
                         )
                 ),
                 StatementParser.mirrorAxial(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         new Token.Mirror(Range.sameLine(0, 6)),
                         new Token.LiteralInt(Range.sameLine(7, 8), 0),
                         new Token.Comma(Range.sameLine(8, 9)),
@@ -518,7 +518,7 @@ public class StatementTestCase {
                         )
                 )),
                 StatementParser.program(),
-                ParsingIterator.of(
+                RangedParsingIterator.ofRanged(
                         //INT n = 5
                         new Token.Identifier(Range.sameLine(0, 3), "INT"),
                         new Token.Identifier(Range.sameLine(4, 5), "n"),

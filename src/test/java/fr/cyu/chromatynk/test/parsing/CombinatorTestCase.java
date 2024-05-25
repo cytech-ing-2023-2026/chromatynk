@@ -1,9 +1,6 @@
 package fr.cyu.chromatynk.test.parsing;
 
-import fr.cyu.chromatynk.parsing.Parser;
-import fr.cyu.chromatynk.parsing.ParsingException;
-import fr.cyu.chromatynk.parsing.ParsingIterator;
-import fr.cyu.chromatynk.parsing.UnexpectedInputException;
+import fr.cyu.chromatynk.parsing.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -16,7 +13,7 @@ public class CombinatorTestCase {
 
     @Test
     public void alwaysValidParser() {
-        assertParse(1, pure(1), ParsingIterator.of());
+        assertParse(1, pure(1), RangedParsingIterator.ofRanged());
         assertParse(1, pure(1), ParsingIterator.fromString("abcd"));
     }
 

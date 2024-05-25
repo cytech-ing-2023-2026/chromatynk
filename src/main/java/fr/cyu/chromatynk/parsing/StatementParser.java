@@ -197,7 +197,8 @@ public class StatementParser {
     }
 
     public static Parser<Token, Statement.Body> body(){
-        return Parser.firstSucceeding(oneLineBody(), multiLineBody());
+        return Parser.firstSucceeding(oneLineBody(), multiLineBody())
+                .mapError(e -> new ParsingException.NonFatal(e.getRange(), "Invalid body"));
     }
 
     /**

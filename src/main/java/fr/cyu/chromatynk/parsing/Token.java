@@ -8,12 +8,7 @@ import fr.cyu.chromatynk.util.Range;
  * A lexical token. For example {@code FWD 5%} is parsed to {@code Fwd() LiteralInt(5) Percent()},
  * each token containing its starting and ending positions.
  */
-public sealed interface Token extends PrettyPrintable {
-
-    /**
-     * The starting and ending position of this {@link Token}.
-     */
-    Range range();
+public sealed interface Token extends Ranged, PrettyPrintable {
 
     /**
      * A boolean literal.
