@@ -27,7 +27,7 @@
 						<items>
 							<MenuItem text="Enregistrer sous" onAction="#saveImage"/>
 							<SeparatorMenuItem/>
-							<MenuItem text="Changer la taille du canvas" onAction="#modifyCanvas"/>
+							<MenuItem text="Changer la taille du canevas" onAction="#modifyCanvas"/>
 							<MenuItem text="Effacer" onAction="#clearCanvas"/>
 						</items>
 					</Menu>
@@ -57,7 +57,7 @@
 					</Menu>
 					<Menu text="Aide">
 						<items>
-							<MenuItem text="À propos"/>
+							<MenuItem text="À propos" onAction="#openAboutWindow"/>
 						</items>
 					</Menu>
 				</menus>
@@ -129,7 +129,7 @@
 	</center>
 
 	<bottom>
-		<HBox fx:id="bottomBar" spacing="10">
+		<HBox fx:id="bottomBar" spacing="10" style="-fx-background-color: rgba(0, 0, 0, 0.07);">
 			<padding>
 				<Insets topRightBottomLeft="10" />
 			</padding>

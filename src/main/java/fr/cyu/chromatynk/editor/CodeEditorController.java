@@ -193,9 +193,6 @@ public class CodeEditorController implements Initializable {
 		graphicsContext.setFill(Color.WHITE);
 		graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Makes the bottom bar's background slightly darker
-        bottomBar.setStyle("-fx-background-color: rgba(0, 0, 0, 0.07);");
-
         // Only show relevant UI when in step-by-step mode
         stepByStepControls.setVisible(stepByStepCheckbox.isSelected());
         stepByStepCheckbox.selectedProperty().addListener((observable, oldValue, newValue) -> {stepByStepControls.setVisible(newValue);});
@@ -351,11 +348,18 @@ public class CodeEditorController implements Initializable {
 		statusLabel.setText("Le dessin a été manuellement effacé.");
 	}
 
+	/**
+	 * Wipes the canvas used for the cursors.
+	 */
     private void clearCursorCanvas() {
         GraphicsContext graphicsContext = cursorCanvas.getGraphicsContext2D();
         graphicsContext.clearRect(0, 0, cursorCanvas.getWidth(), cursorCanvas.getHeight());
     }
 
+	/**
+	 * Opens the window used to change the size of the canvas.
+	 * @param event
+	 */
 	@FXML
 	private void modifyCanvas(ActionEvent event) {
 		try {
@@ -365,11 +369,39 @@ public class CodeEditorController implements Initializable {
 			Stage stage = new Stage();
 			fxmlLoader.setController(new ChangeCanvasSizeController(this, stage));
 			stage.initModality(Modality.APPLICATION_MODAL);
-			stage.setTitle("Changer la taille du canvas");
+			stage.setTitle("Changer la taille du canevas");
 			stage.setScene(new Scene(fxmlLoader.load()));
 			stage.setResizable(false);
 			stage.setMinWidth(200);
 			stage.setMinHeight(100);
+
+			// Add icon
+			Image icon = new Image(getClass().getResourceAsStream("/icon.png"));
+			stage.getIcons().add(icon);
+
+			stage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Opens the About window.
+	 */
+	@FXML
+	public void openAboutWindow() {
+		try {
+			// Prepare and load the FXML file
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/AboutWindow.fxml"));
+
+			Stage stage = new Stage();
+			fxmlLoader.setController(new AboutWindowController(stage));
+
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.setTitle("À propos de Chromat'ynk");
+
+			stage.setScene(new Scene(fxmlLoader.load()));
+			stage.setResizable(false);
 
 			// Add icon
 			Image icon = new Image(getClass().getResourceAsStream("/icon.png"));
