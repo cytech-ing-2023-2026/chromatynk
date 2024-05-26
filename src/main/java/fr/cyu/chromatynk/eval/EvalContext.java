@@ -9,7 +9,7 @@ import fr.cyu.chromatynk.util.Range;
 import javafx.scene.canvas.GraphicsContext;
 
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 /**
  * An evaluation context.
@@ -78,6 +78,10 @@ public class EvalContext {
 
     public Range getCurrentRange() {
         return nextAddress == 0 ? Range.sameLine(0, 0) : instructions.get(nextAddress-1).range();
+    }
+
+    public Range getNextRange() {
+        return instructions.isEmpty() ? Range.sameLine(0, 0) : hasNext() ? peek().range() : new Range(instructions.getLast().range().to(), instructions.getLast().range().to());
     }
 
     /**
@@ -344,9 +348,14 @@ public class EvalContext {
         throw new MissingCursorException(getCurrentRange(), id);
     }
 
-    public void forEachCursor(Consumer<Cursor> consumer) {
+    public void render(GraphicsContext cursorGraphics) {
         for(Scope scope : scopes) {
-            for(Cursor cursor : scope.getCursors()) consumer.accept(cursor);
+            for(Map.Entry<CursorId, Cursor> entry : scope.getCursors()) {
+                CursorId id = entry.getKey();
+                Cursor cursor = entry.getValue();
+
+                if(cursor.isVisible()) cursor.drawAt(cursorGraphics, getCurrentCursorId().equals(id), cursor.getX(), cursor.getY(), cursor.getDirX(), cursor.getDirY());
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import fr.cyu.chromatynk.draw.CursorId;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * The scope of an evaluated block.
@@ -104,8 +105,8 @@ public class Scope {
         return cursors.containsKey(id);
     }
 
-    public Collection<Cursor> getCursors() {
-        return cursors.values();
+    public Set<Map.Entry<CursorId, Cursor>> getCursors() {
+        return cursors.entrySet();
     }
 
     @Override
