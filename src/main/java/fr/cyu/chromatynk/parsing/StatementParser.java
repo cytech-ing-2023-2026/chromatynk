@@ -60,7 +60,7 @@ public class StatementParser {
             if (ZERO_ARG_STATEMENTS.containsKey(token.getClass()))
                 return ZERO_ARG_STATEMENTS.get(token.getClass()).apply(token.range());
             else
-                throw new ParsingException.Fatal(new UnexpectedInputException(token.range(), "0-arg statement", token.toPrettyString()));
+                throw new ParsingException.Fatal(new UnexpectedInputException(token.range(), "0/1-arg statement", token.toPrettyString()));
         });
     }
 
@@ -75,7 +75,7 @@ public class StatementParser {
             if (ONE_ARG_STATEMENTS.containsKey(token.getClass()))
                 return ONE_ARG_STATEMENTS.get(token.getClass()).apply(range, expr);
             else
-                throw new ParsingException.Fatal(new UnexpectedInputException(token.range(), "1-arg statement", token.toPrettyString()));
+                throw new UnexpectedInputException(token.range(), "1-arg statement", token.toPrettyString());
         });
     }
 
