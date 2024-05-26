@@ -348,11 +348,18 @@ public class CodeEditorController implements Initializable {
 		statusLabel.setText("Le dessin a été manuellement effacé.");
 	}
 
+	/**
+	 * Wipes the canvas used for the cursors.
+	 */
     private void clearCursorCanvas() {
         GraphicsContext graphicsContext = cursorCanvas.getGraphicsContext2D();
         graphicsContext.clearRect(0, 0, cursorCanvas.getWidth(), cursorCanvas.getHeight());
     }
 
+	/**
+	 * Opens the window used to change the size of the canvas.
+	 * @param event
+	 */
 	@FXML
 	private void modifyCanvas(ActionEvent event) {
 		try {
@@ -378,6 +385,9 @@ public class CodeEditorController implements Initializable {
 		}
 	}
 
+	/**
+	 * Opens the About window.
+	 */
 	@FXML
 	public void openAboutWindow() {
 		try {
