@@ -18,6 +18,10 @@
     -fx-fill: red;
 }
 
+.evaluating {
+    -fx-background-color: #ffff62;
+}
+
 .paragraph-text, .lineno {
     -fx-font-family: "JetBrains Mono";
     -fx-font-size: 15.0;

@@ -8,6 +8,7 @@ import fr.cyu.chromatynk.parsing.ParsingException;
 import fr.cyu.chromatynk.parsing.ParsingIterator;
 import fr.cyu.chromatynk.parsing.StatementParser;
 import fr.cyu.chromatynk.parsing.Token;
+import fr.cyu.chromatynk.util.Range;
 import fr.cyu.chromatynk.util.Tuple2;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -169,7 +170,7 @@ public class CodeEditorController implements Initializable {
                 .multiPlainChanges()
                 .successionEnds(Duration.ofMillis(125))
                 .retainLatestUntilLater(executor)
-                .supplyTask(() -> computeHighlighting(executor))
+                .supplyTask(() -> computeHighlightingAsync(executor))
                 .awaitLatest(codeArea.multiPlainChanges())
                 .subscribe(tr -> {
                     tr.ifSuccess(highlighting -> codeArea.setStyleSpans(0, highlighting));
@@ -245,63 +246,67 @@ public class CodeEditorController implements Initializable {
      * @param executor the executor to run the task on
      * @return a task that computes the style spans for syntax highlighting
      */
-    public Task<StyleSpans<Collection<String>>> computeHighlighting(Executor executor) {
+    public Task<StyleSpans<Collection<String>>> computeHighlightingAsync(Executor executor) {
         String text = codeArea.getText();
         Task<StyleSpans<Collection<String>>> task = new Task<>() {
             @Override
             protected StyleSpans<Collection<String>> call() throws ParsingException {
-                List<Token> tokens = Chromatynk.lexSource(text);
-                StyleSpansBuilder<Collection<String>> lexSpansBuilder = new StyleSpansBuilder<>();
-
-                int lastKeywordEnd = 0;
-
-                for (Token token : tokens) {
-                    String cssClass = switch (token) {
-                        case Token.LiteralBool ignored -> "boolean";
-                        case Token.LiteralString ignored -> "string";
-                        case Token.LiteralInt ignored -> "num";
-                        case Token.LiteralFloat ignored -> "num";
-                        case Token.LiteralColor ignored -> "color";
-                        case Token.Identifier ignored -> "identifier";
-                        case Token.Keyword ignored -> "keyword";
-                        default -> "default";
-                    };
-
-                    Tuple2<Integer, Integer> range1d = token.range().toCursorRange(text);
-
-                    lexSpansBuilder.add(Collections.singleton("default"), Math.max(0, range1d.a() - lastKeywordEnd));
-                    lexSpansBuilder.add(Collections.singleton(cssClass), range1d.b() - range1d.a());
-                    lastKeywordEnd = range1d.b();
-                }
-
-                StyleSpans<Collection<String>> lexSpans = lexSpansBuilder.create();
-
-                StyleSpansBuilder<Collection<String>> errorSpansBuilder = new StyleSpansBuilder<>();
-
-                try {
-                    Program program = StatementParser.program().parse(new ParsingIterator<>(tokens)).value();
-                    Chromatynk.typecheckProgram(program);
-                } catch (ChromatynkException e) {
-                    Tuple2<Integer, Integer> range1d = e.getRange().toCursorRange(text);
-                    errorSpansBuilder.add(Collections.singleton("default"), Math.max(0, range1d.a()));
-                    errorSpansBuilder.add(Collections.singleton("error"), range1d.b() - range1d.a());
-
-                    StyleSpans<Collection<String>> errorSpans = errorSpansBuilder.create();
-
-                    return lexSpans.overlay(errorSpans, (a, b) -> {
-                        List<String> classes = new ArrayList<>(a.size()+b.size());
-                        classes.addAll(a);
-                        classes.addAll(b);
-                        return classes;
-                    });
-                }
-
-                return lexSpans;
+                return computeHighlighting(text);
             }
         };
 
         executor.execute(task);
         return task;
+    }
+
+    private StyleSpans<Collection<String>> computeHighlighting(String text) throws ParsingException {
+        List<Token> tokens = Chromatynk.lexSource(text);
+        StyleSpansBuilder<Collection<String>> lexSpansBuilder = new StyleSpansBuilder<>();
+
+        int lastKeywordEnd = 0;
+
+        for (Token token : tokens) {
+            String cssClass = switch (token) {
+                case Token.LiteralBool ignored -> "boolean";
+                case Token.LiteralString ignored -> "string";
+                case Token.LiteralInt ignored -> "num";
+                case Token.LiteralFloat ignored -> "num";
+                case Token.LiteralColor ignored -> "color";
+                case Token.Identifier ignored -> "identifier";
+                case Token.Keyword ignored -> "keyword";
+                default -> "default";
+            };
+
+            Tuple2<Integer, Integer> range1d = token.range().toCursorRange(text);
+
+            lexSpansBuilder.add(Collections.singleton("default"), Math.max(0, range1d.a() - lastKeywordEnd));
+            lexSpansBuilder.add(Collections.singleton(cssClass), range1d.b() - range1d.a());
+            lastKeywordEnd = range1d.b();
+        }
+
+        StyleSpans<Collection<String>> result = lexSpansBuilder.create();
+
+        StyleSpansBuilder<Collection<String>> errorSpansBuilder = new StyleSpansBuilder<>();
+
+        try {
+            Program program = StatementParser.program().parse(new ParsingIterator<>(tokens)).value();
+            Chromatynk.typecheckProgram(program);
+        } catch (ChromatynkException e) {
+            Tuple2<Integer, Integer> range1d = e.getRange().toCursorRange(text);
+            errorSpansBuilder.add(Collections.singleton("default"), Math.max(0, range1d.a()));
+            errorSpansBuilder.add(Collections.singleton("error"), range1d.b() - range1d.a());
+
+            result = result.overlay(errorSpansBuilder.create(), CodeEditorController.this::mergeClasses);
+        }
+
+        return result;
+    }
+
+    private Collection<String> mergeClasses(Collection<String> a, Collection<String> b) {
+        List<String> classes = new ArrayList<>(a.size()+b.size());
+        classes.addAll(a);
+        classes.addAll(b);
+        return classes;
     }
 
 	/**
@@ -388,6 +393,10 @@ public class CodeEditorController implements Initializable {
      */
     private void postExecution() {
         stopButton.setDisable(true);
+
+        for(int i = 0; i < codeArea.getParagraphs().size(); i++) {
+            codeArea.setParagraphStyle(i, Collections.singleton("default"));
+        }
     }
 
 	/**
@@ -432,6 +441,13 @@ public class CodeEditorController implements Initializable {
         context.forEachCursor(cursor -> {
             if(cursor.isVisible()) cursor.drawAt(cursorCanvas.getGraphicsContext2D(), cursor.getX(), cursor.getY(), cursor.getDirX(), cursor.getDirY());
         });
+
+        if(context.hasNext()) {
+            Range range = context.getNextRange();
+            for(int i = 0; i < codeArea.getParagraphs().size(); i++) {
+                codeArea.setParagraphStyle(i, Collections.singleton(i == range.from().row() ? "evaluating" : "default"));
+            }
+        }
     }
 
 	/**
@@ -448,6 +464,8 @@ public class CodeEditorController implements Initializable {
 		// Mark execution as currently running
 		infoLabel.setText("INFO - Dessin en cours");
 		statusLabel.setText("Les instructions de dessin sont en cours d'exécution.");
+
+        getClock().reset();
 
         try {
             EvalContext context = Chromatynk.compileSource(codeArea.getText(), canvas.getGraphicsContext2D());

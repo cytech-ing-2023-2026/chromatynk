@@ -80,6 +80,10 @@ public class EvalContext {
         return nextAddress == 0 ? Range.sameLine(0, 0) : instructions.get(nextAddress-1).range();
     }
 
+    public Range getNextRange() {
+        return instructions.isEmpty() ? Range.sameLine(0, 0) : hasNext() ? peek().range() : new Range(instructions.getLast().range().to(), instructions.getLast().range().to());
+    }
+
     /**
      * Get the current cursor's id.
      *

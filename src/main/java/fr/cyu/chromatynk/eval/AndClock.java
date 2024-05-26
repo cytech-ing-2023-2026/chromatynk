@@ -14,4 +14,10 @@ public class AndClock implements Clock {
     public boolean tick(boolean isEffectful) {
         return clockA.tick(isEffectful) && clockB.tick(isEffectful);
     }
+
+    @Override
+    public void reset() {
+        clockA.reset();
+        clockB.reset();
+    }
 }

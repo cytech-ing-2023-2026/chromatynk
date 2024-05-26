@@ -6,4 +6,7 @@ public class ForeverClock implements Clock {
     public boolean tick(boolean isEffectful) {
         return true;
     }
+
+    @Override
+    public void reset() {}
 }

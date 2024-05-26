@@ -40,7 +40,16 @@ public class ExecutionTimer extends AnimationTimer {
         this.onProgress = onProgress;
     }
 
-	/**
+    /**
+     * Get the current evaluation context.
+     *
+     * @return the evaluation context of the current execution
+     */
+    public EvalContext getContext() {
+        return context;
+    }
+
+    /**
      * Sets the clock used for timing the execution.
      * 
      * @param clock the new clock to be used

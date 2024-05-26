@@ -26,4 +26,9 @@ public class StepByStepClock implements Clock{
 
         return false;
     }
+
+    @Override
+    public void reset() {
+        pause();
+    }
 }

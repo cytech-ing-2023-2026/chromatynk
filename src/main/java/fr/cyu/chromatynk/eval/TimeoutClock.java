@@ -26,4 +26,9 @@ public class TimeoutClock implements Clock {
         if(targetFps <= 0) throw new IllegalArgumentException("targetFps must be positive");
         return new TimeoutClock(1000/targetFps);
     }
+
+    @Override
+    public void reset() {
+        stopTime = -1;
+    }
 }

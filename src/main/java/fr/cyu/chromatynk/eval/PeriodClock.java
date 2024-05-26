@@ -20,4 +20,9 @@ public class PeriodClock implements Clock{
             return false;
         }
     }
+
+    @Override
+    public void reset() {
+        nextTime = 0;
+    }
 }
