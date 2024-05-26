@@ -30,9 +30,9 @@ public class MimickedCursor extends DuplicatedCursor {
     }
 
     @Override
-    public void drawAt(GraphicsContext graphics, double x, double y, double dirX, double dirY) {
-        getDuplicated().drawAt(graphics, x, y, dirX, dirY);
-        getDuplicated().drawAt(graphics, x+translateX, y+translateY, dirX, dirY);
+    public void drawAt(GraphicsContext graphics, boolean current, double x, double y, double dirX, double dirY) {
+        getDuplicated().drawAt(graphics, current, x, y, dirX, dirY);
+        getDuplicated().drawAt(graphics, current, x+translateX, y+translateY, dirX, dirY);
     }
 
     /**

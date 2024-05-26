@@ -137,9 +137,9 @@ public class TangibleCursor implements Cursor {
     }
 
     @Override
-    public void drawAt(GraphicsContext graphics, double x, double y, double dirX, double dirY) {
+    public void drawAt(GraphicsContext graphics, boolean current, double x, double y, double dirX, double dirY) {
         double circleWidth = Math.max(15, getThickness());
-        graphics.setStroke(javafx.scene.paint.Color.BLACK);
+        graphics.setStroke(current ? javafx.scene.paint.Color.LIGHTGREEN : javafx.scene.paint.Color.BLACK);
         graphics.setLineWidth(circleWidth/4);
         graphics.setFill(new javafx.scene.paint.Color(getColor().red(), getColor().green(), getColor().blue(), opacity));
         graphics.fillOval(x-circleWidth/2, y-circleWidth/2, circleWidth, circleWidth);

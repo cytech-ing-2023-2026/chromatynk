@@ -438,9 +438,7 @@ public class CodeEditorController implements Initializable {
     private void onProgress(EvalContext context) {
         stepLabel.setText("Instruction " + context.getNextAddress()+1);
         clearCursorCanvas();
-        context.forEachCursor(cursor -> {
-            if(cursor.isVisible()) cursor.drawAt(cursorCanvas.getGraphicsContext2D(), cursor.getX(), cursor.getY(), cursor.getDirX(), cursor.getDirY());
-        });
+        context.render(cursorCanvas.getGraphicsContext2D());
 
         if(context.hasNext()) {
             Range range = context.getNextRange();
